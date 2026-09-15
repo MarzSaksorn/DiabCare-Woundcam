@@ -56,7 +56,7 @@ Settings reachable from every page header
 
 - **Purpose:** clinician's entry: all patients, totals, quick actions.
 - **Access:** clinician scope only.
-- **Contents:** header (app name, lang toggle, logout), patient-overview dashboard panel (stat cards: total patients, total wound records, diabetes-type breakdown Type 1/Type 2/GDM-unknown, average HbA1c — demo aggregates shaped after the Srinakarin dataset schema, labeled "sample dataset · ชุดข้อมูลตัวอย่าง" until real data flows; commit 786b3bd), search field (name/MRN, FR-PAT-2), patient list (PhotoCard-style rows: name, MRN, wound count, last capture date), prominent "Add Patient" button.
+- **Contents:** header (app name, lang toggle, logout), patient-overview dashboard panel — full card set mirroring the reference prototype (commit 56e8011): total patients, total wound records, red alerts, active reports, patients-matched (live-tracks the search input), wound severity breakdown (critical/high/normal), security-classification badge ("Confidential — PDPA-protected · ลับ"), diabetes-type breakdown + average HbA1c — demo aggregates shaped after the Srinakarin dataset schema, labeled "sample dataset · ชุดข้อมูลตัวอย่าง" until real data flows), search field (name/MRN, FR-PAT-2), patient list (PhotoCard-style rows: name, MRN, wound count, last capture date), prominent "Add Patient" button.
 - **Actions:** search (live filter), tap row → Patient Profile, add patient, logout.
 - **States:** loading / empty ("No patients yet — add your first"), search-no-match, error.
 - **FR refs:** FR-PAT-2, FR-LST-3. **Copy notes:** empty states written, not defaulted.
