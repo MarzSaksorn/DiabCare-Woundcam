@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 0.1.1 (review round 1 + docs audit round 1 applied) |
+| Version | 0.1.2 (amendment A1: dashboard scope; audits 1-2 applied) |
 | Date | 2026-09-15 |
 | Owner | diab-orchestrator |
 | Status | Rebuild-clean locked; PRD v0.1.1 — review round 1 folded in (15 issues, 5 agents) |
@@ -32,7 +32,9 @@
 - G4. Thai/English UI, Thai-first (Sarabun).
 
 **Non-goals for v0.1** (contract against scope creep):
-- EHR/FHIR integration, AI wound-area measurement, multi-tenant organizations, analytics dashboards, offline sync, billing/payments, native apps, PDF reports, audit-log UI (raw audit table only).
+- EHR/FHIR integration, AI wound-area measurement, multi-tenant organizations, offline sync, billing/payments, native apps, PDF reports, audit-log UI (raw audit table only), deep clinician analytics (per-patient trend dashboards, exportable clinical reports).
+
+> **PRD AMENDMENT A1 (2026-09-15, audit round 2):** the cohort-overview dashboard (KPI cards, diabetes-type + severity breakdowns, HbA1c trend, security badge — commits 786b3bd…97e2d8e) moved INTO v0.1 scope by direct owner direction (Saksorn, 14:23–14:54 session) during the build; Spark's audit caught the drift and this amendment records it. The stats surface (GET /v1/stats/overview) is appended to the API contract per its §3 append rule. Carried constraint: the route is dev-only until FR-AUTH lands at CP1 — no JWT middleware yet, cohort aggregates only, zero PHI. Deep clinician analytics remain deferred.
 
 ## 3. Users and Personas
 

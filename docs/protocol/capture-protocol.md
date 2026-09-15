@@ -6,7 +6,7 @@
 | Date | 2026-09-15 |
 | Owner | diab-scribe (Track S, deliverable S1) |
 | Source | PRD v0.1.1 (FR-CAP, FR-REV, FR-UPL) · Build Plan v0.1 §2 Track S |
-| Status | **Source of truth for FR-CAP-9's in-app quality checklist.** Retake criteria (§8) are written method-agnostic (observable outcomes, not implementation metrics) so they survive the D4 capture-spike outcome (WASM CV vs heuristic). Reconcile at S3 (D9). |
+| Status | **Source of truth for FR-CAP-9's in-app quality checklist.** Retake criteria (§8) are written method-agnostic (observable outcomes, not implementation metrics) so they survive the D4 capture-spike outcome (WASM CV vs heuristic). Reconcile at S1b (D5). |
 
 This protocol defines how a standardized, comparable wound photo is captured at home — by a patient or caregiver, with zero written instructions. Every rule below is either enforced by the app (capture UI) or taught by it (review screen). The in-app checklist is this document's enforcement layer; where the two disagree, this document wins and the app gets fixed.
 
@@ -85,12 +85,12 @@ This protocol defines how a standardized, comparable wound photo is captured at 
 - **10 s force-enable:** if the automated check cannot confirm within 10 s, the shutter force-enables and the capture is flagged `unverified` for clinician review (FR-CAP-7) — the gate never lies and never dead-ends. The patient still sees the six-criteria chips on Review and can retake voluntarily.
 - Clinician side: an `unverified` capture is visible in the timeline with its flag (pages-draft Page 10); the clinician may accept it or direct a recapture — direction follows §4–§5 as written here.
 
-**Change control:** §8 criteria may only change via PRD amendment + S3 cross-check (Build Plan §2, S3), never silently in-app copy.
+**Change control:** §8 criteria may only change via PRD amendment + S1b cross-check (Build Plan §2, S1b), never silently in-app copy.
 
 ---
 
 ## Open Items
 
-- **OI-S1-1:** reconcile §8 wording with the capture-spike outcome (WASM CV vs heuristic) at S3 (D9) — criteria stay fixed, enforcement method may change.
+- **OI-S1-1:** reconcile §8 wording with the capture-spike outcome (WASM CV vs heuristic) at S1b (D5) — criteria stay fixed, enforcement method may change.
 - **OI-S1-2:** capture study kit (Track P1) will reuse §4/§5 as the printed instruction sheet base (TH/EN).
 - **OI-S1-3:** Thai translation of the patient-facing subsets (§3/§5/§8 chips) coordinated with Writer's tone rules (§6.3 PRD).

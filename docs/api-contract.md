@@ -135,3 +135,8 @@ Covered by `GET /v1/wounds` (cards) and `GET /v1/wounds/{woundId}/photos` (timel
 ## 3. Out of scope for v0.1
 
 `/classify` (FR-AI, v0.2), self-reports + alerts (v0.2), PDF reports + EMR import (v0.3). Endpoints will be appended, never mutated, after the D2 freeze.
+
+## 4. Amendment A1 (2026-09-15, audit round 2, orchestrator-approved)
+
+- **GET /v1/stats/overview** — cohort overview stats from `hospital_dm` (live Srinakarin hackathon sample). Response: `{source, patients: {total, type1, type2, gdm, female, male, avgAge, insulinUsers, ckd}, hba1c: {avgOverall, trend: [{period, avg}...]}}`. Owner-directed addition (commits f07ab20 / 97e2d8e). **Dev-only until FR-AUTH (CP1): no JWT middleware yet — cohort aggregates only, zero PHI.**
+- CP2 additions: per-period `n` in trend rows (small-sample honesty — period 69's 8.7 avg rests on 2 non-null values); dedup pass for `dm_observations` (1,288 duplicate patient-period hba1c groups, 97.7% exact-identical; 29 differing pairs are a data-owner semantics question).

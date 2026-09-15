@@ -7,6 +7,43 @@ All notable changes to DiabCare WoundCam are documented here.
 
 - Scaffold express service, compose, nginx placeholder (B1) _(api)_
 
+- Add changelog automation via git-cliff + release process docs _(release)_
+
+- Scaffold Vite+React+TS PWA shell with design tokens _(web)_
+
+- Add 11-page route skeleton, i18n, mocked API client, shared components _(web)_
+
+- Add v0.1 postgres migrations (B2) _(api)_
+
+- Add patient-overview stat panel to clinician dashboard _(web)_
+
+- Complete clinician dashboard card set with alerts, severity, security badge _(web)_
+
+- Add fixed bottom navigation with five tabs _(web)_
+
+- Transfer reference-prototype blue palette across the app _(web)_
+
+- Add hand-rolled SVG charts to clinician dashboard _(web)_
+
+- Add hospital_dm stats overview endpoint + dev CORS _(api)_
+
+- Wire clinician dashboard to live Srinakarin stats endpoint _(web)_
+
+
+### <!-- 1 -->🐛 Bug Fixes
+
+- Restructure clinician dashboard into uniform non-bento layout _(web)_
+
+- Split bilingual stats keys so the TH/EN toggle works on every label _(i18n)_
+
+- Align Thai register wording — amputated per dictionary, plain-choice consent verbs, ความยินยอม spelling _(i18n)_
+
+- Move ConsentGate and AddPatient copy into TH/EN keys with consent body and declined states _(i18n)_
+
+- Harden live-wiring shape validation, fix bottom-nav active-state, add error+retry states (audit round 2) _(web)_
+
+- Drop duplicate patients state declaration in PatientsPage _(web)_
+
 
 ### <!-- 3 -->📚 Documentation
 
@@ -19,6 +56,27 @@ All notable changes to DiabCare WoundCam are documented here.
 - Add Thai register ruleset — canonical spec for all Thai copy _(copy)_
 
 - Draft v0.1 API contract (B0) _(api)_
+
+- Add FR-CAP-10 capture-attempt telemetry (M1 measurability) _(prd)_
+
+- Add dataset-overview dashboard panel to clinician dashboard spec _(pages)_
+
+- Mirror full reference dashboard card set in clinician dashboard spec _(pages)_
+
+- Add BottomNav to shared components spec _(pages)_
+
+- Record reference-palette transfer (tokens supersede monochrome spec) _(design)_
+
+- Record non-bento dashboard layout in clinician dashboard spec _(pages)_
+
+- Record dashboard SVG charts in clinician dashboard spec _(pages)_
+
+- Add database.md (hospital_dm schema, provenance, verification)
+
+
+### <!-- 7 -->⚙️ Miscellaneous Tasks
+
+- Ignore tsbuildinfo build artifacts _(web)_
 
 
 ### <!-- 3 -->📚 Documentation

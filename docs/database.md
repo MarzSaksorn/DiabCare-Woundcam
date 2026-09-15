@@ -21,8 +21,14 @@ Why normalized: the source workbook is a 4,714-column longitudinal wide table �
 - Insulin users: 13 · CKD patients: 41
 - Avg HbA1c by period (P0→P7): 7.49 → 7.15 → 6.96 → 6.93 → 6.97 → 6.70 → 6.64 → 7.17
 
+## House rules (audit round 2)
+
+- Null rates are structural: dm_observations is a 100×67×70 cross-product skeleton; only measured cells carry values (~91% null). All analysis must filter `value IS NOT NULL` — the stats endpoint complies.
+- Dedup deferred to CP2: 1,288 duplicate patient-period hba1c groups (97.7% exact-identical); 29 differing pairs are a data-owner semantics question (repeat measurement vs export bug). `avg()` reads are tolerant meanwhile.
+- Period 69's hba1c avg 8.7 = small-n artifact (2 non-null values vs 10–12 in neighbors). Per-period `n` joins the trend payload at CP2.
+
 ## Next
 
 - Forge maps `hospital_dm` → app schema at CP2 (patient clinical context, period model).
-- Dashboard demo aggregates switch to live queries against this DB.
+- Dashboard patient cards already read live from this DB via GET /v1/stats/overview (97e2d8e); wound cards stay demo until captures exist.
 - If the full 70k cohort export arrives, it loads into the same shape (dm_observations scales).
