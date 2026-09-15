@@ -1,0 +1,38 @@
+services:
+  api:
+    build: ./apps/api
+    environment:
+      NODE_ENV: development
+      PORT: "3000"
+      # Local-dev placeholder credentials — production injects real secrets
+      # at deploy time (NFR-SEC-3); never bake secrets into images.
+      DATABASE_URL: postgres://woundcam:woundcam@postgres:5432/woundcam
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: woundcam       # dev-only placeholder (see above)
+      POSTGRES_PASSWORD: woundcam   # dev-only placeholder (see above)
+      POSTGRES_DB: woundcam
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U woundcam -d woundcam"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    # Exposed for host-side `npm run migrate` during development.
+    # In production Postgres is not published; api reaches it over the
+    # compose network (NFR-DUR-1: nightly managed backups).
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
