@@ -91,6 +91,13 @@ export interface ConsentRecord {
 export interface PatientOverviewStats {
   totalPatients: number
   totalWounds: number
+  redAlerts: number
+  activeReports: number
+  severityBreakdown: {
+    critical: number
+    high: number
+    normal: number
+  }
   dmBreakdown: {
     type1: number
     type2: number

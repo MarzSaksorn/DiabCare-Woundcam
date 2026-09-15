@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import type { Patient, PatientOverviewStats } from '@/api/types'
 import { Layout } from '@/components/Layout'
+import { StateChip } from '@/components/StateChip'
 import { useI18n } from '@/i18n'
 
 /**
@@ -63,6 +64,17 @@ export function ClinicianDashboardPage() {
     [lang],
   )
 
+  /** Severity rows render as icon+text chips — never color alone (WCAG 1.4.1). */
+  const severityRows = stats
+    ? (
+        [
+          { key: 'critical', icon: 'fail', tone: 'destructive', count: stats.severityBreakdown.critical },
+          { key: 'high', icon: 'unverified', tone: 'fail', count: stats.severityBreakdown.high },
+          { key: 'normal', icon: 'ok', tone: 'pass', count: stats.severityBreakdown.normal },
+        ] as const
+      )
+    : []
+
   return (
     <Layout title={t('clinician.title')}>
       {/* Patient overview — aggregates from the demo sample dataset (no PHI) */}
@@ -93,6 +105,40 @@ export function ClinicianDashboardPage() {
             label={t('stats.totalWounds')}
             value={stats ? fmt.format(stats.totalWounds) : '…'}
           />
+          <StatCard
+            label={t('stats.redAlerts')}
+            value={stats ? fmt.format(stats.redAlerts) : '…'}
+          >
+            {/* Alert icon rides with the number — not color alone (WCAG 1.4.1) */}
+            <span className="mt-1 flex items-center gap-1.5 text-caption text-ember">
+              <svg aria-hidden="true" viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M8 3.5v5.5M8 12.4v.2" />
+              </svg>
+              {t('stats.redAlerts')}
+            </span>
+          </StatCard>
+          <StatCard
+            label={t('stats.activeReports')}
+            value={stats ? fmt.format(stats.activeReports) : '…'}
+          />
+          <StatCard
+            label={t('stats.patientsMatched')}
+            value={fmt.format(patients?.length ?? 0)}
+          />
+          <StatCard label={t('stats.severity')}>
+            {stats ? (
+              <dl className="mt-2 space-y-1.5">
+                {severityRows.map((row) => (
+                  <div key={row.key} className="flex items-center justify-between gap-2">
+                    <StateChip icon={row.icon} tone={row.tone} label={t(`state.${row.key}`)} />
+                    <dd className="text-body font-semibold">{fmt.format(row.count)}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <p className="mt-2 text-body text-mid-gray">…</p>
+            )}
+          </StatCard>
           <StatCard label={t('stats.dmBreakdown')}>
             {stats ? (
               <dl className="mt-2 space-y-1.5 text-body">
@@ -117,6 +163,15 @@ export function ClinicianDashboardPage() {
             label={t('stats.avgHba1c')}
             value={stats ? `${stats.avgHba1c.toFixed(1)}%` : '…'}
           />
+          <StatCard label={t('stats.security')}>
+            <span className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-hairline bg-canvas px-2.5 py-1 text-caption font-medium text-ink-soft">
+              <svg aria-hidden="true" viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <rect x="3" y="7" width="10" height="6" rx="1.5" />
+                <path d="M5.5 7V5.5a2.5 2.5 0 0 1 5 0V7" />
+              </svg>
+              {t('stats.confidential')}
+            </span>
+          </StatCard>
         </div>
       </section>
 

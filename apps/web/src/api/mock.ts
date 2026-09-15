@@ -181,13 +181,17 @@ export const mock = {
   /**
    * Sample aggregates shaped after the Srinakarin hospital diabetes dataset
    * description (~70k patients; ~2k type1, ~50k type2, ~18k gdm/unknown).
-   * No real PHI — representative numbers only.
+   * Severity split is coherent with 18.4k wound records. No real PHI —
+   * representative numbers only.
    */
   async getPatientOverviewStats(): Promise<PatientOverviewStats> {
     await wait(200)
     return {
       totalPatients: 70_000,
       totalWounds: 18_400,
+      redAlerts: 124,
+      activeReports: 312,
+      severityBreakdown: { critical: 890, high: 4_120, normal: 13_390 },
       dmBreakdown: { type1: 2_000, type2: 50_000, gdmUnknown: 18_000 },
       avgHba1c: 8.2,
       source: 'sample-dataset',
