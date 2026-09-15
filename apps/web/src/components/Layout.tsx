@@ -1,7 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { api } from '@/api/client'
 import { useI18n } from '@/i18n'
+import { BottomNav } from './BottomNav'
 import { LangToggle } from './LangToggle'
 
 /**
@@ -19,6 +20,11 @@ export function Layout({
 }) {
   const { t } = useI18n()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Immersive screens (Capture/Review) run chrome-free per the nav map —
+  // the camera owns the screen; bottom nav hides there.
+  const immersive = /\/(capture|review)$/.test(location.pathname)
 
   const handleLogout = async () => {
     await api.logout()
@@ -61,10 +67,11 @@ export function Layout({
           </div>
         </div>
       </header>
-      <main className={`mx-auto w-full ${maxWidth} px-4 py-6`}>
+      <main className={`mx-auto w-full ${maxWidth} px-4 py-6 ${immersive ? '' : 'pb-28'}`}>
         {title && <h1 className="mb-4 text-heading-sm font-semibold">{title}</h1>}
         {children}
       </main>
+      {!immersive && <BottomNav />}
     </div>
   )
 }

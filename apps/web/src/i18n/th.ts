@@ -6,6 +6,12 @@ export const th: Record<string, string> = {
   'nav.wounds': 'แผลของฉัน',
   'nav.settings': 'ตั้งค่า',
   'nav.clinician': 'รายชื่อผู้ป่วย',
+  'nav.bottom': 'เมนูหลัก',
+  'nav.dashboard': 'แดชบอร์ด',
+  'nav.patients': 'ผู้ป่วย',
+  'nav.camera': 'กล้อง',
+  'nav.reports': 'รายงาน',
+  'nav.profile': 'โปรไฟล์',
 
   'login.title': 'เข้าสู่ระบบ',
   'login.identifier': 'อีเมลหรือเบอร์โทรศัพท์',
@@ -91,4 +97,6 @@ export const th: Record<string, string> = {
   'common.error': 'เกิดข้อผิดพลาด — ลองอีกครั้ง',
   'common.retry': 'ลองอีกครั้ง',
   'common.back': 'ย้อนกลับ',
+
+  'reports.placeholder': 'รายงานภาพถ่าย PDF จะเปิดใช้งานในเวอร์ชันถัดไป — ตอนนี้ภาพทั้งหมดถูกเก็บในไทม์ไลน์ของแผลแล้ว',
 }

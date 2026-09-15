@@ -12,6 +12,8 @@ import { SettingsPage } from '@/pages/SettingsPage'
 import { WoundDetailPage } from '@/pages/WoundDetailPage'
 import { WoundListPage } from '@/pages/WoundListPage'
 import { WoundSelectPage } from '@/pages/WoundSelectPage'
+import { PatientsPage } from '@/pages/PatientsPage'
+import { ReportsPage } from '@/pages/ReportsPage'
 
 /**
  * Route table per docs/pages-draft.md navigation map (11 pages).
@@ -38,6 +40,10 @@ export function App() {
           <Route path="/wounds/:woundId/capture" element={<CapturePage />} />
           <Route path="/wounds/:woundId/review" element={<ReviewPage />} />
           <Route path="/wounds/:woundId" element={<WoundDetailPage />} />
+
+          {/* Bottom-nav destinations */}
+          <Route path="/patients" element={<PatientsPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
 
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/wounds" replace />} />

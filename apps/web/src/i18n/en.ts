@@ -5,6 +5,12 @@ export const en: Record<string, string> = {
   'nav.wounds': 'My Wounds',
   'nav.settings': 'Settings',
   'nav.clinician': 'Patients',
+  'nav.bottom': 'Main menu',
+  'nav.dashboard': 'Dashboard',
+  'nav.patients': 'Patients',
+  'nav.camera': 'Camera',
+  'nav.reports': 'Reports',
+  'nav.profile': 'Profile',
 
   'login.title': 'Sign in',
   'login.identifier': 'Email or phone number',
@@ -90,4 +96,6 @@ export const en: Record<string, string> = {
   'common.error': 'Something went wrong — try again',
   'common.retry': 'Retry',
   'common.back': 'Back',
+
+  'reports.placeholder': 'Photo-based PDF reports arrive in a later version — every photo is already saved in the wound timeline',
 }
