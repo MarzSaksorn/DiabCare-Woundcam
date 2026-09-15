@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 0.1 (draft for team review) |
+| Version | 0.1.1 (review round 1 + docs audit round 1 applied) |
 | Date | 2026-09-15 |
 | Owner | diab-orchestrator |
 | Status | Rebuild-clean locked; PRD v0.1.1 — review round 1 folded in (15 issues, 5 agents) |
@@ -70,22 +70,24 @@
 
 ### FR-AUTH — Identity
 - FR-AUTH-1: Users authenticate; JWT carries role scope `patient` or `clinician`. v0.1: clinician accounts are provisioned; no self-registration for clinicians.
-- FR-AUTH-2: Patient binds to the app via clinician-issued enrollment (v0.1: clinician creates patient record; patient device logs in against it).
+- FR-AUTH-2: Patient binds to the app via clinician-issued enrollment: clinician creates the patient record and generates a one-time invite (code or link, expires in 24h); the patient redeems it on first login and sets their password. Unredeemed invites cannot be reused.
 - FR-AUTH-3: Logout invalidates session server-side.
 
 ### FR-PAT — Patients
 - FR-PAT-1: Patient record stores: internal ULID `id`, external `mrn` (unique), consent process fields — `consent` flag (**required true before any photo upload**) + `consent_at`, `consent_version`, `consent_method` — plus `dob` (or `age_years` if DOB unavailable), `sex`, `dm_type` (enum type1/type2/gdm), `dm_onset` date, `identify_by` (enum medication/icd10/lab), `hba1c` (single manual field, optional), timestamps.
 - FR-PAT-2: Clinician can add/edit patients; patient list supports search by name/MRN.
 - FR-PAT-3: All patient edits write to the audit table (actor, field, old, new, at).
+- FR-PAT-5: Patient or clinician can file a data-export or withdrawal request from Settings; the request is recorded (type, requested_at, status) — fulfillment automation lands v0.3, SLA target 30 days (draft, pending compliance sign-off).
 
 ### FR-WND — Wounds
 - FR-WND-1: Wound record: `id`, `patient_id` FK, `location` (enum: foot_plantar/foot_dorsal/heel/toe/lower_leg/other), `laterality` (left/right/na), `status` (open/healing/closed/amputated), `notes`.
 - FR-WND-2: `first_photo_at` anchor = timestamp of the **first validated photo** (passed `/complete` integrity check), never the first upload attempt.
 - FR-WND-3: Re-baselining stores `effective_anchor_at` override; original anchor and all history are never rewritten.
 - FR-WND-4: Wound creation (added in review): clinician creates wound records; a patient/caregiver finding a new wound at home picks body-part location + laterality from large tiles, creating a record pending clinician confirmation (ghost overlay starts empty). Location and tissue type are separate concepts — chips in capture are tissue type only.
+- FR-WND-5: Clinician can edit wound `status` and `notes` via the API (wound detail screen); every edit is audit-logged. The re-baseline action (FR-WND-3) is clinician-only, on the same screen.
 
 ### FR-CAP — Guided capture (capture-first)
-- FR-CAP-1: Camera-first screen: viewfinder is the screen; one large shutter button; wound-type (tissue type) selectable as large tappable chips; wound selection/creation happens on the preceding screen (FR-WND-4), not in the camera.
+- FR-CAP-1: Camera-first screen: viewfinder is the screen; one large shutter button; tissue-type chips (canonical term across all docs and i18n keys — never "wound-type") as large tappable controls; wound selection/creation happens on the preceding screen (FR-WND-4), not in the camera. Caregiver runs show a persistent attribution chip ("Reporting for: [Name]", FR-PLT-5).
 - FR-CAP-2: Fill-frame guide: dashed outline sized for a calibration (ruler) sticker; when the sticker fills the outline, capture distance is correct.
 - FR-CAP-3: Ghost overlay: last accepted photo for the same wound rendered at ~30% opacity for angle/crop matching by alignment, not memory.
 - FR-CAP-4: Single green check state (in frame + in focus + sticker visible + exposure OK) enables the shutter; any failing element is highlighted in red on the outline itself — under/over-exposure uses the same live outline warning; lighting is never a review-screen quiz.
@@ -107,7 +109,7 @@
 
 ### FR-UPL — Secure upload pipeline
 - FR-UPL-1: Two-phase: `POST /v1/wounds/{woundId}/photos/upload-ticket` returns a presigned PUT (HMAC-signed, single-use intent, 5-minute expiry, content-length + content-type pinned in signature); binaries never touch the API server.
-- FR-UPL-2: `POST /v1/photos/{photoId}/complete`: server verifies the object landed, sniffs MIME by magic bytes (never extension), enforces 10 MB cap, strips EXIF server-side, stores sha256 (dedupe + integrity), writes the photo row.
+- FR-UPL-2: `POST /v1/photos/{photoId}/complete`: server verifies the object landed, sniffs MIME by magic bytes (never extension), enforces 10 MB cap, stores sha256 (dedupe + integrity), writes the photo row. EXIF policy (audit fix — binaries never touch the API server): EXIF is stripped client-side before upload (browser re-encode); `/complete` verifies none remains — any survivor is flagged and stripped by a background R2 worker, never by the API server.
 - FR-UPL-3: `GET /v1/photos/{photoId}` returns a short-lived presigned read URL.
 - FR-UPL-4: Storage: Cloudflare R2, bucket `woundcam-photos`, key `patients/{patientId}/wounds/{woundId}/{YYYY-MM}/{ULID}.jpg`. Server generates keys; client filenames are never trusted.
 - FR-UPL-5: Wound-ownership check (JWT scope → patient → wound) before issuing any ticket or read URL.
@@ -134,6 +136,7 @@
 - FR-PLT-2: Toast pattern for save confirmations; notifications for self-report nudges.
 - FR-PLT-3: Raw audit table from day one (no UI); every clinical mutation logged.
 - FR-PLT-4: Thai copy is authored natively, not machine-translated: register rules (neutral polite register for clinician and patient voice; no clinical jargon on patient screens), and a named Thai language review step gates every release.
+- FR-PLT-5: Caregiver attribution (v0.1, audit fix): caregiver operates the patient's device profile with a device-level "Reporting for" toggle; submissions are tagged `by_caregiver` and weighted equally. Separate caregiver accounts defer to v0.2+.
 
 ## 6. UX Requirements
 
@@ -153,6 +156,7 @@
 - NFR-SEC-4: Encryption at rest for the R2 bucket and Postgres; audit-table integrity guarantees (append-only, no client-facing deletes).
 - NFR-COMP-1: Thai PDPA-grade consent is a process, not a flag: consent flow before first upload; `consent_records` table (subject, consent_at, document_version, method, withdrawn_at); data-subject rights honored — access + withdrawal with a defined erasure path.
 - NFR-COMP-2: Audit trail, append-only, with defined retention period and tamper-evidence; event taxonomy: clinical field create/edit, photo upload/read (FR-UPL-3 GETs are logged)/delete, consent change, escalation disposition.
+- NFR-COMP-3: Retention & erasure — DRAFT policy pending owner/compliance sign-off: erasure scope covers R2 photos + Postgres rows + backup expiry; draft retention 10 years for photos and audit (aligns with Thai medical-record norms); access/withdrawal request SLA 30 days. Final values must be confirmed before the first real patient upload.
 - NFR-DUR-1: Photos in R2 (off-VPS durability); Postgres nightly managed backups; MinIO-on-app-box is vetoed.
 - NFR-PERF-1: Capture → accepted-in-record under 30 s on a mid-range Android over 4G.
 - NFR-A11Y-1: Touch targets ≥44 px; large-type patient screens; high-contrast states.
@@ -165,7 +169,7 @@
 - **Edge:** Cloudflare (TLS, rate limit, origin hiding) → Nginx on VPS → Docker Compose services.
 - **API:** Express-compatible service; endpoints per FR-UPL/FR-AI; JWT auth.
 - **Data:** Postgres (patients, wounds, photos, classifications, audit, self-reports v0.2, alerts v0.2) + Cloudflare R2 photo bucket.
-- **Storage schema highlights:** photo table (`r2_key`, `sha256`, `captured_at` device clock, `received_at` server clock — authoritative, `exif_stripped`, `classification_id`); `wound_periods` as a query-time view: `period = floor(days_since(first_photo_at)/60)` (hospital 60-day pattern, re-anchored on first capture).
+- **Storage schema highlights:** photo table (`r2_key`, `sha256`, `captured_by`, `capture_method`, `unverified` flag, `captured_at` device clock, `received_at` server clock — authoritative, `exif_stripped`, `classification_id`); wound table adds `pending_confirmation` + `confirmed_by` for the patient-created path (FR-WND-4) — healing `status` enum stays orthogonal; `wound_periods` as a query-time view: `period = floor(days_since(first_photo_at)/60)` (hospital 60-day pattern, re-anchored on first capture).
 - **Deferred schema:** `patient_clinical` extension table keyed by MRN with `source` (emr_import/manual) + `effective_date` columns; meds stored as rows (drug, start, stop), not columns.
 
 ## 9. Success Metrics

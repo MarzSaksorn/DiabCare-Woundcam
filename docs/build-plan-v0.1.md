@@ -30,6 +30,7 @@
 | B6 | D4–D6 | Upload pipeline: `upload-ticket` / `complete` / read endpoints, R2 integration, EXIF strip, magic-byte sniff, 10 MB cap, sha256 dedupe, presigned read URLs (FR-UPL) |
 | B7 | D7–D8 | Audit event taxonomy wired (field edits, photo upload/read/delete, consent change) + `unverified` capture flag support (FR-CAP-7) |
 | B8 | D9 | Contract test suite + API reference doc |
+| B9 | D8–D9 | Wound status/notes edit, per-wound photo timeline, data-export/withdrawal request endpoints (FR-WND-5, FR-LST-2, FR-PAT-5) — audit round 1 addition |
 
 ### Track F — Frontend (diab-canvas)
 | # | Days | Deliverable |
@@ -47,13 +48,15 @@
 | # | Days | Deliverable |
 |---|---|---|
 | W1 | D1–D2 | Copy inventory: every patient-facing state across all v0.1 screens, tone rules applied (consent, capture guidance, retake, upload errors, caregiver attribution) |
+| W1b | D3 | Thai register ruleset doc (short, authored) — the spec W2 writes against; audit round 1 addition |
 | W2 | D3–D5 | Thai authored natively (register rules; no clinical jargon on patient screens) — delivered as i18n resource files |
 | W3 | D9 | Thai language review gate + jargon sweep (gates release) |
 
 ### Track S — Docs (diab-scribe)
 | # | Days | Deliverable |
 |---|---|---|
-| S1 | D1–D3 | Photo Capture Protocol — full 8-section draft; retake criteria are the source of truth for FR-CAP-9's checklist |
+| S1 | D1–D3 | Photo Capture Protocol — full 8-section draft v0.9; retake criteria stay method-agnostic until the FR-CAP-7 spike outcome lands |
+| S1b | D5 | Protocol reconcile with the capture-check method decision (spike lands D4) — audit round 1 addition |
 | S2 | D4–D5 | Consent document, Thai + EN, versioned as `consent_version 1.0` (pairs with FR-PAT-1/NFR-COMP-1) |
 | S3 | D9–D10 | Protocol ↔ in-app checklist cross-check; docs polish |
 

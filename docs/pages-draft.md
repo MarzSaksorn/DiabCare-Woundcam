@@ -18,6 +18,7 @@ Login ──> role?
   │                                     └> Patient Profile ──> (creates wound) 
   └─ Patient ──> Consent Gate (first run) ──> Wound List (home)
                                     └> Wound Select/Create ──> Capture ──> Review ──> (Accept) ──> Wound List
+(Caregiver v0.1: operates on the patient's device profile with a device-level "Reporting for" attribution toggle — FR-PLT-5; separate accounts defer to v0.2)
 Wound List ──> Wound Detail/Compare (any role, scope-filtered)
 Settings reachable from every page header
 ```
@@ -39,7 +40,7 @@ Settings reachable from every page header
 - **Access:** public.
 - **Contents:** app logo + name (TH first), identifier field (email/phone), password field, login button, role determined server-side by JWT scope (no role picker exposed), link: language toggle.
 - **Actions:** login (JWT issue), failure → non-blaming error ("Sign-in didn't work — check your details and try again"), logout elsewhere invalidates session.
-- **States:** idle / loading / error (inline, icon + text) / success → dispatch by scope.
+- **States:** idle / loading / error (inline, icon + text) / first-login invite redemption (patient sets password from clinician's one-time invite, FR-AUTH-2) / success → dispatch by scope.
 - **FR refs:** FR-AUTH-1/2/3. **Copy notes:** Writer owns error strings.
 
 ## Page 2 — Consent Gate
@@ -65,7 +66,7 @@ Settings reachable from every page header
 - **Purpose:** create patient record + start consent (FR-PAT).
 - **Access:** clinician scope.
 - **Contents:** form fields exactly per FR-PAT-1: MRN (unique), DOB or age, sex, dm_type as three large chips (type1/type2/gdm), dm_onset date picker, identify_by selector, optional manual HbA1c field, consent enrollment section (shows consent doc v1.0 inline or hands device to patient → Consent Gate).
-- **Actions:** save → audit row (FR-PAT-3), validation errors inline per field (icon + text), success toast + jump to Patient Profile.
+- **Actions:** save → audit row (FR-PAT-3), validation errors inline per field (icon + text), generate one-time invite (code/link) for the patient's first login (FR-AUTH-2), success toast + jump to Patient Profile.
 - **States:** editing / field-error / saving / saved.
 - **FR refs:** FR-PAT-1/2/3. **Copy notes:** no jargon on patient-facing side; clinician-facing may use clinical terms.
 
@@ -109,7 +110,7 @@ Settings reachable from every page header
 
 - **Purpose:** patient's home: their wounds, reverse-chronological.
 - **Access:** patient scope (own wounds only; server-enforced).
-- **Contents:** header, wound cards: thumbnail, wound location label, latest photo date, status StateChip (open/healing/closed — icon + text), add-capture button per wound, add-new-wound tile, streak/reminder teaser placeholder (v0.2 slot).
+- **Contents:** header, wound cards: thumbnail, wound location label, latest photo date, status StateChip (open/healing/closed/amputated — icon + text, all four states incl. amputated), add-capture button per wound, add-new-wound tile, streak/reminder teaser placeholder (v0.2 slot).
 - **Actions:** tap card → Wound Detail; capture again → Wound Select (preselected); logout.
 - **States:** loading / no wounds (→ Wound Select) / error.
 - **FR refs:** FR-LST-1/3. **Copy notes:** —.
@@ -119,7 +120,7 @@ Settings reachable from every page header
 - **Purpose:** healing trajectory + side-by-side comparison (FR-LST-2).
 - **Access:** patient (own) / clinician (all) — scope-filtered.
 - **Contents:** side-by-side view: latest accepted photo vs previous accepted photo; capture timeline (PhotoCards, chronological, each with capturedBy + time + unverified flag if any); wound status chip + location/laterality; clinician-only: status edit (open/healing/closed/amputated) + notes field; pending-confirmation banner if patient-created (FR-WND-4).
-- **Actions:** compare toggle, tap timeline item → full photo, clinician status edit → audit logged, capture new photo → Capture.
+- **Actions:** compare toggle, tap timeline item → full photo, clinician status edit (FR-WND-5) and re-baseline anchor (FR-WND-3) — both audit-logged, capture new photo → Capture.
 - **States:** single photo (no comparison yet — shows latest only with hint chip) / loading / error.
 - **FR refs:** FR-LST-2, FR-WND-1/3, FR-CAP-7 (unverified display). **Copy notes:** hint chips plain-language.
 
@@ -128,7 +129,7 @@ Settings reachable from every page header
 - **Purpose:** language, session, consent visibility.
 - **Access:** any logged-in role.
 - **Contents:** language toggle (TH/EN), my account (name, role), consent status + "view consent document" + withdrawal request entry (patient), logout button, app version (from Log's release automation).
-- **Actions:** toggle language, request data export/withdrawal (v0.1: creates request record; automation v0.3), logout.
+- **Actions:** toggle language, request data export/withdrawal (v0.1: files a request record via FR-PAT-5; fulfillment automation v0.3, 30-day SLA draft), logout.
 - **States:** —.
 - **FR refs:** FR-AUTH-3, NFR-COMP-1 (withdrawal path). **Copy notes:** withdrawal copy must be plain and unafraid.
 
