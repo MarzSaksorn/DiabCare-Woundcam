@@ -22,6 +22,11 @@ export const th: Record<string, string> = {
   'consent.title': 'ความยินยอมก่อนเริ่มใช้งาน',
   'consent.accept': 'ฉันยินยอม',
   'consent.decline': 'ไม่ใช่ตอนนี้',
+  'consent.body.data': 'เราเก็บภาพแผล วันที่ถ่าย และบันทึกที่คุณเขียนเท่านั้น ไม่มีการเก็บอย่างอื่นจากโทรศัพท์ของคุณ',
+  'consent.body.who': 'มีเพียงทีมแพทย์ผู้ดูแลของคุณเท่านั้นที่เห็นภาพเหล่านี้ เราไม่นำภาพไปใช้เพื่อการโฆษณา',
+  'consent.body.withdraw': 'ปฏิเสธได้ตอนนี้ หรือเปลี่ยนใจภายหลังได้ในหน้าตั้งค่า การปฏิเสธจะไม่กระทบการรักษาของคุณ',
+  'consent.declined.title': 'การถ่ายภาพแผลยังปิดอยู่',
+  'consent.declined.body': 'ไม่เป็นไร ทีมแพทย์ผู้ดูแลจะดูแลคุณตามปกติเหมือนเดิม และเปิดใหม่ได้ทุกเมื่อในหน้าตั้งค่า',
 
   'wounds.title': 'แผลของฉัน',
   'wounds.empty': 'ยังไม่มีรายการแผล — เริ่มบันทึกแผลแรกกันเลย',
@@ -37,6 +42,15 @@ export const th: Record<string, string> = {
   'wound.right': 'ขวา',
   'wound.na': 'ไม่ระบุ',
   'wound.selectOrCreate': 'เลือกแผล หรือเริ่มแผลใหม่',
+
+  'patient.mrn': 'MRN (เลขที่โรงพยาบาล)',
+  'patient.name': 'ชื่อ-นามสกุล',
+  'patient.dmtype': 'ชนิดของเบาหวาน',
+  'patient.dmtype.type1': 'ชนิดที่ 1',
+  'patient.dmtype.type2': 'ชนิดที่ 2',
+  'patient.dmtype.gdm': 'ขณะตั้งครรภ์',
+  'patient.hba1c': 'HbA1c (%)',
+  'patient.fielderror.required': 'กรอกข้อมูลส่วนนี้ด้วย',
 
   'capture.title': 'ถ่ายภาพแผล',
   'capture.shutter': 'ถ่าย',

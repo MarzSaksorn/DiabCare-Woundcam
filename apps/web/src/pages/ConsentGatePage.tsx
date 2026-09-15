@@ -32,16 +32,17 @@ export function ConsentGatePage() {
         </p>
 
         <div className="mt-4 space-y-3 text-body leading-relaxed">
-          {/* Placeholder body — Scribe's consent document v1.0 lands via W-track (build plan S2). */}
-          <p className="rounded-[10px] bg-canvas p-4 text-mid-gray">
-            [เอกสารคำยินยอม v{CONSENT_DOC_VERSION} — ข้อมูลที่เก็บ / ใครเห็นภาพ / วิธียกเลิกความยินยอม]
-          </p>
+          {/* Body per docs/copy/inventory.md r4 slots — Scribe's consent document v1.0 lands via W-track (build plan S2). */}
+          <p className="rounded-[10px] bg-canvas p-4 text-mid-gray">{t('consent.body.data')}</p>
+          <p className="rounded-[10px] bg-canvas p-4 text-mid-gray">{t('consent.body.who')}</p>
+          <p className="rounded-[10px] bg-canvas p-4 text-mid-gray">{t('consent.body.withdraw')}</p>
         </div>
 
         {accepted === false && (
-          <p role="alert" className="mt-4 text-body text-ember-ink">
-            [Declined state — withdrawal/re-consent info, plain and unafraid]
-          </p>
+          <div role="alert" className="mt-4 text-body text-ember-ink">
+            <p className="font-medium">{t('consent.declined.title')}</p>
+            <p className="mt-1">{t('consent.declined.body')}</p>
+          </div>
         )}
 
         <div className="mt-6 flex gap-3">

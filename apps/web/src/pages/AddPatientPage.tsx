@@ -25,8 +25,8 @@ export function AddPatientPage() {
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     const next: Record<string, string> = {}
-    if (!mrn.trim()) next.mrn = t('common.error')
-    if (!fullName.trim()) next.fullName = t('common.error')
+    if (!mrn.trim()) next.mrn = t('patient.fielderror.required')
+    if (!fullName.trim()) next.fullName = t('patient.fielderror.required')
     setErrors(next)
     if (Object.keys(next).length > 0) return
     setBusy(true)
@@ -48,19 +48,19 @@ export function AddPatientPage() {
     <Layout title={t('clinician.addPatient')}>
       <form onSubmit={submit} className="rounded-card border border-hairline bg-paper p-6 shadow-card">
         <label className="block text-caption font-medium text-mid-gray" htmlFor="mrn">
-          MRN
+          {t('patient.mrn')}
         </label>
         <input id="mrn" value={mrn} onChange={(e) => setMrn(e.target.value)} className={fieldClass} />
         {errors.mrn && <p className="text-caption text-ember-ink">{errors.mrn}</p>}
 
         <label className="mt-4 block text-caption font-medium text-mid-gray" htmlFor="fullName">
-          ชื่อ-นามสกุล / Full name
+          {t('patient.name')}
         </label>
         <input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} className={fieldClass} />
         {errors.fullName && <p className="text-caption text-ember-ink">{errors.fullName}</p>}
 
         <fieldset className="mt-4">
-          <legend className="text-caption font-medium text-mid-gray">dm_type</legend>
+          <legend className="text-caption font-medium text-mid-gray">{t('patient.dmtype')}</legend>
           <div className="mt-1 flex gap-2">
             {(['type1', 'type2', 'gdm'] as const).map((v) => (
               <button
@@ -72,14 +72,14 @@ export function AddPatientPage() {
                   dmType === v ? 'bg-primary text-white' : 'bg-canvas text-ink'
                 }`}
               >
-                {v}
+                {t(`patient.dmtype.${v}`)}
               </button>
             ))}
           </div>
         </fieldset>
 
         <label className="mt-4 block text-caption font-medium text-mid-gray" htmlFor="hba1c">
-          HbA1c (%)
+          {t('patient.hba1c')}
         </label>
         <input
           id="hba1c"

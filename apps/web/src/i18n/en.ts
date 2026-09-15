@@ -21,6 +21,11 @@ export const en: Record<string, string> = {
   'consent.title': 'Consent before we start',
   'consent.accept': 'I agree',
   'consent.decline': 'Not now',
+  'consent.body.data': 'We collect wound photos, dates, and the notes you add. Nothing else from your phone.',
+  'consent.body.who': 'Only your care team can see them. We never share photos for advertising.',
+  'consent.body.withdraw': "You can say no now, or change your mind later in Settings. Saying no never affects your care.",
+  'consent.declined.title': 'Photos are turned off',
+  'consent.declined.body': "That's okay. Your care team will keep seeing you as usual. You can turn photos on anytime in Settings.",
 
   'wounds.title': 'My Wounds',
   'wounds.empty': 'No wounds yet — capture your first one',
@@ -36,6 +41,15 @@ export const en: Record<string, string> = {
   'wound.right': 'Right',
   'wound.na': 'N/A',
   'wound.selectOrCreate': 'Pick a wound or start a new one',
+
+  'patient.mrn': 'MRN (hospital number)',
+  'patient.name': 'Full name',
+  'patient.dmtype': 'Diabetes type',
+  'patient.dmtype.type1': 'Type 1',
+  'patient.dmtype.type2': 'Type 2',
+  'patient.dmtype.gdm': 'Gestational',
+  'patient.hba1c': 'HbA1c (%)',
+  'patient.fielderror.required': 'This field is needed.',
 
   'capture.title': 'Capture wound photo',
   'capture.shutter': 'Capture',
