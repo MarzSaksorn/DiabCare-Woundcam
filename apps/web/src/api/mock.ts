@@ -2,6 +2,7 @@ import type {
   AuthSession,
   ConsentRecord,
   Patient,
+  PatientOverviewStats,
   Photo,
   UploadTicket,
   Wound,
@@ -174,6 +175,22 @@ export const mock = {
       consentAt: new Date().toISOString(),
       documentVersion: version,
       method: 'in_app',
+    }
+  },
+
+  /**
+   * Sample aggregates shaped after the Srinakarin hospital diabetes dataset
+   * description (~70k patients; ~2k type1, ~50k type2, ~18k gdm/unknown).
+   * No real PHI — representative numbers only.
+   */
+  async getPatientOverviewStats(): Promise<PatientOverviewStats> {
+    await wait(200)
+    return {
+      totalPatients: 70_000,
+      totalWounds: 18_400,
+      dmBreakdown: { type1: 2_000, type2: 50_000, gdmUnknown: 18_000 },
+      avgHba1c: 8.2,
+      source: 'sample-dataset',
     }
   },
 }

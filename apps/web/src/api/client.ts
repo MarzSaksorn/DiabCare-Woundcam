@@ -2,6 +2,7 @@ import type {
   AuthSession,
   ConsentRecord,
   Patient,
+  PatientOverviewStats,
   Photo,
   UploadTicket,
   Wound,
@@ -88,4 +89,9 @@ export const api = {
     USE_MOCKS
       ? mock.acceptConsent(version)
       : request('/consent', { method: 'POST', body: JSON.stringify({ version }) }),
+
+  getPatientOverviewStats: (): Promise<PatientOverviewStats> =>
+    USE_MOCKS
+      ? mock.getPatientOverviewStats()
+      : request('/patients/overview-stats'),
 }

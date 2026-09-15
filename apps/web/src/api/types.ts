@@ -83,3 +83,20 @@ export interface ConsentRecord {
   documentVersion: string
   method: 'in_app' | 'assisted'
 }
+
+/**
+ * Aggregates for the clinician overview panel. Shape mirrors FR-PAT-1
+ * fields bucketed for display (dm_type, hba1c) — Srinakarin-style schema.
+ */
+export interface PatientOverviewStats {
+  totalPatients: number
+  totalWounds: number
+  dmBreakdown: {
+    type1: number
+    type2: number
+    gdmUnknown: number
+  }
+  avgHba1c: number
+  /** Marks demo data so the UI can label it honestly. */
+  source: 'sample-dataset'
+}

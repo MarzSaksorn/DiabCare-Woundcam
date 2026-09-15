@@ -64,6 +64,15 @@ export const th: Record<string, string> = {
   'clinician.addPatient': 'เพิ่มผู้ป่วย',
   'clinician.empty': 'ยังไม่มีผู้ป่วย — เพิ่มผู้ป่วยคนแรก',
 
+  'stats.sampleDataset': 'ชุดข้อมูลตัวอย่าง · Sample dataset',
+  'stats.totalPatients': 'ผู้ป่วยทั้งหมด',
+  'stats.totalWounds': 'แผลที่บันทึก',
+  'stats.dmBreakdown': 'ชนิดของเบาหวาน',
+  'stats.avgHba1c': 'HbA1c เฉลี่ย',
+  'stats.type1': 'ประเภทที่ 1',
+  'stats.type2': 'ประเภทที่ 2',
+  'stats.gdmUnknown': 'GDM/ไม่ทราบ',
+
   'settings.title': 'ตั้งค่า',
   'settings.language': 'ภาษา',
   'settings.logout': 'ออกจากระบบ',

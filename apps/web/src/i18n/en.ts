@@ -63,6 +63,15 @@ export const en: Record<string, string> = {
   'clinician.addPatient': 'Add patient',
   'clinician.empty': 'No patients yet — add your first',
 
+  'stats.sampleDataset': 'Sample dataset · ชุดข้อมูลตัวอย่าง',
+  'stats.totalPatients': 'Total patients',
+  'stats.totalWounds': 'Wound records',
+  'stats.dmBreakdown': 'Diabetes type',
+  'stats.avgHba1c': 'Average HbA1c',
+  'stats.type1': 'Type 1',
+  'stats.type2': 'Type 2',
+  'stats.gdmUnknown': 'GDM/Unknown',
+
   'settings.title': 'Settings',
   'settings.language': 'Language',
   'settings.logout': 'Sign out',
