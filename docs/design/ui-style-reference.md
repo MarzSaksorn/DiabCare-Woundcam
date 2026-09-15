@@ -3,6 +3,8 @@
 
 **Theme:** light
 
+> ⚠️ **SUPERSEDED PALETTE BELOW — ACTIVE PALETTE (2026-09-15, commit ef8fa7c):** per Saksorn, the live UI uses the reference prototype's blue clinical design. Active tokens: canvas `#f2f8ff` · card surfaces white + soft shadow rgba(0,0,0,.10) · headings `#16345c` · muted text `#5e7ea6` (large-text AA only, captions) · action blue `#1568e8` · active nav `#0a4fbe` · sky accents `#35bdfb/#64d9ff` · success `#16b67a` · alert coral `#e84d67` (icons/chips/large type only) · AA-darkened critical text: errors `#cf3550`, success `#0b7d54` · radii: cards 20px, chips 12px, shutter circular · font: Sarabun (300–900), Noto Sans Thai secondary. The shadcn/Geist monochrome spec below is retained for history only.
+
 shadcn/ui is a monochromatic design-system workshop: pure white canvas, soft warm-gray surfaces, and large-radius cards floating on hairline borders. The interface is almost entirely achromatic — black text, white surfaces, gray secondary tones — with a single destructive red reserved for error states and nothing else. Typography leans on Geist's geometric neutrality with tight letter-spacing on display sizes, creating a quiet, code-adjacent feel that reads as developer infrastructure rather than consumer product.
 
 ## Tokens — Colors
