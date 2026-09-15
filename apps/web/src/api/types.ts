@@ -109,3 +109,23 @@ export interface PatientOverviewStats {
   /** Marks demo data so the UI can label it honestly. */
   source: 'sample-dataset'
 }
+
+/** Live Srinakarin hackathon diabetes EMR — GET /v1/stats/overview (Forge). */
+export interface LiveOverviewStats {
+  source: string
+  patients: {
+    total: number
+    type1: number
+    type2: number
+    gdm: number
+    female: number
+    male: number
+    avgAge: number
+    insulinUsers: number
+    ckd: number
+  }
+  hba1c: {
+    avgOverall: number
+    trend: Array<{ period: string; avg: number }>
+  }
+}

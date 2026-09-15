@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api } from '@/api/client'
-import type { Patient, PatientOverviewStats } from '@/api/types'
+import { api, fetchLiveOverview } from '@/api/client'
+import type { LiveOverviewStats, Patient, PatientOverviewStats } from '@/api/types'
 import { Layout } from '@/components/Layout'
 import { DonutChart, DonutLegend } from '@/components/charts/DonutChart'
 import { LineAreaChart } from '@/components/charts/LineAreaChart'
@@ -18,14 +18,47 @@ import { useI18n } from '@/i18n'
 
 const GAP = 'gap-4'
 
-function KpiCard({ label, value, alertIcon }: {
+/** Provenance pill — text carries the meaning, the dot is decorative (WCAG 1.4.1). */
+function SourceChip({ mode, liveLabel, sampleLabel }: {
+  mode: 'live' | 'sample'
+  liveLabel: string
+  sampleLabel: string
+}) {
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1 rounded-[12px] px-2 py-0.5 text-caption font-medium ring-1 ${
+        mode === 'live'
+          ? 'bg-surface-alt text-primary-deep ring-primary/30'
+          : 'bg-canvas text-mid-gray ring-hairline'
+      }`}
+    >
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 16 16"
+        className="h-2.5 w-2.5"
+        fill={mode === 'live' ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        {mode === 'live' ? <circle cx="8" cy="8" r="4" stroke="none" /> : <path d="M8 2v12M2 8h12" strokeLinecap="round" />}
+      </svg>
+      {mode === 'live' ? liveLabel : sampleLabel}
+    </span>
+  )
+}
+
+function KpiCard({ label, value, alertIcon, chip }: {
   label: string
   value: string
   alertIcon?: boolean
+  chip?: React.ReactNode
 }) {
   return (
     <div className={`flex flex-col rounded-card border border-hairline bg-paper p-5 shadow-card`}>
-      <p className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">{label}</p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">{label}</p>
+        {chip}
+      </div>
       <p className="mt-2 flex items-center gap-2 text-heading-sm font-semibold tracking-[-0.6px]">
         {alertIcon && (
           <svg
@@ -79,6 +112,17 @@ export function ClinicianDashboardPage() {
   const [search, setSearch] = useState('')
   const [patients, setPatients] = useState<Patient[] | null>(null)
   const [stats, setStats] = useState<PatientOverviewStats | null>(null)
+  const [live, setLive] = useState<LiveOverviewStats | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchLiveOverview().then((s) => {
+      if (!cancelled) setLive(s) // null on any failure → all-mock fallback
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -108,14 +152,22 @@ export function ClinicianDashboardPage() {
   const severity = stats?.severityBreakdown
   const severityTotal = severity ? severity.critical + severity.high + severity.normal : 0
   const dm = stats?.dmBreakdown
-  const dmTotal = dm ? dm.type1 + dm.type2 + dm.gdmUnknown : 0
-  const dmSlices = dm
+  const dmSlices = live
     ? [
-        { label: t('stats.type1'), value: dm.type1, color: '#35bdfb' },
-        { label: t('stats.type2'), value: dm.type2, color: '#1568e8' },
-        { label: t('stats.gdmUnknown'), value: dm.gdmUnknown, color: '#0a4fbe' },
+        { label: t('stats.type1'), value: live.patients.type1, color: '#35bdfb' },
+        { label: t('stats.type2'), value: live.patients.type2, color: '#1568e8' },
+        { label: t('stats.gdm'), value: live.patients.gdm, color: '#0a4fbe' },
       ]
-    : []
+    : dm
+      ? [
+          { label: t('stats.type1'), value: dm.type1, color: '#35bdfb' },
+          { label: t('stats.type2'), value: dm.type2, color: '#1568e8' },
+          { label: t('stats.gdmUnknown'), value: dm.gdmUnknown, color: '#0a4fbe' },
+        ]
+      : []
+  const dmTotal = live ? live.patients.total : dm ? dm.type1 + dm.type2 + dm.gdmUnknown : 0
+  const avgHba1c = live ? live.hba1c.avgOverall : stats?.avgHba1c
+  const patientMode = live ? 'live' : 'sample'
   const severitySlices = severity
     ? [
         { label: t('state.critical'), value: severity.critical, color: '#e84d67' },
@@ -127,7 +179,7 @@ export function ClinicianDashboardPage() {
   return (
     <Layout title={t('clinician.title')}>
       <div className={`flex flex-col ${GAP}`}>
-        {/* Slim classification strip under the header (moved out of the grid) */}
+        {/* Slim classification strip under the header */}
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-pill border border-hairline bg-paper px-4 py-1.5 shadow-card">
           <span className="inline-flex items-center gap-1.5 text-caption font-medium text-ink">
             <svg
@@ -144,28 +196,32 @@ export function ClinicianDashboardPage() {
             </svg>
             {t('stats.confidential')}
           </span>
-          <span className="inline-flex items-center gap-1.5 text-caption font-medium text-mid-gray">
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 16 16"
-              className="h-3.5 w-3.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <path d="M8 2v12M2 8h12" />
-            </svg>
-            {t('stats.sampleDataset')}
-          </span>
+          <span className="text-caption text-mid-gray">{t('stats.sampleDataset')}</span>
         </div>
 
         {/* TOP ROW — five equal KPI cards: 1 col phone, 3+2 tablet, 5 across desktop */}
         <div className={`grid grid-cols-1 ${GAP} sm:grid-cols-3 lg:grid-cols-5`}>
-          <KpiCard label={t('stats.totalPatients')} value={stats ? fmt.format(stats.totalPatients) : '…'} />
-          <KpiCard label={t('stats.totalWounds')} value={stats ? fmt.format(stats.totalWounds) : '…'} />
-          <KpiCard label={t('stats.redAlerts')} value={stats ? fmt.format(stats.redAlerts) : '…'} alertIcon />
-          <KpiCard label={t('stats.activeReports')} value={stats ? fmt.format(stats.activeReports) : '…'} />
+          <KpiCard
+            label={t('stats.totalPatients')}
+            value={fmt.format(live ? live.patients.total : (stats?.totalPatients ?? 0))}
+            chip={stats ? <SourceChip mode={patientMode} liveLabel={t('stats.liveDatabase')} sampleLabel={t('stats.sampleDataset')} /> : undefined}
+          />
+          <KpiCard
+            label={t('stats.totalWounds')}
+            value={stats ? fmt.format(stats.totalWounds) : '…'}
+            chip={stats ? <SourceChip mode="sample" liveLabel={t('stats.liveDatabase')} sampleLabel={t('stats.sampleDataset')} /> : undefined}
+          />
+          <KpiCard
+            label={t('stats.redAlerts')}
+            value={stats ? fmt.format(stats.redAlerts) : '…'}
+            alertIcon
+            chip={stats ? <SourceChip mode="sample" liveLabel={t('stats.liveDatabase')} sampleLabel={t('stats.sampleDataset')} /> : undefined}
+          />
+          <KpiCard
+            label={t('stats.activeReports')}
+            value={stats ? fmt.format(stats.activeReports) : '…'}
+            chip={stats ? <SourceChip mode="sample" liveLabel={t('stats.liveDatabase')} sampleLabel={t('stats.sampleDataset')} /> : undefined}
+          />
           <KpiCard
             label={t('stats.patientsMatched')}
             value={fmt.format(patients?.length ?? 0)}
@@ -178,9 +234,12 @@ export function ClinicianDashboardPage() {
             aria-label={t('stats.severity')}
             className="flex flex-col rounded-card border border-hairline bg-paper p-5 shadow-card"
           >
-            <h2 className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">
-              {t('stats.severity')}
-            </h2>
+            <div className="flex items-start justify-between gap-2">
+              <h2 className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">
+                {t('stats.severity')}
+              </h2>
+              <SourceChip mode="sample" liveLabel={t('stats.liveDatabase')} sampleLabel={t('stats.sampleDataset')} />
+            </div>
             {severity ? (
               <div className="mt-4 flex flex-1 flex-col justify-center gap-4">
                 <SeverityStackedBar
@@ -198,19 +257,45 @@ export function ClinicianDashboardPage() {
             aria-label={t('stats.dmBreakdown')}
             className="flex flex-col rounded-card border border-hairline bg-paper p-5 shadow-card"
           >
-            <h2 className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">
-              {t('stats.dmBreakdown')}
-            </h2>
-            {dm ? (
-              <div className="mt-4 flex flex-1 items-center justify-center gap-6">
-                <DonutChart
-                  slices={dmSlices}
-                  centerValue={fmt.format(dmTotal)}
-                  centerLabel={t('stats.totalPatients')}
-                  ariaLabel={t('charts.aria.dm')}
-                  size={150}
-                />
-                <DonutLegend slices={dmSlices} total={dmTotal} fmt={fmt} />
+            <div className="flex items-start justify-between gap-2">
+              <h2 className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">
+                {t('stats.dmBreakdown')}
+              </h2>
+              <SourceChip mode={patientMode} liveLabel={t('stats.liveDatabase')} sampleLabel={t('stats.sampleDataset')} />
+            </div>
+            {dm || live ? (
+              <div className="mt-4 flex flex-1 flex-col justify-center gap-4">
+                <div className="flex items-center justify-center gap-6">
+                  <DonutChart
+                    slices={dmSlices}
+                    centerValue={fmt.format(dmTotal)}
+                    centerLabel={t('stats.totalPatients')}
+                    ariaLabel={t('charts.aria.dm')}
+                    size={150}
+                  />
+                  <DonutLegend slices={dmSlices} total={dmTotal} fmt={fmt} />
+                </div>
+                <div className="flex items-center justify-between border-t border-hairline pt-3">
+                  <span className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">
+                    {t('stats.avgHba1c')}
+                  </span>
+                  <span className="text-body-lg font-semibold">
+                    {avgHba1c != null ? `${avgHba1c.toFixed(1)}%` : '…'}
+                  </span>
+                </div>
+                {live && live.hba1c.trend.length > 1 && (
+                  <div>
+                    <p className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">
+                      {t('stats.hba1cTrend')}
+                    </p>
+                    <LineAreaChart
+                      points={live.hba1c.trend.map((x) => ({ label: x.period, count: x.avg }))}
+                      ariaLabel={t('stats.hba1cTrend')}
+                      gradientId="hba1c-trend-fill"
+                      colorVar="--color-primary-deep"
+                    />
+                  </div>
+                )}
               </div>
             ) : (
               <p className="mt-4 text-body text-mid-gray">{t('common.loading')}</p>
@@ -223,9 +308,12 @@ export function ClinicianDashboardPage() {
           aria-label={t('charts.aria.trend')}
           className="rounded-card border border-hairline bg-paper p-5 shadow-card"
         >
-          <h2 className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">
-            {t('charts.periodAxis')}
-          </h2>
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">
+              {t('charts.periodAxis')}
+            </h2>
+            <SourceChip mode="sample" liveLabel={t('stats.liveDatabase')} sampleLabel={t('stats.sampleDataset')} />
+          </div>
           {stats ? (
             <div className="mt-3">
               <LineAreaChart

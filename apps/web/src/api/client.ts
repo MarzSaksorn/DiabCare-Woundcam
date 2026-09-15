@@ -1,6 +1,7 @@
 import type {
   AuthSession,
   ConsentRecord,
+  LiveOverviewStats,
   Patient,
   PatientOverviewStats,
   Photo,
@@ -17,6 +18,7 @@ import { mock } from './mock'
 const USE_MOCKS = true
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/v1'
+const STATS_BASE_URL = import.meta.env.VITE_STATS_BASE_URL ?? 'http://localhost:3001'
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -94,4 +96,30 @@ export const api = {
     USE_MOCKS
       ? mock.getPatientOverviewStats()
       : request('/patients/overview-stats'),
+}
+
+/**
+ * Live Srinakarin diabetes EMR aggregates (Forge, GET /v1/stats/overview).
+ * Independent of USE_MOCKS — it is a separate data source, not the v1 API.
+ * Resolves null on any failure (offline, CORS, timeout, bad shape) so the
+ * caller falls back to the sample dataset without an error surface.
+ */
+export async function fetchLiveOverview(): Promise<LiveOverviewStats | null> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 4000)
+  try {
+    const res = await fetch(`${STATS_BASE_URL}/v1/stats/overview`, {
+      signal: controller.signal,
+    })
+    if (!res.ok) return null
+    const json: unknown = await res.json()
+    const p = (json as LiveOverviewStats | null)?.patients
+    // Minimal shape validation before we trust it for rendering
+    if (!p || typeof p.total !== 'number' || typeof p.type1 !== 'number') return null
+    return json as LiveOverviewStats
+  } catch {
+    return null
+  } finally {
+    clearTimeout(timeout)
+  }
 }

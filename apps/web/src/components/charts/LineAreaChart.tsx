@@ -12,11 +12,14 @@ export function LineAreaChart({
   points,
   ariaLabel,
   gradientId,
+  colorVar = '--color-primary',
 }: {
   points: TrendPoint[]
   ariaLabel: string
   /** Unique per page — SVG gradient ids are document-global. */
   gradientId: string
+  /** CSS var driving line/dots/gradient — e.g. '--color-primary-deep'. */
+  colorVar?: string
 }) {
   const W = 320
   const H = 150
@@ -61,8 +64,8 @@ export function LineAreaChart({
     >
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="0.02" />
+          <stop offset="0%" stopColor={`var(${colorVar})`} stopOpacity="0.25" />
+          <stop offset="100%" stopColor={`var(${colorVar})`} stopOpacity="0.02" />
         </linearGradient>
       </defs>
 
@@ -85,7 +88,7 @@ export function LineAreaChart({
       <line x1={padL} y1={baseline} x2={W - padR} y2={baseline} stroke="var(--color-hairline)" strokeWidth="1" />
 
       <path d={area} fill={`url(#${gradientId})`} />
-      <path d={line} fill="none" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" />
+      <path d={line} fill="none" stroke={`var(${colorVar})`} strokeWidth="2.5" strokeLinecap="round" />
 
       {points.map((p, i) => {
         const last = i === points.length - 1
@@ -95,8 +98,8 @@ export function LineAreaChart({
               cx={xs[i]}
               cy={ys[i]}
               r={last ? 4 : 3}
-              fill={last ? 'var(--color-primary)' : 'var(--color-paper)'}
-              stroke="var(--color-primary)"
+              fill={last ? `var(${colorVar})` : 'var(--color-paper)'}
+              stroke={`var(${colorVar})`}
               strokeWidth="2"
             />
             <text
