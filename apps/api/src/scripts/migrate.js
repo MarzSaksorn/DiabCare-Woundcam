@@ -46,5 +46,5 @@ for (const file of files) {
   }
 }
 
-console.log(`${applied} migration(s) applied, ${files.length - applied} already present`);
+console.log(`${applied} migration(s) applied, ${files.length - applied} skipped (already present or after failure)`);
 await client.end();
