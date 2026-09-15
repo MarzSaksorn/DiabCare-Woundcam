@@ -15,8 +15,6 @@ export function PatientsPage() {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [patients, setPatients] = useState<Patient[] | null>(null)
-
-  const [patients, setPatients] = useState<Patient[] | null>(null)
   const [error, setError] = useState(false)
 
   const loadPatients = useCallback((q: string) => {
