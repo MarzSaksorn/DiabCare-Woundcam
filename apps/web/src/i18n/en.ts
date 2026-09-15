@@ -19,8 +19,8 @@ export const en: Record<string, string> = {
   'login.error': "Sign-in didn't work — check your details and try again",
 
   'consent.title': 'Consent before we start',
-  'consent.accept': 'Accept',
-  'consent.decline': 'Decline',
+  'consent.accept': 'I agree',
+  'consent.decline': 'Not now',
 
   'wounds.title': 'My Wounds',
   'wounds.empty': 'No wounds yet — capture your first one',

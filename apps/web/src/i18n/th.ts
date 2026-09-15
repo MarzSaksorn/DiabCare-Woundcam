@@ -19,9 +19,9 @@ export const th: Record<string, string> = {
   'login.submit': 'เข้าสู่ระบบ',
   'login.error': 'เข้าสู่ระบบไม่สำเร็จ — ตรวจสอบข้อมูลแล้วลองอีกครั้ง',
 
-  'consent.title': 'คำยินยอมก่อนใช้งาน',
-  'consent.accept': 'ยอมรับ',
-  'consent.decline': 'ไม่ยอมรับ',
+  'consent.title': 'ความยินยอมก่อนเริ่มใช้งาน',
+  'consent.accept': 'ฉันยินยอม',
+  'consent.decline': 'ไม่ใช่ตอนนี้',
 
   'wounds.title': 'แผลของฉัน',
   'wounds.empty': 'ยังไม่มีรายการแผล — เริ่มบันทึกแผลแรกกันเลย',
@@ -52,7 +52,7 @@ export const th: Record<string, string> = {
   'state.open': 'แผลเปิด',
   'state.healing': 'กำลังหาย',
   'state.closed': 'ปิดสนิท',
-  'state.amputated': 'ถูกตัด',
+  'state.amputated': 'ขาด (จากการรักษา)',
   'state.unverified': 'รอตรวจสอบ',
   'state.ok': 'ผ่าน',
   'state.focus': 'ภาพชัด',
@@ -100,7 +100,7 @@ export const th: Record<string, string> = {
   'settings.title': 'ตั้งค่า',
   'settings.language': 'ภาษา',
   'settings.logout': 'ออกจากระบบ',
-  'settings.consentStatus': 'สถานะคำยินยอม',
+  'settings.consentStatus': 'สถานะความยินยอม',
 
   'common.loading': 'กำลังโหลด…',
   'common.error': 'เกิดข้อผิดพลาด — ลองอีกครั้ง',
