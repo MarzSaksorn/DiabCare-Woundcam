@@ -1,0 +1,76 @@
+/** Thai is the authored-native source (FR-PLT-4); English mirrors it. */
+export const th: Record<string, string> = {
+  'app.name': 'WoundCam',
+  'app.tagline': 'บันทึกภาพแผล เพื่อการหายที่ตามได้',
+
+  'nav.wounds': 'แผลของฉัน',
+  'nav.settings': 'ตั้งค่า',
+  'nav.clinician': 'รายชื่อผู้ป่วย',
+
+  'login.title': 'เข้าสู่ระบบ',
+  'login.identifier': 'อีเมลหรือเบอร์โทรศัพท์',
+  'login.password': 'รหัสผ่าน',
+  'login.submit': 'เข้าสู่ระบบ',
+  'login.error': 'เข้าสู่ระบบไม่สำเร็จ — ตรวจสอบข้อมูลแล้วลองอีกครั้ง',
+
+  'consent.title': 'คำยินยอมก่อนใช้งาน',
+  'consent.accept': 'ยอมรับ',
+  'consent.decline': 'ไม่ยอมรับ',
+
+  'wounds.title': 'แผลของฉัน',
+  'wounds.empty': 'ยังไม่มีรายการแผล — เริ่มบันทึกแผลแรกกันเลย',
+  'wounds.addNew': 'บันทึกแผลใหม่',
+  'wounds.capture': 'ถ่ายภาพ',
+  'wounds.detail': 'รายละเอียดแผล',
+  'wounds.compare': 'เปรียบเทียบภาพ',
+  'wounds.pending': 'รอแพทย์ยืนยัน',
+
+  'wound.location': 'ตำแหน่งแผล',
+  'wound.laterality': 'ด้าน',
+  'wound.left': 'ซ้าย',
+  'wound.right': 'ขวา',
+  'wound.na': 'ไม่ระบุ',
+  'wound.selectOrCreate': 'เลือกแผล หรือเริ่มแผลใหม่',
+
+  'capture.title': 'ถ่ายภาพแผล',
+  'capture.shutter': 'ถ่าย',
+  'capture.cameraDenied': 'กล้องไม่พร้อมใช้งาน — อนุญาตการเข้าถึงกล้องแล้วลองอีกครั้ง',
+
+  'review.title': 'ตรวจภาพก่อนบันทึก',
+  'review.retake': 'ถ่ายใหม่',
+  'review.accept': 'บันทึกภาพ',
+  'review.uploading': 'กำลังส่งภาพ…',
+  'review.uploadError': 'ภาพของคุณปลอดภัย — การส่งติดขัด แตะเพื่อลองอีกครั้ง',
+  'review.accepted': 'บันทึกภาพเรียบร้อย ✅',
+
+  'state.open': 'แผลเปิด',
+  'state.healing': 'กำลังหาย',
+  'state.closed': 'ปิดสนิท',
+  'state.amputated': 'ถูกตัด',
+  'state.unverified': 'รอตรวจสอบ',
+  'state.ok': 'ผ่าน',
+  'state.focus': 'ภาพชัด',
+  'state.blur': 'ภาพเบลอ',
+  'state.rulerVisible': 'เห็นไม้บรรทัด',
+  'state.rulerMissing': 'ไม่เห็นไม้บรรทัด',
+  'state.exposureOk': 'แสงพอดี',
+  'state.tooDark': 'แสงน้อยเกินไป',
+  'state.tooBright': 'แสงมากเกินไป',
+  'state.inFrame': 'อยู่ในกรอบ',
+  'state.outOfFrame': 'อยู่นอกกรอบ',
+
+  'clinician.title': 'รายชื่อผู้ป่วย',
+  'clinician.search': 'ค้นหาชื่อ หรือ HN',
+  'clinician.addPatient': 'เพิ่มผู้ป่วย',
+  'clinician.empty': 'ยังไม่มีผู้ป่วย — เพิ่มผู้ป่วยคนแรก',
+
+  'settings.title': 'ตั้งค่า',
+  'settings.language': 'ภาษา',
+  'settings.logout': 'ออกจากระบบ',
+  'settings.consentStatus': 'สถานะคำยินยอม',
+
+  'common.loading': 'กำลังโหลด…',
+  'common.error': 'เกิดข้อผิดพลาด — ลองอีกครั้ง',
+  'common.retry': 'ลองอีกครั้ง',
+  'common.back': 'ย้อนกลับ',
+}
