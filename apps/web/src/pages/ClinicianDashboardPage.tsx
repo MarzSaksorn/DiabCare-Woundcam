@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, fetchLiveOverview } from '@/api/client'
 import type { LiveOverviewStats, Patient, PatientOverviewStats } from '@/api/types'
 import { Layout } from '@/components/Layout'
+import { ErrorState } from '@/components/ErrorState'
 import { DonutChart, DonutLegend } from '@/components/charts/DonutChart'
 import { LineAreaChart } from '@/components/charts/LineAreaChart'
 import { useI18n } from '@/i18n'
@@ -111,8 +112,16 @@ export function ClinicianDashboardPage() {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [patients, setPatients] = useState<Patient[] | null>(null)
+  const [patientsError, setPatientsError] = useState(false)
   const [stats, setStats] = useState<PatientOverviewStats | null>(null)
   const [live, setLive] = useState<LiveOverviewStats | null>(null)
+
+  const loadPatients = useCallback((q: string) => {
+    setPatientsError(false)
+    api.listPatients(q)
+      .then((rows) => setPatients(rows))
+      .catch(() => setPatientsError(true))
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -125,14 +134,8 @@ export function ClinicianDashboardPage() {
   }, [])
 
   useEffect(() => {
-    let cancelled = false
-    api.listPatients(search).then((rows) => {
-      if (!cancelled) setPatients(rows)
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [search])
+    loadPatients(search)
+  }, [loadPatients, search])
 
   useEffect(() => {
     let cancelled = false
@@ -345,11 +348,17 @@ export function ClinicianDashboardPage() {
         </button>
 
         <div className={`flex flex-col ${GAP}`}>
-          {patients === null && <p className="text-mid-gray">{t('common.loading')}</p>}
-          {patients?.length === 0 && (
-            <p className="rounded-card border border-hairline bg-paper p-6 text-center text-mid-gray">
-              {t('clinician.empty')}
-            </p>
+          {patientsError ? (
+            <ErrorState onRetry={() => loadPatients(search)} />
+          ) : (
+            <>
+              {patients === null && <p className="text-mid-gray">{t('common.loading')}</p>}
+              {patients?.length === 0 && (
+                <p className="rounded-card border border-hairline bg-paper p-6 text-center text-mid-gray">
+                  {t('clinician.empty')}
+                </p>
+              )}
+            </>
           )}
           {patients?.map((p) => (
             <button

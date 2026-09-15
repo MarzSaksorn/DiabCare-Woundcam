@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import type { Wound } from '@/api/types'
 import { Layout } from '@/components/Layout'
+import { ErrorState } from '@/components/ErrorState'
 import { PhotoCard } from '@/components/PhotoCard'
 import { useI18n } from '@/i18n'
 
@@ -14,23 +15,37 @@ export function WoundListPage() {
   const { t, lang } = useI18n()
   const navigate = useNavigate()
   const [wounds, setWounds] = useState<Wound[] | null>(null)
+  const [error, setError] = useState(false)
+
+  const loadWounds = useCallback(() => {
+    setError(false)
+    api.listWounds('01J8ZK3M9P2Q4R5S6T7U8V9W0X')
+      .then(setWounds)
+      .catch(() => setError(true))
+  }, [])
 
   useEffect(() => {
-    api.listWounds('01J8ZK3M9P2Q4R5S6T7U8V9W0X').then(setWounds)
-  }, [])
+    loadWounds()
+  }, [loadWounds])
 
   return (
     <Layout title={t('wounds.title')}>
-      {wounds === null && <p className="text-mid-gray">{t('common.loading')}</p>}
+      {error ? (
+        <ErrorState onRetry={loadWounds} />
+      ) : (
+        <>
+          {wounds === null && <p className="text-mid-gray">{t('common.loading')}</p>}
 
-      {wounds?.length === 0 && (
-        <button
-          type="button"
-          onClick={() => navigate('/wounds/select')}
-          className="w-full rounded-card border border-dashed border-hairline bg-paper p-8 text-center text-body text-mid-gray shadow-card"
-        >
-          {t('wounds.empty')}
-        </button>
+          {wounds?.length === 0 && (
+            <button
+              type="button"
+              onClick={() => navigate('/wounds/select')}
+              className="w-full rounded-card border border-dashed border-hairline bg-paper p-8 text-center text-body text-mid-gray shadow-card"
+            >
+              {t('wounds.empty')}
+            </button>
+          )}
+        </>
       )}
 
       <div className="space-y-3">

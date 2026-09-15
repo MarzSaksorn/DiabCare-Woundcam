@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import type { Patient } from '@/api/types'
 import { Layout } from '@/components/Layout'
+import { ErrorState } from '@/components/ErrorState'
 import { useI18n } from '@/i18n'
 
 /**
@@ -15,15 +16,19 @@ export function PatientsPage() {
   const [search, setSearch] = useState('')
   const [patients, setPatients] = useState<Patient[] | null>(null)
 
+  const [patients, setPatients] = useState<Patient[] | null>(null)
+  const [error, setError] = useState(false)
+
+  const loadPatients = useCallback((q: string) => {
+    setError(false)
+    api.listPatients(q)
+      .then((rows) => setPatients(rows))
+      .catch(() => setError(true))
+  }, [])
+
   useEffect(() => {
-    let cancelled = false
-    api.listPatients(search).then((rows) => {
-      if (!cancelled) setPatients(rows)
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [search])
+    loadPatients(search)
+  }, [loadPatients, search])
 
   return (
     <Layout title={t('nav.patients')}>
@@ -36,11 +41,17 @@ export function PatientsPage() {
       />
 
       <div className="mt-4 space-y-3">
-        {patients === null && <p className="text-mid-gray">{t('common.loading')}</p>}
-        {patients?.length === 0 && (
-          <p className="rounded-card border border-hairline bg-paper p-6 text-center text-mid-gray">
-            {t('clinician.empty')}
-          </p>
+        {error ? (
+          <ErrorState onRetry={() => loadPatients(search)} />
+        ) : (
+          <>
+            {patients === null && <p className="text-mid-gray">{t('common.loading')}</p>}
+            {patients?.length === 0 && (
+              <p className="rounded-card border border-hairline bg-paper p-6 text-center text-mid-gray">
+                {t('clinician.empty')}
+              </p>
+            )}
+          </>
         )}
         {patients?.map((p) => (
           <button

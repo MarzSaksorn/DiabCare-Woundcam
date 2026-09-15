@@ -20,6 +20,38 @@ const USE_MOCKS = true
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/v1'
 const STATS_BASE_URL = import.meta.env.VITE_STATS_BASE_URL ?? 'http://localhost:3001'
 
+const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
+
+/**
+ * Full-shape guard for the live overview: every field the dashboard renders
+ * must be present and correctly typed, hba1c.trend included — a malformed
+ * response must fall back to mock, never crash a render (audit round 2).
+ */
+function isValidLiveOverview(json: unknown): json is LiveOverviewStats {
+  const o = json as LiveOverviewStats | null
+  if (!o || typeof o !== 'object') return false
+  const p = o.patients
+  const h = o.hba1c
+  return (
+    !!p &&
+    !!h &&
+    isNum(p.total) &&
+    isNum(p.type1) &&
+    isNum(p.type2) &&
+    isNum(p.gdm) &&
+    isNum(p.female) &&
+    isNum(p.male) &&
+    isNum(p.avgAge) &&
+    isNum(p.insulinUsers) &&
+    isNum(p.ckd) &&
+    isNum(h.avgOverall) &&
+    Array.isArray(h.trend) &&
+    h.trend.every(
+      (t) => !!t && isNum(t.avg) && (typeof t.period === 'string' || isNum(t.period)),
+    )
+  )
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     credentials: 'include',
@@ -113,10 +145,8 @@ export async function fetchLiveOverview(): Promise<LiveOverviewStats | null> {
     })
     if (!res.ok) return null
     const json: unknown = await res.json()
-    const p = (json as LiveOverviewStats | null)?.patients
-    // Minimal shape validation before we trust it for rendering
-    if (!p || typeof p.total !== 'number' || typeof p.type1 !== 'number') return null
-    return json as LiveOverviewStats
+    if (!isValidLiveOverview(json)) return null
+    return json
   } catch {
     return null
   } finally {

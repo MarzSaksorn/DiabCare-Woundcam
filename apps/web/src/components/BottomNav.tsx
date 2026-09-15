@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useI18n } from '@/i18n'
 import { cn } from '@/lib/cn'
 
@@ -6,6 +6,11 @@ import { cn } from '@/lib/cn'
  * BottomNav — 5 fixed tabs, mobile-first, ≥44px targets (NFR-A11Y-1).
  * Active state = icon weight/fill change + label emphasis; color is never
  * the sole cue (WCAG 1.4.1). Hidden on immersive screens by Layout.
+ *
+ * Active mapping is path-prefix based (audit round 2): /wounds (patient
+ * home, post-Accept landing) tracks the Patients tab; the capture flow
+ * (/wounds/select, /wounds/:id/capture|review) tracks the Camera tab —
+ * so no screen renders with zero active tabs.
  */
 
 function TabIcon({
@@ -90,32 +95,43 @@ const TABS = [
 
 export function BottomNav() {
   const { t } = useI18n()
+  const { pathname } = useLocation()
+
+  const isCamera =
+    pathname.startsWith('/wounds/select') || /\/(capture|review)$/.test(pathname)
+  const isPatients =
+    pathname.startsWith('/patients') || (pathname.startsWith('/wounds') && !isCamera)
+  const activeByTab: Record<string, boolean> = {
+    '/clinician': pathname.startsWith('/clinician'),
+    '/patients': isPatients,
+    '/wounds/select': isCamera,
+    '/reports': pathname.startsWith('/reports'),
+    '/settings': pathname.startsWith('/settings'),
+  }
+
   return (
     <nav
       aria-label={t('nav.bottom')}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-paper pb-[env(safe-area-inset-bottom)]"
     >
       <div className="mx-auto flex max-w-2xl items-stretch">
-        {TABS.map((tab) => (
-          <NavLink
-            key={tab.to}
-            to={tab.to}
-            className={({ isActive }) =>
-              cn(
+        {TABS.map((tab) => {
+          const active = activeByTab[tab.to] ?? false
+          return (
+            <Link
+              key={tab.to}
+              to={tab.to}
+              aria-current={active ? 'page' : undefined}
+              className={cn(
                 'flex min-h-[4.5rem] flex-1 flex-col items-center justify-center gap-1 px-1 py-2 text-caption',
-                isActive ? 'font-semibold text-primary-deep' : 'font-normal text-mid-gray',
-              )
-            }
-          >
-            {({ isActive }) => (
-              <>
-                {tab.icon(isActive)}
-                {/* aria-current from NavLink marks active for AT; visual emphasis is weight, not color alone */}
-                <span aria-current={isActive ? 'page' : undefined}>{t(tab.labelKey)}</span>
-              </>
-            )}
-          </NavLink>
-        ))}
+                active ? 'font-semibold text-primary-deep' : 'font-normal text-mid-gray',
+              )}
+            >
+              {tab.icon(active)}
+              <span>{t(tab.labelKey)}</span>
+            </Link>
+          )
+        })}
       </div>
     </nav>
   )
