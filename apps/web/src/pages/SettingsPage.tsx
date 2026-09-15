@@ -47,7 +47,7 @@ export function SettingsPage() {
         <button
           type="button"
           onClick={logout}
-          className="w-full rounded-pill bg-canvas px-4 py-2 text-body font-medium text-ember ring-1 ring-ember/40"
+          className="w-full rounded-pill bg-canvas px-4 py-2 text-body font-medium text-ember-ink ring-1 ring-ember/40"
         >
           {t('settings.logout')}
         </button>

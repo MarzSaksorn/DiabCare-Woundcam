@@ -4,7 +4,8 @@ import { cn } from '@/lib/cn'
 
 /**
  * StateChip — status = icon + short text, never color alone (NFR-A11Y-2,
- * WCAG 1.4.1). Pill geometry per the style bible: 18px radius, 2px 8px pad.
+ * WCAG 1.4.1). Chip geometry per reference spec: 12px radius, 2px 8px pad.
+ * Small-text tones use the AA-darkened -ink variants on white.
  */
 export type ChipTone = 'neutral' | 'pass' | 'fail' | 'destructive'
 
@@ -19,11 +20,11 @@ const ICONS: Record<string, string> = {
 }
 
 const TONE_CLASSES: Record<ChipTone, string> = {
-  neutral: 'bg-canvas text-ink-soft',
-  pass: 'bg-ink-soft text-[#fafafa]',
+  neutral: 'bg-surface-alt text-ink',
+  pass: 'bg-paper text-success-ink ring-1 ring-success/40',
   fail: 'bg-paper text-ink ring-1 ring-hairline',
-  // Ember only ever marks destructive/error — style bible rule
-  destructive: 'bg-paper text-ember ring-1 ring-ember/40',
+  // Coral is the alert voice; -ink keeps small text at AA contrast
+  destructive: 'bg-paper text-ember-ink ring-1 ring-ember/40',
 }
 
 export interface StateChipProps {
@@ -53,7 +54,7 @@ export function StateChip({ icon, tone = 'neutral', label, className }: StateChi
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-caption font-medium',
+        'inline-flex items-center gap-1.5 rounded-[12px] px-2 py-0.5 text-caption font-medium',
         TONE_CLASSES[tone],
         className,
       )}

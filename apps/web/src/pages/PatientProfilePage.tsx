@@ -58,7 +58,7 @@ export function PatientProfilePage() {
       <button
         type="button"
         onClick={() => navigate(`/wounds/select?patientId=${patientId}`)}
-        className="mt-4 w-full rounded-pill bg-ink px-4 py-2 text-body font-medium text-[#fafafa]"
+        className="mt-4 w-full rounded-pill bg-primary px-4 py-2 text-body font-medium text-white"
       >
         + {t('wounds.addNew')}
       </button>

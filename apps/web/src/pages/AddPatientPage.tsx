@@ -51,13 +51,13 @@ export function AddPatientPage() {
           MRN
         </label>
         <input id="mrn" value={mrn} onChange={(e) => setMrn(e.target.value)} className={fieldClass} />
-        {errors.mrn && <p className="text-caption text-ember">{errors.mrn}</p>}
+        {errors.mrn && <p className="text-caption text-ember-ink">{errors.mrn}</p>}
 
         <label className="mt-4 block text-caption font-medium text-mid-gray" htmlFor="fullName">
           ชื่อ-นามสกุล / Full name
         </label>
         <input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} className={fieldClass} />
-        {errors.fullName && <p className="text-caption text-ember">{errors.fullName}</p>}
+        {errors.fullName && <p className="text-caption text-ember-ink">{errors.fullName}</p>}
 
         <fieldset className="mt-4">
           <legend className="text-caption font-medium text-mid-gray">dm_type</legend>
@@ -69,7 +69,7 @@ export function AddPatientPage() {
                 aria-pressed={dmType === v}
                 onClick={() => setDmType(v)}
                 className={`min-h-11 flex-1 rounded-pill px-3 text-body font-medium ${
-                  dmType === v ? 'bg-ink text-[#fafafa]' : 'bg-canvas text-ink'
+                  dmType === v ? 'bg-primary text-white' : 'bg-canvas text-ink'
                 }`}
               >
                 {v}
@@ -92,7 +92,7 @@ export function AddPatientPage() {
         <button
           type="submit"
           disabled={busy}
-          className="mt-6 w-full rounded-pill bg-ink px-4 py-2 text-body font-medium text-[#fafafa] disabled:opacity-60"
+          className="mt-6 w-full rounded-pill bg-primary px-4 py-2 text-body font-medium text-white disabled:opacity-60"
         >
           {t('clinician.addPatient')}
         </button>

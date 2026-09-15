@@ -46,7 +46,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={toast.id}
             className={cn(
               'pointer-events-auto flex items-center gap-2 rounded-pill px-4 py-2 text-body shadow-card',
-              toast.kind === 'success' ? 'bg-ink-soft text-[#fafafa]' : 'bg-paper text-ember ring-1 ring-ember/40',
+              toast.kind === 'success' ? 'bg-primary-deep text-white' : 'bg-paper text-ember-ink ring-1 ring-ember/40',
             )}
           >
             <svg

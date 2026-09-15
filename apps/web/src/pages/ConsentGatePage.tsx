@@ -39,7 +39,7 @@ export function ConsentGatePage() {
         </div>
 
         {accepted === false && (
-          <p role="alert" className="mt-4 text-body text-ember">
+          <p role="alert" className="mt-4 text-body text-ember-ink">
             [Declined state — withdrawal/re-consent info, plain and unafraid]
           </p>
         )}
@@ -49,7 +49,7 @@ export function ConsentGatePage() {
             type="button"
             disabled={busy}
             onClick={accept}
-            className="flex-1 rounded-pill bg-ink px-4 py-2 text-body font-medium text-[#fafafa] disabled:opacity-60"
+            className="flex-1 rounded-pill bg-primary px-4 py-2 text-body font-medium text-white disabled:opacity-60"
           >
             {t('consent.accept')}
           </button>

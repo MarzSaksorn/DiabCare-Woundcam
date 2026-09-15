@@ -29,7 +29,7 @@ export function LangToggle({ className }: { className?: string }) {
             onClick={() => setLang(opt.value)}
             className={cn(
               'min-h-11 rounded-pill px-3 text-caption font-medium transition-colors',
-              active ? 'bg-ink text-[#fafafa]' : 'text-mid-gray',
+              active ? 'bg-primary text-white' : 'text-mid-gray',
             )}
           >
             {opt.label}

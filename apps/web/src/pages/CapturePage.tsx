@@ -81,7 +81,7 @@ export function CapturePage() {
           {t('capture.cameraDenied')}
         </p>
       ) : (
-        <div className="relative overflow-hidden rounded-card border border-hairline bg-ink shadow-card">
+        <div className="relative overflow-hidden rounded-card border border-hairline bg-primary shadow-card">
           <video ref={videoRef} playsInline muted className="aspect-[3/4] w-full object-cover" />
           {/* Fill-frame dashed outline (FR-CAP-2) + ghost overlay (FR-CAP-3) */}
           <div
@@ -135,7 +135,7 @@ export function CapturePage() {
           aria-label={t('capture.shutter')}
           className={cn(
             'flex h-20 w-20 items-center justify-center rounded-full text-body font-semibold transition-opacity',
-            passed ? 'bg-ink text-[#fafafa]' : 'bg-ink/30 text-[#fafafa]',
+            passed ? 'bg-primary text-white' : 'bg-primary/30 text-white',
           )}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="1.8">

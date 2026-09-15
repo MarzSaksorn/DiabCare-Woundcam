@@ -68,7 +68,7 @@ export function WoundSelectPage() {
               className={cn(
                 'min-h-16 rounded-card border px-4 py-3 text-start text-body-lg font-medium',
                 location === loc
-                  ? 'border-ink bg-ink text-[#fafafa]'
+                  ? 'border-primary-deep bg-primary text-white'
                   : 'border-hairline bg-canvas',
               )}
             >
@@ -90,7 +90,7 @@ export function WoundSelectPage() {
               onClick={() => setLaterality(side)}
               className={cn(
                 'min-h-11 flex-1 rounded-pill px-3 text-body font-medium',
-                laterality === side ? 'bg-ink text-[#fafafa]' : 'bg-canvas',
+                laterality === side ? 'bg-primary text-white' : 'bg-canvas',
               )}
             >
               {t(`wound.${side}`)}
@@ -102,7 +102,7 @@ export function WoundSelectPage() {
           type="button"
           disabled={!location || busy}
           onClick={createAndCapture}
-          className="mt-5 w-full rounded-pill bg-ink px-4 py-2 text-body font-medium text-[#fafafa] disabled:opacity-60"
+          className="mt-5 w-full rounded-pill bg-primary px-4 py-2 text-body font-medium text-white disabled:opacity-60"
         >
           {t('wounds.addNew')} → {t('wounds.capture')}
         </button>

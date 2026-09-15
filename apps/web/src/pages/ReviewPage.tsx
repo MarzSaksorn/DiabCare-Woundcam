@@ -44,8 +44,8 @@ export function ReviewPage() {
 
   return (
     <Layout title={t('review.title')}>
-      <div className="overflow-hidden rounded-card border border-hairline bg-ink shadow-card">
-        <div className="flex aspect-[3/4] items-center justify-center bg-ink text-mid-gray">
+      <div className="overflow-hidden rounded-card border border-hairline bg-primary shadow-card">
+        <div className="flex aspect-[3/4] items-center justify-center bg-primary text-mid-gray">
           {/* Captured frame renders here; mock placeholder until B6 camera pipeline. */}
           <span className="text-body">{t('review.title')}</span>
         </div>
@@ -62,7 +62,7 @@ export function ReviewPage() {
       <p className="mt-3 text-caption text-mid-gray">[Aligned with last photo ✓]</p>
 
       {phase === 'error' && (
-        <p role="alert" className="mt-4 text-body text-ember">
+        <p role="alert" className="mt-4 text-body text-ember-ink">
           {t('review.uploadError')}
         </p>
       )}
@@ -81,7 +81,7 @@ export function ReviewPage() {
           type="button"
           onClick={accept}
           disabled={phase === 'uploading' || phase === 'accepted'}
-          className="min-h-11 flex-1 rounded-pill bg-ink px-4 py-2 text-body font-medium text-[#fafafa] disabled:opacity-60"
+          className="min-h-11 flex-1 rounded-pill bg-primary px-4 py-2 text-body font-medium text-white disabled:opacity-60"
         >
           {t('review.accept')}
         </button>

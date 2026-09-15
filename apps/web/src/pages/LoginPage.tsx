@@ -73,7 +73,7 @@ export function LoginPage() {
         />
 
         {error && (
-          <p role="alert" className="mt-4 flex items-center gap-2 text-body text-ember">
+          <p role="alert" className="mt-4 flex items-center gap-2 text-body text-ember-ink">
             <svg aria-hidden="true" viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M8 3.5v5.5M8 12.4v.2" />
             </svg>
@@ -84,7 +84,7 @@ export function LoginPage() {
         <button
           type="submit"
           disabled={busy}
-          className="mt-6 w-full rounded-pill bg-ink px-4 py-2 text-body font-medium text-[#fafafa] disabled:opacity-60"
+          className="mt-6 w-full rounded-pill bg-primary px-4 py-2 text-body font-medium text-white disabled:opacity-60"
         >
           {t('login.submit')}
         </button>
