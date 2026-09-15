@@ -87,6 +87,12 @@ export const en: Record<string, string> = {
   'state.high': 'High',
   'state.normal': 'Normal',
 
+  'charts.periodAxis': 'Wound records per 60-day period (P1–P6)',
+  'charts.records': 'records',
+  'charts.aria.dm': 'Diabetes type breakdown',
+  'charts.aria.severity': 'Wound severity breakdown',
+  'charts.aria.trend': 'Capture trend per 60-day period, last six periods',
+
   'settings.title': 'Settings',
   'settings.language': 'Language',
   'settings.logout': 'Sign out',

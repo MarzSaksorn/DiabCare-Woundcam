@@ -104,6 +104,8 @@ export interface PatientOverviewStats {
     gdmUnknown: number
   }
   avgHba1c: number
+  /** Wound records captured per 60-day period (anchor model, PRD §8) — last 6 periods, oldest first. */
+  captureTrend: Array<{ label: string; count: number }>
   /** Marks demo data so the UI can label it honestly. */
   source: 'sample-dataset'
 }

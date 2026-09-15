@@ -88,6 +88,12 @@ export const th: Record<string, string> = {
   'state.high': 'ระดับสูง',
   'state.normal': 'ปกติ',
 
+  'charts.periodAxis': 'ภาพบันทึกต่อรอบ 60 วัน (รอบ P1–P6)',
+  'charts.records': 'ภาพบันทึก',
+  'charts.aria.dm': 'สัดส่วนชนิดของเบาหวาน',
+  'charts.aria.severity': 'สัดส่วนความรุนแรงของแผล',
+  'charts.aria.trend': 'แนวโน้มภาพบันทึกต่อรอบ 60 วัน หกรอบล่าสุด',
+
   'settings.title': 'ตั้งค่า',
   'settings.language': 'ภาษา',
   'settings.logout': 'ออกจากระบบ',

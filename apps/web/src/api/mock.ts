@@ -194,6 +194,16 @@ export const mock = {
       severityBreakdown: { critical: 890, high: 4_120, normal: 13_390 },
       dmBreakdown: { type1: 2_000, type2: 50_000, gdmUnknown: 18_000 },
       avgHba1c: 8.2,
+      // Six 60-day periods, sums to 18,400 — adoption curve growing then flattening
+      // (P6 is the current partial period).
+      captureTrend: [
+        { label: 'P1', count: 1_250 },
+        { label: 'P2', count: 2_400 },
+        { label: 'P3', count: 3_600 },
+        { label: 'P4', count: 4_450 },
+        { label: 'P5', count: 4_300 },
+        { label: 'P6', count: 2_400 },
+      ],
       source: 'sample-dataset',
     }
   },

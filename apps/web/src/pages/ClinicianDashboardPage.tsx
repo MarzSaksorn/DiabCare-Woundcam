@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import type { Patient, PatientOverviewStats } from '@/api/types'
 import { Layout } from '@/components/Layout'
-import { StateChip } from '@/components/StateChip'
+import { DonutChart, DonutLegend } from '@/components/charts/DonutChart'
+import { LineAreaChart } from '@/components/charts/LineAreaChart'
 import { useI18n } from '@/i18n'
 
 /**
@@ -45,21 +46,29 @@ function KpiCard({ label, value, alertIcon }: {
   )
 }
 
-/** Horizontal bar row: icon+text chip label (WCAG 1.4.1), bar, count. */
-function BarRow({ chip, count, max, barClass }: {
-  chip: React.ReactNode
-  count: number
-  max: number
-  barClass: string
+/** Horizontal stacked severity bar — segments sized by share; legend carries text. */
+function SeverityStackedBar({ severity, ariaLabel }: {
+  severity: PatientOverviewStats['severityBreakdown']
+  ariaLabel: string
 }) {
-  const pct = max > 0 ? Math.max(2, Math.round((count / max) * 100)) : 0
+  const total = severity.critical + severity.high + severity.normal
+  const segments = [
+    { count: severity.critical, color: 'var(--color-ember)', labelKey: 'state.critical' },
+    { count: severity.high, color: 'var(--color-primary)', labelKey: 'state.high' },
+    { count: severity.normal, color: 'var(--color-success)', labelKey: 'state.normal' },
+  ]
   return (
-    <div className="flex items-center gap-3">
-      <span className="flex w-28 shrink-0">{chip}</span>
-      <span aria-hidden="true" className="h-2 flex-1 overflow-hidden rounded-full bg-fill-soft">
-        <span className={`block h-full rounded-full ${barClass}`} style={{ width: `${pct}%` }} />
-      </span>
-      <span className="w-16 text-end text-body font-semibold tabular-nums">{count}</span>
+    <div
+      role="img"
+      aria-label={ariaLabel}
+      className="flex h-3 w-full overflow-hidden rounded-full"
+    >
+      {segments.map((seg) => (
+        <span
+          key={seg.labelKey}
+          style={{ width: `${(seg.count / total) * 100}%`, backgroundColor: seg.color }}
+        />
+      ))}
     </div>
   )
 }
@@ -97,9 +106,23 @@ export function ClinicianDashboardPage() {
   )
 
   const severity = stats?.severityBreakdown
-  const severityMax = severity ? Math.max(...Object.values(severity)) : 0
+  const severityTotal = severity ? severity.critical + severity.high + severity.normal : 0
   const dm = stats?.dmBreakdown
-  const dmMax = dm ? Math.max(...Object.values(dm)) : 0
+  const dmTotal = dm ? dm.type1 + dm.type2 + dm.gdmUnknown : 0
+  const dmSlices = dm
+    ? [
+        { label: t('stats.type1'), value: dm.type1, color: '#35bdfb' },
+        { label: t('stats.type2'), value: dm.type2, color: '#1568e8' },
+        { label: t('stats.gdmUnknown'), value: dm.gdmUnknown, color: '#0a4fbe' },
+      ]
+    : []
+  const severitySlices = severity
+    ? [
+        { label: t('state.critical'), value: severity.critical, color: '#e84d67' },
+        { label: t('state.high'), value: severity.high, color: '#1568e8' },
+        { label: t('state.normal'), value: severity.normal, color: '#16b67a' },
+      ]
+    : []
 
   return (
     <Layout title={t('clinician.title')}>
@@ -149,7 +172,7 @@ export function ClinicianDashboardPage() {
           />
         </div>
 
-        {/* Breakdown panels — full-width pair on desktop, stacked on mobile */}
+        {/* Charts row 1 — severity stacked bar + diabetes-type donut */}
         <div className={`grid grid-cols-1 ${GAP} lg:grid-cols-2`}>
           <section
             aria-label={t('stats.severity')}
@@ -159,33 +182,13 @@ export function ClinicianDashboardPage() {
               {t('stats.severity')}
             </h2>
             {severity ? (
-              <dl className={`mt-4 flex flex-1 flex-col justify-center ${GAP}`}>
-                <dt className="sr-only">{t('stats.severity')}</dt>
-                <dd className={`flex items-center ${GAP}`}>
-                  <BarRow
-                    chip={<StateChip icon="fail" tone="destructive" label={t('state.critical')} />}
-                    count={severity.critical}
-                    max={severityMax}
-                    barClass="bg-ember"
-                  />
-                </dd>
-                <dd className={`flex items-center ${GAP}`}>
-                  <BarRow
-                    chip={<StateChip icon="unverified" tone="fail" label={t('state.high')} />}
-                    count={severity.high}
-                    max={severityMax}
-                    barClass="bg-primary"
-                  />
-                </dd>
-                <dd className={`flex items-center ${GAP}`}>
-                  <BarRow
-                    chip={<StateChip icon="ok" tone="pass" label={t('state.normal')} />}
-                    count={severity.normal}
-                    max={severityMax}
-                    barClass="bg-success"
-                  />
-                </dd>
-              </dl>
+              <div className="mt-4 flex flex-1 flex-col justify-center gap-4">
+                <SeverityStackedBar
+                  severity={severity}
+                  ariaLabel={t('charts.aria.severity')}
+                />
+                <DonutLegend slices={severitySlices} total={severityTotal} fmt={fmt} />
+              </div>
             ) : (
               <p className="mt-4 text-body text-mid-gray">{t('common.loading')}</p>
             )}
@@ -199,44 +202,42 @@ export function ClinicianDashboardPage() {
               {t('stats.dmBreakdown')}
             </h2>
             {dm ? (
-              <dl className={`mt-4 flex flex-1 flex-col justify-center ${GAP}`}>
-                <dt className="sr-only">{t('stats.dmBreakdown')}</dt>
-                <dd>
-                  <BarRow
-                    chip={<StateChip icon="healing" tone="neutral" label={t('stats.type1')} />}
-                    count={dm.type1}
-                    max={dmMax}
-                    barClass="bg-primary"
-                  />
-                </dd>
-                <dd>
-                  <BarRow
-                    chip={<StateChip icon="healing" tone="neutral" label={t('stats.type2')} />}
-                    count={dm.type2}
-                    max={dmMax}
-                    barClass="bg-primary"
-                  />
-                </dd>
-                <dd>
-                  <BarRow
-                    chip={<StateChip icon="healing" tone="neutral" label={t('stats.gdmUnknown')} />}
-                    count={dm.gdmUnknown}
-                    max={dmMax}
-                    barClass="bg-primary"
-                  />
-                </dd>
-                <dd className="flex items-center justify-between border-t border-hairline pt-3">
-                  <span className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">
-                    {t('stats.avgHba1c')}
-                  </span>
-                  <span className="text-body-lg font-semibold">{stats.avgHba1c.toFixed(1)}%</span>
-                </dd>
-              </dl>
+              <div className="mt-4 flex flex-1 items-center justify-center gap-6">
+                <DonutChart
+                  slices={dmSlices}
+                  centerValue={fmt.format(dmTotal)}
+                  centerLabel={t('stats.totalPatients')}
+                  ariaLabel={t('charts.aria.dm')}
+                  size={150}
+                />
+                <DonutLegend slices={dmSlices} total={dmTotal} fmt={fmt} />
+              </div>
             ) : (
               <p className="mt-4 text-body text-mid-gray">{t('common.loading')}</p>
             )}
           </section>
         </div>
+
+        {/* Charts row 2 — capture trend, full width */}
+        <section
+          aria-label={t('charts.aria.trend')}
+          className="rounded-card border border-hairline bg-paper p-5 shadow-card"
+        >
+          <h2 className="text-caption font-medium uppercase tracking-[0.6px] text-mid-gray">
+            {t('charts.periodAxis')}
+          </h2>
+          {stats ? (
+            <div className="mt-3">
+              <LineAreaChart
+                points={stats.captureTrend}
+                ariaLabel={t('charts.aria.trend')}
+                gradientId="trend-fill"
+              />
+            </div>
+          ) : (
+            <p className="mt-4 text-body text-mid-gray">{t('common.loading')}</p>
+          )}
+        </section>
 
         {/* Search + patient list */}
         <input
