@@ -30,6 +30,7 @@ Settings reachable from every page header
 - **PhotoCard** — thumbnail, capture date, status chip, capturedBy (name + role).
 - **Toast** — save confirmations; reassurance-first error copy (tone rule 3).
 - **ConsentGate** — wrapper blocking photo features until `consent = true`.
+- **BottomNav** — fixed 5-tab bar: Dashboard (/clinician) · Patients (/patients) · Camera (/wounds/select — capture requires a wound record first, FR-WND-4) · Report (/reports, v0.3 placeholder) · Profile (/settings). ≥44px targets, icon + text labels TH/EN, active state never color alone; hidden on Capture/Review (immersive); safe-area inset for notched devices (commit f6a05c8).
 - **LangToggle** — TH/EN switch, persists per device; TH is default.
 
 ---
