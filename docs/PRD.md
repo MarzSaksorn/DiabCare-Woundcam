@@ -5,7 +5,7 @@
 | Version | 0.1 (draft for team review) |
 | Date | 2026-09-15 |
 | Owner | diab-orchestrator |
-| Status | Rebuild-clean decision locked by Saksorn; prototype = design reference only |
+| Status | Rebuild-clean locked; PRD v0.1.1 — review round 1 folded in (15 issues, 5 agents) |
 | Inputs | Research Day 1: competitor teardown, stack plan, capture-UI de-risk, patient schema, escalation model, reference-app teardown + feature inventory, hospital EMR dataset study |
 
 ---
@@ -74,7 +74,7 @@
 - FR-AUTH-3: Logout invalidates session server-side.
 
 ### FR-PAT — Patients
-- FR-PAT-1: Patient record stores: internal ULID `id`, external `mrn` (unique), `consent` flag (**required true before any photo upload**), `dob` (or `age_years` if DOB unavailable), `sex`, `dm_type` (enum type1/type2/gdm), `dm_onset` date, `identify_by` (enum medication/icd10/lab), `hba1c` (single manual field, optional), timestamps.
+- FR-PAT-1: Patient record stores: internal ULID `id`, external `mrn` (unique), consent process fields — `consent` flag (**required true before any photo upload**) + `consent_at`, `consent_version`, `consent_method` — plus `dob` (or `age_years` if DOB unavailable), `sex`, `dm_type` (enum type1/type2/gdm), `dm_onset` date, `identify_by` (enum medication/icd10/lab), `hba1c` (single manual field, optional), timestamps.
 - FR-PAT-2: Clinician can add/edit patients; patient list supports search by name/MRN.
 - FR-PAT-3: All patient edits write to the audit table (actor, field, old, new, at).
 
@@ -82,19 +82,23 @@
 - FR-WND-1: Wound record: `id`, `patient_id` FK, `location` (enum: foot_plantar/foot_dorsal/heel/toe/lower_leg/other), `laterality` (left/right/na), `status` (open/healing/closed/amputated), `notes`.
 - FR-WND-2: `first_photo_at` anchor = timestamp of the **first validated photo** (passed `/complete` integrity check), never the first upload attempt.
 - FR-WND-3: Re-baselining stores `effective_anchor_at` override; original anchor and all history are never rewritten.
+- FR-WND-4: Wound creation (added in review): clinician creates wound records; a patient/caregiver finding a new wound at home picks body-part location + laterality from large tiles, creating a record pending clinician confirmation (ghost overlay starts empty). Location and tissue type are separate concepts — chips in capture are tissue type only.
 
 ### FR-CAP — Guided capture (capture-first)
-- FR-CAP-1: Camera-first screen: viewfinder is the screen; one large shutter button; wound-type selectable as large tappable chips.
+- FR-CAP-1: Camera-first screen: viewfinder is the screen; one large shutter button; wound-type (tissue type) selectable as large tappable chips; wound selection/creation happens on the preceding screen (FR-WND-4), not in the camera.
 - FR-CAP-2: Fill-frame guide: dashed outline sized for a calibration (ruler) sticker; when the sticker fills the outline, capture distance is correct.
 - FR-CAP-3: Ghost overlay: last accepted photo for the same wound rendered at ~30% opacity for angle/crop matching by alignment, not memory.
-- FR-CAP-4: Single green check state (in frame + in focus + sticker visible) enables the shutter; any failing element is highlighted in red on the outline itself.
+- FR-CAP-4: Single green check state (in frame + in focus + sticker visible + exposure OK) enables the shutter; any failing element is highlighted in red on the outline itself — under/over-exposure uses the same live outline warning; lighting is never a review-screen quiz.
 - FR-CAP-5: Capture metadata is automatic: timestamp, wound ID, capturedBy (name + role), capture method. No manual typing during capture.
-- FR-CAP-6: The flow must be completable with zero written instructions (UI shows the end state; no onboarding text screens).
+- FR-CAP-6: The flow must be completable with zero written instructions (UI shows the end state; no onboarding text screens). Scope: the capture screen itself; the Accept chip (FR-REV-3) uses plain words or icon + number, never jargon.
+- FR-CAP-7: Quality-check method is spec'd, not assumed: lightweight in-browser check (focus variance + sticker visibility via WASM CV or heuristic — feasibility spike owned by Canvas + Forge before v0.1 build starts). Honest fallback: if the check cannot confirm within 10 s, the shutter force-enables and the capture is flagged `unverified` for clinician review — the gate never lies and never dead-ends.
+- FR-CAP-8: Ghost overlay opacity is user-adjustable (low-vision support).
+- FR-CAP-9: The in-app quality checklist mirrors the Photo Capture Protocol's retake criteria — Scribe's doc is the source of truth; the checklist is its enforcement.
 
 ### FR-REV — Review
 - FR-REV-1: After shutter, full-width photo with overlay checklist (in focus? ruler in frame? lighting OK?).
 - FR-REV-2: Two pinned bottom actions ≥44px: Retake / Accept. **Nothing persists until Accept.**
-- FR-REV-3: On Accept, a one-line comparison chip reinforces teaching: e.g. "Aligned with last photo ✓ · 2.1 cm framing ✓" (v0.1: heuristic; real area analytics at v0.3).
+- FR-REV-3: On Accept, a one-line comparison chip reinforces teaching: e.g. "Aligned with last photo ✓ · 2.1 cm framing ✓" (v0.1: heuristic; real area analytics at v0.3). Copy rule: plain words or icon + number — "framing" and other jargon never reach a patient screen; every state carries icon + short text, not color or a checkmark alone.
 
 ### FR-LST — Wound list & compare
 - FR-LST-1: Wound list: reverse-chronological cards per wound (thumbnail, date, status chip).
@@ -115,8 +119,8 @@
 - FR-AI-4: Exposed keys from the reference prototype are treated as burned; all production keys are new and server-side only. *(Operator action pending — see §12.)*
 
 ### FR-ESC — Escalation (v0.2)
-- FR-ESC-1: Trigger set: HbA1c rise ≥0.5% period-over-period; new insulin initiation; CKD stage progression; new HF or stroke event. Excluded by design: FPG, SBP (noise → alert fatigue).
-- FR-ESC-2: Alert payload (one per period, max 4 trigger rows): signal + delta ("HbA1c 7.1→8.0, 90 days"); wound context (site, photo trend healing/stalled/worsening with % area change per week, days since last in-person review, last self-report flags); one pre-written suggested action per tier; one-tap dispositions — Acknowledge · Schedule visit · Mark false positive (false-positive taps are tuning data; dismissal <5 s).
+- FR-ESC-1: Trigger set — re-scoped after review (dependency fix): **v0.2 evaluates only data v0.1 actually holds.** v0.2 triggers: photo-trend deterioration (classification-based tissue trend, FR-ESC-2) + self-report signals (infection flags, pain rising ≥3 consecutive days, missed-report streak ≥3). Lab/med triggers — HbA1c rise ≥0.5% period-over-period, new insulin initiation, CKD progression, new HF/stroke event — are specified now but activate in v0.3 together with the `patient_clinical` EMR import that feeds them. Excluded by design: FPG, SBP (noise → alert fatigue).
+- FR-ESC-2: Alert payload (one per period, max 4 trigger rows): signal + delta ("HbA1c 7.1→8.0, 90 days"); wound context (site, photo trend healing/stalled/worsening — v0.2: classification-based tissue trend, % area change per week upgrades in v0.3 with area analytics — days since last in-person review, last self-report flags); one pre-written suggested action per tier; one-tap dispositions — Acknowledge · Schedule visit · Mark false positive (false-positive taps are tuning data; dismissal <5 s).
 - FR-ESC-3: Triage tiers (exactly three): photo deterioration + any lab trigger → immediate clinician alert; infection self-report flags alone → 24 h nurse callback; everything else → next scheduled visit.
 - FR-ESC-4: Edge cases: no lab data → evaluate on photo trend + self-reports (never suppress for missing data); silent patient (≥3 missed daily reports on an active wound) → nurse outreach tier, not automated alarm; 2 failed outreach attempts → engagement-risk tag; conflicting signals → photo wins for wound escalation; multiple triggers → one merged alert, tier = highest single trigger; patient/caregiver contradiction → trust the infection-sign reporter, flag discrepancy for the nurse script.
 - FR-ESC-5: Trigger evaluation runs on data ingestion (labs/events land → evaluate); alert delivery table (sent/acked/false-positive) enables precision measurement from day one.
@@ -129,26 +133,30 @@
 - FR-PLT-1: Thai-first bilingual UI (Thai/English), Sarabun typeface; all copy per Writer tone rules (§6.3).
 - FR-PLT-2: Toast pattern for save confirmations; notifications for self-report nudges.
 - FR-PLT-3: Raw audit table from day one (no UI); every clinical mutation logged.
+- FR-PLT-4: Thai copy is authored natively, not machine-translated: register rules (neutral polite register for clinician and patient voice; no clinical jargon on patient screens), and a named Thai language review step gates every release.
 
 ## 6. UX Requirements
 
-**6.1 Flows (v0.1):** Enrollment → consent → capture (FR-CAP) → review (FR-REV) → wound list/compare (FR-LST).
+**6.1 Flows (v0.1):** Enrollment → consent → wound select/create (FR-WND-4) → capture (FR-CAP) → review (FR-REV) → wound list/compare (FR-LST).
 **6.2 Zero-instruction rule:** the UI physically shows the desired end state; no tutorial screens.
 **6.3 Tone rules (all patient-facing copy, TH + EN):**
 1. Steady, not clinical — "Lay the ruler next to the wound, then fill the frame."
 2. Never blame the patient — describe the photo, not their skill — "Photo came out blurry — hold steady and try again."
 3. Reassure before you explain — "Your photo is safe. The upload hiccuped — tap to retry."
+4. High-stakes screens get explicit copy specs: consent (plain-language, versioned), review checklist (states, not quizzes), caregiver attribution ("Reporting for: [Name]" always visible).
 
 ## 7. Non-Functional Requirements
 
 - NFR-SEC-1: TLS everywhere (Cloudflare edge); origin IP hidden; rate limiting at edge.
 - NFR-SEC-2: No clinical data in browser storage; server is the sole source of truth.
 - NFR-SEC-3: All provider keys server-side (env/secrets); the client bundle contains zero secrets.
-- NFR-COMP-1: Thai PDPA-grade consent flow before first upload; consent flag schema-enforced.
-- NFR-COMP-2: Audit trail for every clinical mutation (append-only raw table).
+- NFR-SEC-4: Encryption at rest for the R2 bucket and Postgres; audit-table integrity guarantees (append-only, no client-facing deletes).
+- NFR-COMP-1: Thai PDPA-grade consent is a process, not a flag: consent flow before first upload; `consent_records` table (subject, consent_at, document_version, method, withdrawn_at); data-subject rights honored — access + withdrawal with a defined erasure path.
+- NFR-COMP-2: Audit trail, append-only, with defined retention period and tamper-evidence; event taxonomy: clinical field create/edit, photo upload/read (FR-UPL-3 GETs are logged)/delete, consent change, escalation disposition.
 - NFR-DUR-1: Photos in R2 (off-VPS durability); Postgres nightly managed backups; MinIO-on-app-box is vetoed.
 - NFR-PERF-1: Capture → accepted-in-record under 30 s on a mid-range Android over 4G.
 - NFR-A11Y-1: Touch targets ≥44 px; large-type patient screens; high-contrast states.
+- NFR-A11Y-2: WCAG 1.4.1 — every state communicates with icon + short text, never color alone (red/green highlights, status chips, comparison chips all carry non-color cues).
 - NFR-OPS-1: One VPS + Docker Compose + Nginx; no Kubernetes; 3 a.m. debuggability is the bar.
 
 ## 8. Architecture Summary
@@ -164,8 +172,9 @@
 
 - M1 (v0.1 gate): ≥60% of home captures usable on first-or-second attempt (clinician-rated; the guided UI is the test of our riskiest assumption).
 - M2: capture-to-accepted-in-record median < 30 s.
-- M3 (v0.2): alert precision — false-positive rate below agreed threshold (measured from disposition taps).
+- M3 (v0.2): alert precision — ≥20 evaluated P1/P2 alerts before judgment; false-positive rate <30%, else the trigger set is retuned before expansion (measured from disposition taps).
 - M4 (v0.2): self-report adherence — ≥5 reports/week on active wounds.
+- M5 (v0.2): clinician responsiveness — ≥80% of P1 alerts acknowledged within 4 h; 24 h nurse-callback SLA met ≥90%. The two-way loop is measured on both ends.
 
 ## 10. Risks and Mitigations
 
@@ -189,6 +198,6 @@
 ## 12. Open Items
 
 - **OI-1 (operator):** rotate the Roboflow/diabcare keys exposed in the reference bundle (treat as burned) — pending Saksorn.
-- **OI-2 (Scribe):** draft the 8-section Photo Capture Protocol once capture specs freeze.
+- **OI-2 (Scribe):** draft the 8-section Photo Capture Protocol once capture specs freeze; the in-app checklist (FR-CAP-9) must mirror its retake criteria.
 - **OI-3 (Log):** changelog automation on Conventional Commits + SemVer tags (repo initialized; wiring pending).
 - **OI-4 (research):** actual 100-record hospital sample is not in the public repo (dictionary + briefing only); statistical pass pending data file.
