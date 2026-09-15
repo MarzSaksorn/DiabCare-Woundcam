@@ -96,6 +96,7 @@
 - FR-CAP-7: Quality-check method is spec'd, not assumed: lightweight in-browser check (focus variance + sticker visibility via WASM CV or heuristic — feasibility spike owned by Canvas + Forge before v0.1 build starts). Honest fallback: if the check cannot confirm within 10 s, the shutter force-enables and the capture is flagged `unverified` for clinician review — the gate never lies and never dead-ends.
 - FR-CAP-8: Ghost overlay opacity is user-adjustable (low-vision support).
 - FR-CAP-9: The in-app quality checklist mirrors the Photo Capture Protocol's retake criteria — Scribe's doc is the source of truth; the checklist is its enforcement.
+- FR-CAP-10: Capture-attempt telemetry (adjudicated from Spark's M1 blocker): every capture session logs the attempt count (shutter presses) and failed-check events (which element failed, per event) as non-PHI client events reported with the capture. Photo row carries `capture_attempts` + `check_failures`. M1's "first-or-second attempt" = sessions with ≤1 retake. Requires a contract field — Forge includes it before the CP1 freeze.
 
 ### FR-REV — Review
 - FR-REV-1: After shutter, full-width photo with overlay checklist (in focus? ruler in frame? lighting OK?).
