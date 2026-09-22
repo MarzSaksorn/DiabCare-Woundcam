@@ -1,0 +1,66 @@
+import DashboardLayout from "@/components/DashboardLayout";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { trpc } from "@/lib/trpc";
+import { AlertTriangle, ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, ClipboardList, Filter, RefreshCw, Search, ShieldAlert, Users, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Link } from "wouter";
+
+type FilterState = "all" | "review" | "complete" | "imported";
+const PAGE_SIZE = 12;
+
+function PatientsPageContent() {
+  const patientsQuery = trpc.diabetes.patients.useQuery({ limit: 100 });
+  const summaryQuery = trpc.diabetes.summary.useQuery();
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<FilterState>("all");
+  const [page, setPage] = useState(1);
+
+  const rows = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return (patientsQuery.data ?? []).filter((patient) => {
+      const matchesQuery = !normalized || [
+        `imported cohort record ${patient.sourceRowNumber - 1}`,
+        patient.id,
+        patient.age,
+        patient.sex,
+        patient.identifyBy,
+      ].join(" ").toLowerCase().includes(normalized);
+      const matchesFilter = filter === "all" || filter === "imported" || filter === "review" || filter === "complete";
+      return matchesQuery && matchesFilter;
+    });
+  }, [filter, patientsQuery.data, query]);
+
+  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const visibleRows = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const totalObservations = summaryQuery.data?.observationCount ?? patientsQuery.data?.reduce((sum, patient) => sum + patient.observationCount, 0) ?? 0;
+
+  function updateQuery(value: string) { setQuery(value); setPage(1); }
+  function updateFilter(value: FilterState) { setFilter(value); setPage(1); }
+
+  return <DashboardLayout><div className="mx-auto w-full max-w-[1500px] space-y-6 px-1 py-1 sm:px-3 lg:px-6 lg:py-4">
+    <header className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end"><div><div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500"><span className="h-2 w-2 rounded-full bg-[#6d9681]" /> Care workspace <span className="text-slate-300">/</span> Patient records</div><h1 className="font-display text-4xl leading-none tracking-[-0.04em] text-[#132238] sm:text-5xl">Patients</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Find a record, review imported clinical context, and continue into the patient timeline.</p></div><div className="flex items-center gap-2"><Button onClick={() => patientsQuery.refetch()} variant="outline" className="h-10 rounded-xl border-slate-200 bg-white text-slate-600"><RefreshCw className={`mr-2 h-4 w-4 ${patientsQuery.isFetching ? "animate-spin" : ""}`} /> Refresh</Button><Button variant="outline" className="h-10 rounded-xl border-slate-200 bg-white text-slate-600"><ClipboardList className="mr-2 h-4 w-4" /> Export metadata</Button></div></header>
+
+    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={Users} label="Records in scope" value={patientsQuery.data?.length ?? "—"} helper="Local permitted cohort" tone="navy" /><Metric icon={ShieldAlert} label="Needs review" value={patientsQuery.data ? patientsQuery.data.length : "—"} helper="Imported / unverified" tone="amber" /><Metric icon={ClipboardList} label="Observations" value={totalObservations.toLocaleString()} helper="Non-null source values" tone="sage" /><Metric icon={CheckCircle2} label="Baseline complete" value={patientsQuery.data?.length ?? "—"} helper="Required fields present" tone="sage" /></section>
+
+    <section className="panel-card overflow-hidden"><div className="flex flex-col gap-4 border-b border-slate-100 px-5 py-5 lg:flex-row lg:items-center lg:justify-between lg:px-6"><div><div className="flex flex-wrap items-center gap-2"><h2 className="font-display text-[23px] tracking-[-0.03em] text-[#132238]">Patient records</h2><Badge className="rounded-full bg-[#eef3f0] text-[#4f7463] hover:bg-[#eef3f0]">{rows.length} matching</Badge></div><p className="mt-1 text-sm text-slate-400">Source-preserved baseline information. Names, diagnoses, allergies, and wounds are shown only when governed data exists.</p></div><div className="flex w-full gap-2 lg:w-auto"><div className="relative min-w-0 flex-1 lg:w-72"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><Input value={query} onChange={(event) => updateQuery(event.target.value)} placeholder="Search records" aria-label="Search patient records" className="h-10 rounded-lg border-slate-200 bg-white pl-9 pr-9 text-sm" />{query && <button onClick={() => updateQuery("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:bg-slate-100"><X className="h-4 w-4" /></button>}</div><Button variant="outline" className="h-10 rounded-lg border-slate-200 px-3 text-slate-500"><Filter className="mr-2 h-4 w-4" /> Filters</Button></div></div>
+
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-5 py-3 sm:px-6">{([['all', 'All records'], ['review', 'Needs review'], ['complete', 'Baseline complete'], ['imported', 'Imported']] as const).map(([value, label]) => <button key={value} onClick={() => updateFilter(value)} className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${filter === value ? "bg-[#132238] text-white" : "bg-[#f1f4f2] text-slate-500 hover:bg-[#e7efeb] hover:text-[#25354a]"}`}>{label}</button>)}<span className="ml-auto text-[11px] text-slate-400">Local data scope · refreshed {summaryQuery.data?.batch?.createdAt ? new Date(summaryQuery.data.batch.createdAt).toLocaleDateString() : "—"}</span></div>
+
+      {patientsQuery.isLoading && <div className="space-y-2 p-6">{[1, 2, 3, 4, 5].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl bg-[#f1f4f2]" />)}</div>}
+      {patientsQuery.error && <div className="flex items-start gap-3 px-6 py-12"><AlertTriangle className="mt-0.5 h-5 w-5 text-[#c86b52]" /><div><h3 className="text-sm font-bold text-[#25354a]">Patient records could not be loaded</h3><p className="mt-1 text-xs text-slate-400">The session may not have access to this care scope. Try again or contact the local administrator.</p><Button onClick={() => patientsQuery.refetch()} variant="outline" className="mt-4 h-9 rounded-lg text-xs">Try again</Button></div></div>}
+      {!patientsQuery.isLoading && !patientsQuery.error && visibleRows.length === 0 && <div className="flex flex-col items-center px-6 py-16 text-center"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f1f4f2] text-slate-400"><Search className="h-5 w-5" /></div><h3 className="mt-4 text-sm font-bold text-[#25354a]">No records match this view</h3><p className="mt-1 max-w-sm text-xs leading-5 text-slate-400">Try a different search term or clear the active filters. Missing identity fields are not inferred.</p><Button onClick={() => { updateQuery(""); updateFilter("all"); }} variant="ghost" className="mt-3 h-8 text-xs text-[#4f7463]">Reset view</Button></div>}
+      {!patientsQuery.isLoading && !patientsQuery.error && visibleRows.length > 0 && <><div className="hidden grid-cols-[1.45fr_.75fr_.8fr_1fr_.75fr_.65fr_auto] gap-4 border-b border-slate-100 bg-[#fbfcfb] px-6 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 lg:grid"><span>Record</span><span>Age / sex</span><span>Diabetes</span><span>Data state</span><span>Observations</span><span>Updated</span><span /></div><div className="divide-y divide-slate-100">{visibleRows.map((patient) => <Link key={patient.id} href={`/patients/${patient.id}`} className="group grid gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fbfcfb] sm:px-6 lg:grid-cols-[1.45fr_.75fr_.8fr_1fr_.75fr_.65fr_auto] lg:items-center lg:gap-4"><div className="flex min-w-0 items-center gap-3"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#edf1f5] text-[#4f647d]"><Users className="h-4 w-4" /></div><div className="min-w-0"><p className="truncate text-sm font-semibold text-[#25354a]">Imported cohort record #{patient.sourceRowNumber - 1}</p><p className="mt-0.5 truncate text-xs text-slate-400">Internal ID {patient.id} · source row {patient.sourceRowNumber}</p></div></div><div className="text-sm text-slate-600"><span className="lg:hidden text-[10px] font-bold uppercase tracking-[.1em] text-slate-400">Age / sex · </span>{patient.age} · {patient.sex}</div><div className="text-sm text-slate-600"><span className="lg:hidden text-[10px] font-bold uppercase tracking-[.1em] text-slate-400">Context · </span>{patient.type2 ? "Type 2" : patient.type1 ? "Type 1" : patient.gdm ? "GDM" : "Not specified"}</div><div><span className="status-badge status-review"><span className="status-dot" />Imported / unverified</span></div><div className="text-sm font-semibold text-[#25354a]"><span className="lg:hidden text-[10px] font-bold uppercase tracking-[.1em] text-slate-400">Observations · </span>{patient.observationCount.toLocaleString()}</div><div className="text-xs text-slate-400"><span className="lg:hidden text-[10px] font-bold uppercase tracking-[.1em] text-slate-400">Updated · </span>{patient.createdAt ? new Date(patient.createdAt).toLocaleDateString() : "—"}</div><ArrowRight className="hidden h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 lg:block" /></Link>)}</div><div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"><p className="text-xs text-slate-400">Showing {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, rows.length)} of {rows.length} records</p><div className="flex items-center gap-2"><Button variant="outline" disabled={safePage === 1} onClick={() => setPage((value) => Math.max(1, value - 1))} className="h-8 rounded-lg border-slate-200 px-2 text-xs"><ChevronLeft className="h-3.5 w-3.5" /> Previous</Button><span className="min-w-16 text-center text-xs font-semibold text-slate-500">Page {safePage} / {pageCount}</span><Button variant="outline" disabled={safePage === pageCount} onClick={() => setPage((value) => Math.min(pageCount, value + 1))} className="h-8 rounded-lg border-slate-200 px-2 text-xs">Next <ChevronRight className="h-3.5 w-3.5" /></Button></div></div></>}
+    </section>
+
+    <section className="flex items-start gap-3 rounded-xl border border-[#e6ece8] bg-[#f7faf8] px-4 py-3"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-[#6d9681]" /><p className="text-xs leading-5 text-slate-500"><strong className="text-[#25354a]">Decision support, not diagnosis.</strong> Imported values are source-preserved and may require clinician confirmation before use in care decisions.</p></section>
+  </div></DashboardLayout>;
+}
+
+function Metric({ icon: Icon, label, value, helper, tone }: { icon: typeof Users; label: string; value: number | string; helper: string; tone: "navy" | "amber" | "sage" }) {
+  return <div className="metric-card"><div className={`metric-icon metric-icon-${tone}`}><Icon className="h-[18px] w-[18px]" /></div><div className="min-w-0"><p className="text-sm font-medium text-slate-500">{label}</p><p className="mt-1 font-display text-3xl tracking-[-0.04em] text-[#132238]">{value}</p><p className="mt-1 text-xs text-slate-400">{helper}</p></div><ArrowRight className="ml-auto mt-1 h-4 w-4 text-slate-300" /></div>;
+}
+
+export default PatientsPageContent;
