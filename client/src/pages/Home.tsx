@@ -26,6 +26,7 @@ import {
   X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { getReviewPriority } from "@shared/dashboard";
 
 const patients = [
   { id: "DC-1048", name: "María Santos", age: 64, wound: "Left plantar foot", status: "Urgent", stage: "Stage 3", trend: "Needs review", updated: "Today, 08:42", initials: "MS", tone: "terracotta" },
@@ -41,11 +42,11 @@ const activity = [
 ];
 
 const metrics = [
-  { label: "Active wounds", value: "24", helper: "+3 this month", icon: Activity, tone: "navy" },
-  { label: "Need review", value: "07", helper: "2 high priority", icon: CircleAlert, tone: "terracotta" },
-  { label: "Healing trend", value: "68%", helper: "+8% vs last month", icon: HeartPulse, tone: "sage" },
-  { label: "Follow-ups due", value: "05", helper: "Next 7 days", icon: CalendarDays, tone: "amber" },
-];
+  { label: "Active wounds", value: "24", helper: "+3 this month", context: "Across 18 patients", icon: Activity, tone: "navy" },
+  { label: "Need review", value: "07", helper: "2 high priority", context: "29% of active wounds", icon: CircleAlert, tone: "terracotta" },
+  { label: "Healing trend", value: "68%", helper: "+8% vs last month", context: "Target ≥ 65%", icon: HeartPulse, tone: "sage" },
+  { label: "Follow-ups due", value: "05", helper: "Next 7 days", context: "1 overdue", icon: CalendarDays, tone: "amber" },
+]; 
 
 function StatusBadge({ status }: { status: string }) {
   const tone = status === "Urgent" ? "urgent" : status === "Review due" ? "review" : "healing";
@@ -82,13 +83,28 @@ export default function Home() {
         </header>
 
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {metrics.map(({ label, value, helper, icon: Icon, tone }) => (
+          {metrics.map(({ label, value, helper, context, icon: Icon, tone }) => (
             <div key={label} className="metric-card">
               <div className={`metric-icon metric-icon-${tone}`}><Icon className="h-[18px] w-[18px]" /></div>
-              <div className="min-w-0"><p className="text-sm font-medium text-slate-500">{label}</p><p className="mt-1 font-display text-3xl tracking-[-0.04em] text-[#132238]">{value}</p><p className="mt-1 text-xs text-slate-400">{helper}</p></div>
+              <div className="min-w-0"><p className="text-sm font-medium text-slate-500">{label}</p><p className="mt-1 font-display text-3xl tracking-[-0.04em] text-[#132238]">{value}</p><p className="mt-1 text-xs text-slate-400">{helper}</p><p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">{context}</p></div>
               <ArrowRight className="ml-auto mt-1 h-4 w-4 text-slate-300" />
             </div>
           ))}
+        </section>
+
+        <section className="panel-card grid gap-6 overflow-hidden px-5 py-5 sm:px-6 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Care performance</p><h2 className="mt-1 font-display text-[23px] tracking-[-0.03em] text-[#132238]">Healing progress is moving in the right direction</h2></div>
+              <span className="rounded-full bg-[#edf5f0] px-2.5 py-1 text-[10px] font-bold text-[#4f7463]">Last 30 days</span>
+            </div>
+            <div className="mt-5 flex items-end gap-4"><div><p className="font-display text-4xl tracking-[-0.05em] text-[#132238]">68%</p><p className="mt-1 text-xs text-slate-400">wounds with improving measurements</p></div><span className="mb-1 rounded-full bg-[#edf5f0] px-2 py-1 text-[10px] font-bold text-[#4f7463]">+8 pts</span></div>
+            <div className="mt-5 flex h-20 items-end gap-1.5" aria-label="Healing progress trend from 30 days ago to today">
+              {[38, 42, 45, 43, 50, 53, 52, 57, 55, 61, 64, 68].map((height, index) => <div key={index} className="trend-bar" style={{ height: `${height}%` }} />)}
+            </div>
+            <div className="mt-2 flex justify-between text-[10px] text-slate-400"><span>30 days ago</span><span>Today</span></div>
+          </div>
+          <div className="rounded-xl bg-[#f7faf8] p-4 sm:p-5"><div className="flex items-center justify-between"><p className="text-xs font-bold text-[#25354a]">Review workload</p><span className="text-[10px] font-semibold text-slate-400">This week</span></div><div className="mt-4 space-y-3"><div className="workload-row"><span>Due today</span><strong>2</strong><div className="workload-track"><i className="w-[40%] bg-[#c86b52]" /></div></div><div className="workload-row"><span>Due in 3 days</span><strong>3</strong><div className="workload-track"><i className="w-[60%] bg-[#d9a441]" /></div></div><div className="workload-row"><span>On schedule</span><strong>19</strong><div className="workload-track"><i className="w-[82%] bg-[#6d9681]" /></div></div></div><button className="mt-5 text-xs font-bold text-[#4f7463]">View workload details <ArrowRight className="ml-1 inline h-3.5 w-3.5" /></button></div>
         </section>
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
@@ -112,7 +128,7 @@ export default function Home() {
           </section>
 
           <aside className="space-y-5">
-            <section className="panel-card overflow-hidden"><div className="flex items-start justify-between px-5 pb-4 pt-5"><div><h2 className="font-display text-[21px] tracking-[-0.03em] text-[#132238]">Attention required</h2><p className="mt-1 text-xs text-slate-400">Review before end of shift</p></div><span className="rounded-full bg-[#fff0ec] px-2 py-1 text-[11px] font-bold text-[#b85b45]">2 high priority</span></div><div className="space-y-1 px-3 pb-3"><button onClick={() => setSelectedPatient(patients[0])} className="attention-item border-l-[#c86b52]"><div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-[#c86b52]" /><div className="min-w-0"><p className="truncate text-sm font-semibold text-[#25354a]">María Santos</p><p className="mt-1 text-xs leading-5 text-slate-400">Wound area increased 12% since last visit</p></div><ChevronRight className="ml-auto h-4 w-4 shrink-0 text-slate-300" /></button><button onClick={() => setSelectedPatient(patients[1])} className="attention-item border-l-[#d9a441]"><div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-[#d9a441]" /><div className="min-w-0"><p className="truncate text-sm font-semibold text-[#25354a]">Robert Chen</p><p className="mt-1 text-xs leading-5 text-slate-400">Follow-up window closes tomorrow</p></div><ChevronRight className="ml-auto h-4 w-4 shrink-0 text-slate-300" /></button></div><div className="border-t border-slate-100 px-5 py-3"><button className="text-xs font-bold text-[#4f7463]">Open review queue <ArrowRight className="ml-1 inline h-3.5 w-3.5" /></button></div></section>
+            <section className="panel-card overflow-hidden"><div className="flex items-start justify-between px-5 pb-4 pt-5"><div><h2 className="font-display text-[21px] tracking-[-0.03em] text-[#132238]">Attention required</h2><p className="mt-1 text-xs text-slate-400">Ranked by urgency and due date</p></div><span className="rounded-full bg-[#fff0ec] px-2 py-1 text-[11px] font-bold text-[#b85b45]">2 high priority</span></div><div className="space-y-1 px-3 pb-3"><button onClick={() => setSelectedPatient(patients[0])} className="attention-item border-l-[#c86b52]"><div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-[#c86b52]" /><div className="min-w-0"><div className="flex items-center gap-2"><p className="truncate text-sm font-semibold text-[#25354a]">María Santos</p><span className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#b85b45]">{getReviewPriority(patients[0].status as "Urgent")}</span></div><p className="mt-1 text-xs leading-5 text-slate-400">Wound area increased 12% since last visit · review today</p></div><ChevronRight className="ml-auto h-4 w-4 shrink-0 text-slate-300" /></button><button onClick={() => setSelectedPatient(patients[1])} className="attention-item border-l-[#d9a441]"><div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-[#d9a441]" /><div className="min-w-0"><div className="flex items-center gap-2"><p className="truncate text-sm font-semibold text-[#25354a]">Robert Chen</p><span className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#9e762a]">{getReviewPriority(patients[1].status as "Review due")}</span></div><p className="mt-1 text-xs leading-5 text-slate-400">Follow-up window closes tomorrow · stable</p></div><ChevronRight className="ml-auto h-4 w-4 shrink-0 text-slate-300" /></button></div><div className="border-t border-slate-100 px-5 py-3"><button className="text-xs font-bold text-[#4f7463]">Open review queue <ArrowRight className="ml-1 inline h-3.5 w-3.5" /></button></div></section>
             <section className="panel-card px-5 py-5"><div className="flex items-start justify-between"><div><h2 className="font-display text-[21px] tracking-[-0.03em] text-[#132238]">Recent activity</h2><p className="mt-1 text-xs text-slate-400">Team updates</p></div><Clock3 className="h-4 w-4 text-slate-300" /></div><div className="mt-5 space-y-5">{activity.map((item) => <div key={item.time} className="flex gap-3"><div className={`activity-line activity-${item.tone}`}><span /></div><div className="min-w-0"><div className="flex items-center justify-between gap-2"><p className="truncate text-xs font-bold text-[#25354a]">{item.title}</p><span className="shrink-0 text-[10px] text-slate-400">{item.time}</span></div><p className="mt-1 text-xs leading-5 text-slate-400">{item.detail}</p></div></div>)}</div></section>
           </aside>
         </div>

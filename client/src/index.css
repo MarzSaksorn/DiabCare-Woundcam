@@ -44,6 +44,8 @@ button { cursor: pointer; }
 .metric-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(19,34,56,.08); }
 .metric-icon { display: flex; height: 38px; width: 38px; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 11px; }
 .metric-icon-navy { background: #edf1f5; color: #4f647d; } .metric-icon-terracotta { background: #fff0ec; color: #c86b52; } .metric-icon-sage { background: #edf5f0; color: #5d8a73; } .metric-icon-amber { background: #fff7e7; color: #bd8a2f; }
+.trend-bar { min-width: 8px; flex: 1; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #6d9681, #b9d1c2); opacity: .88; transition: opacity 160ms ease-out, transform 160ms ease-out; } .trend-bar:hover { opacity: 1; transform: translateY(-2px); }
+.workload-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; font-size: 11px; color: #71808f; } .workload-row strong { font-size: 12px; color: #25354a; } .workload-track { grid-column: 1 / -1; height: 5px; overflow: hidden; border-radius: 999px; background: #e8efea; } .workload-track i { display: block; height: 100%; border-radius: inherit; }
 .panel-card { border-radius: 16px; }
 .status-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 5px 8px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .status-dot { height: 6px; width: 6px; border-radius: 999px; } .status-urgent { background: #fff0ec; color: #b85b45; } .status-urgent .status-dot { background: #c86b52; } .status-review { background: #fff7e7; color: #9e762a; } .status-review .status-dot { background: #d9a441; } .status-healing { background: #edf5f0; color: #4f7463; } .status-healing .status-dot { background: #6d9681; }
