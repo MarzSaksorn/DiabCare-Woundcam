@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { getDiabetesImportSummary, getDiabetesPatients } from "./db";
+import { getDiabetesImportSummary, getDiabetesPatient, getDiabetesPatientObservations, getDiabetesPatients } from "./db";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -22,6 +22,8 @@ export const appRouter = router({
   diabetes: router({
     summary: protectedProcedure.query(() => getDiabetesImportSummary()),
     patients: protectedProcedure.input(z.object({ limit: z.number().int().min(1).max(100).default(100) })).query(({ input }) => getDiabetesPatients(input.limit)),
+    detail: protectedProcedure.input(z.object({ patientId: z.number().int().positive() })).query(({ input }) => getDiabetesPatient(input.patientId)),
+    observations: protectedProcedure.input(z.object({ patientId: z.number().int().positive(), limit: z.number().int().min(1).max(100).default(24) })).query(({ input }) => getDiabetesPatientObservations(input.patientId, input.limit)),
   }),
 
 });

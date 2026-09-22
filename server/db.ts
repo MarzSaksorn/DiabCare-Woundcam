@@ -119,3 +119,20 @@ export async function getDiabetesPatients(limit = 100) {
 
   return patients.map((patient) => ({ ...patient, observationCount: countByPatient.get(patient.id) ?? 0 }));
 }
+
+export async function getDiabetesPatient(patientId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [row] = await db.select({ patient: diabetesPatients, batch: diabetesImportBatches }).from(diabetesPatients).innerJoin(diabetesImportBatches, eq(diabetesPatients.importBatchId, diabetesImportBatches.id)).where(eq(diabetesPatients.id, patientId)).limit(1);
+  if (!row) return null;
+
+  const [observationCount] = await db.select({ count: sql<number>`count(*)` }).from(diabetesPatientObservations).where(eq(diabetesPatientObservations.patientId, patientId));
+  return { ...row.patient, sourceFilename: row.batch.sourceFilename, observationCount: Number(observationCount?.count ?? 0) };
+}
+
+export async function getDiabetesPatientObservations(patientId: number, limit = 24) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(diabetesPatientObservations).where(eq(diabetesPatientObservations.patientId, patientId)).orderBy(desc(diabetesPatientObservations.id)).limit(limit);
+}
