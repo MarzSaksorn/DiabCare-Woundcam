@@ -1,4 +1,5 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { getReviewPriority } from "@shared/dashboard";
+import { trpc } from "@/lib/trpc";
 
 const patients = [
   { id: "DC-1048", name: "María Santos", age: 64, wound: "Left plantar foot", status: "Urgent", stage: "Stage 3", trend: "Needs review", updated: "Today, 08:42", initials: "MS", tone: "terracotta" },
@@ -54,6 +56,9 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function Home() {
+  const { user } = useAuth();
+  const diabetesSummary = trpc.diabetes.summary.useQuery(undefined, { enabled: Boolean(user) });
+  const diabetesPatients = trpc.diabetes.patients.useQuery({ limit: 100 }, { enabled: Boolean(user) });
   const [query, setQuery] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<(typeof patients)[number] | null>(patients[0]);
   const [assessmentOpen, setAssessmentOpen] = useState(false);
@@ -66,7 +71,7 @@ export default function Home() {
   }, [query]);
 
   return (
-    <DashboardLayout demoMode>
+    <DashboardLayout>
       <div className="mx-auto w-full max-w-[1500px] space-y-7 px-1 py-1 sm:px-3 lg:px-6 lg:py-4">
         <header className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
           <div>
@@ -105,6 +110,17 @@ export default function Home() {
             <div className="mt-2 flex justify-between text-[10px] text-slate-400"><span>30 days ago</span><span>Today</span></div>
           </div>
           <div className="rounded-xl bg-[#f7faf8] p-4 sm:p-5"><div className="flex items-center justify-between"><p className="text-xs font-bold text-[#25354a]">Review workload</p><span className="text-[10px] font-semibold text-slate-400">This week</span></div><div className="mt-4 space-y-3"><div className="workload-row"><span>Due today</span><strong>2</strong><div className="workload-track"><i className="w-[40%] bg-[#c86b52]" /></div></div><div className="workload-row"><span>Due in 3 days</span><strong>3</strong><div className="workload-track"><i className="w-[60%] bg-[#d9a441]" /></div></div><div className="workload-row"><span>On schedule</span><strong>19</strong><div className="workload-track"><i className="w-[82%] bg-[#6d9681]" /></div></div></div><button className="mt-5 text-xs font-bold text-[#4f7463]">View workload details <ArrowRight className="ml-1 inline h-3.5 w-3.5" /></button></div>
+        </section>
+
+        <section className="panel-card overflow-hidden">
+          <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:px-6">
+            <div><div className="flex flex-wrap items-center gap-2"><h2 className="font-display text-[22px] tracking-[-0.03em] text-[#132238]">Imported diabetes cohort</h2><Badge className="rounded-full bg-[#edf1f5] text-[#4f647d] hover:bg-[#edf1f5]">Database records</Badge></div><p className="mt-1 text-sm text-slate-400">Baseline fields from the approved workbook import. Source rows are shown instead of inferred patient identities.</p></div>
+            <div className="text-left sm:text-right"><p className="text-xs font-bold text-[#25354a]">{diabetesSummary.data?.patientCount ?? "—"} patients</p><p className="mt-1 text-[11px] text-slate-400">{diabetesSummary.data?.observationCount?.toLocaleString() ?? "—"} observations</p></div>
+          </div>
+          {diabetesPatients.isLoading && <div className="px-6 py-10 text-sm text-slate-400">Loading imported records…</div>}
+          {diabetesPatients.error && <div className="px-6 py-10 text-sm text-slate-500">Database records require an authenticated care-team session.</div>}
+          {!diabetesPatients.isLoading && !diabetesPatients.error && <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left"><thead className="bg-[#fbfcfb] text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400"><tr><th className="px-6 py-3">Source row</th><th className="px-4 py-3">Age</th><th className="px-4 py-3">Sex</th><th className="px-4 py-3">Identify by</th><th className="px-4 py-3">Type 1</th><th className="px-4 py-3">Type 2</th><th className="px-4 py-3">GDM</th><th className="px-4 py-3">Observations</th></tr></thead><tbody className="divide-y divide-slate-100">{(diabetesPatients.data ?? []).slice(0, 8).map((patient) => <tr key={patient.id} className="text-sm text-[#25354a] hover:bg-[#fbfcfb]"><td className="px-6 py-3 font-semibold">Imported record #{patient.sourceRowNumber - 1}</td><td className="px-4 py-3 text-slate-600">{patient.age}</td><td className="px-4 py-3 text-slate-600">{patient.sex}</td><td className="px-4 py-3 text-slate-600">{patient.identifyBy}</td><td className="px-4 py-3 text-slate-600">{patient.type1}</td><td className="px-4 py-3 text-slate-600">{patient.type2}</td><td className="px-4 py-3 text-slate-600">{patient.gdm}</td><td className="px-4 py-3 text-slate-600">{patient.observationCount}</td></tr>)}</tbody></table></div>}
+          {!diabetesPatients.isLoading && !diabetesPatients.error && (diabetesPatients.data?.length ?? 0) > 8 && <div className="border-t border-slate-100 px-6 py-3 text-xs text-slate-400">Showing 8 of {diabetesPatients.data?.length} imported records. Use the Patients workspace for the full cohort.</div>}
         </section>
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">

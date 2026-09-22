@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { diabetesImportBatches, diabetesPatientObservations, diabetesPatients, InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,33 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function getDiabetesImportSummary() {
+  const db = await getDb();
+  if (!db) return { batch: null, patientCount: 0, observationCount: 0 };
+
+  const [batch] = await db.select().from(diabetesImportBatches).orderBy(desc(diabetesImportBatches.createdAt)).limit(1);
+  if (!batch) return { batch: null, patientCount: 0, observationCount: 0 };
+
+  const [patientCount] = await db.select({ count: sql<number>`count(*)` }).from(diabetesPatients).where(eq(diabetesPatients.importBatchId, batch.id));
+  const [observationCount] = await db.select({ count: sql<number>`count(*)` }).from(diabetesPatientObservations).innerJoin(diabetesPatients, eq(diabetesPatientObservations.patientId, diabetesPatients.id)).where(eq(diabetesPatients.importBatchId, batch.id));
+
+  return {
+    batch: { id: batch.id, sourceFilename: batch.sourceFilename, sourceRecordCount: batch.sourceRecordCount, createdAt: batch.createdAt },
+    patientCount: Number(patientCount?.count ?? 0),
+    observationCount: Number(observationCount?.count ?? 0),
+  };
+}
+
+export async function getDiabetesPatients(limit = 100) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const patients = await db.select().from(diabetesPatients).orderBy(asc(diabetesPatients.sourceRowNumber)).limit(limit);
+  if (patients.length === 0) return [];
+
+  const patientIds = patients.map((patient) => patient.id);
+  const counts = await db.select({ patientId: diabetesPatientObservations.patientId, count: sql<number>`count(*)` }).from(diabetesPatientObservations).where(inArray(diabetesPatientObservations.patientId, patientIds)).groupBy(diabetesPatientObservations.patientId);
+  const countByPatient = new Map(counts.map((row) => [row.patientId, Number(row.count)]));
+
+  return patients.map((patient) => ({ ...patient, observationCount: countByPatient.get(patient.id) ?? 0 }));
+}
