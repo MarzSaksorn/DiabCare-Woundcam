@@ -22,6 +22,7 @@ import {
 import { useState } from "react";
 import { Link, useLocation, useRoute } from "wouter";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const tabs = ["Overview", "Observations", "Wounds", "Timeline", "Audit trail"] as const;
 type Tab = (typeof tabs)[number];
@@ -40,6 +41,7 @@ export default function PatientRecord() {
   const [, params] = useRoute("/patients/:id");
   const patientId = Number(params?.id ?? 0);
   const [tab, setTab] = useState<Tab>("Overview");
+  const { t } = useLanguage();
   const [selectedObservation, setSelectedObservation] = useState<ObservationRow | null>(null);
   const detail = trpc.diabetes.detail.useQuery({ patientId }, { enabled: patientId > 0 });
   const observations = trpc.diabetes.observations.useQuery({ patientId, limit: 24 }, { enabled: patientId > 0 });
@@ -48,15 +50,15 @@ export default function PatientRecord() {
   const sourceLabel = patient ? `Imported cohort record #${patient.sourceRowNumber - 1}` : "Patient record";
 
   if (detail.isLoading) return <div className="record-page"><div className="record-skeleton"><div /><div /><div /><div /></div></div>;
-  if (detail.error || !patient) return <div className="record-page"><div className="record-error"><ShieldAlert className="h-6 w-6 text-[#c86b52]" /><div><h1>Record unavailable</h1><p>This record cannot be displayed in your current care-team scope or no longer exists.</p><Button onClick={() => setLocation("/patients")} variant="outline" className="mt-4 h-9 rounded-lg">Back to patients</Button></div></div></div>;
+  if (detail.error || !patient) return <div className="record-page"><div className="record-error"><ShieldAlert className="h-6 w-6 text-[#c86b52]" /><div><h1>{t("recordUnavailable")}</h1><p>{t("signInRequired")}</p><Button onClick={() => setLocation("/patients")} variant="outline" className="mt-4 h-9 rounded-lg">{t("backToPatients")}</Button></div></div></div>;
 
   const recordedFlags = [patient.type1, patient.type2, patient.gdm, patient.dmOnset].filter(Boolean).length;
 
   return <div className="record-page">
-    <div className="record-topbar"><Link href="/patients" className="record-back"><ArrowLeft className="h-4 w-4" /> Patients</Link><div className="record-topbar-meta"><span><LockKeyhole className="h-3.5 w-3.5" /> Scoped clinical view</span><span className="hidden sm:inline">Local database · source preserved</span></div></div>
+    <div className="record-topbar"><Link href="/patients" className="record-back"><ArrowLeft className="h-4 w-4" /> {t("patients")}</Link><div className="record-topbar-meta"><span><LockKeyhole className="h-3.5 w-3.5" /> {t("scopedClinicalView")}</span><span className="hidden sm:inline">{t("localDatabase")}</span></div></div>
 
     <header className="record-header panel-card">
-      <div className="record-identity"><div className="record-avatar"><UserRound className="h-6 w-6" /></div><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h1>{sourceLabel}</h1><span className="record-state record-state-imported"><span /> Imported / unverified</span></div><p className="record-subtitle">Internal record ID {patient.id} · Source row {patient.sourceRowNumber} · {patient.sourceFilename}</p></div><Button onClick={() => toast.info("Record actions will be enabled when amendments and audit events are available.")} variant="outline" className="ml-auto hidden h-9 rounded-lg border-slate-200 text-xs sm:flex"><MoreHorizontal className="mr-2 h-4 w-4" /> Record actions</Button></div>
+      <div className="record-identity"><div className="record-avatar"><UserRound className="h-6 w-6" /></div><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h1>{sourceLabel}</h1><span className="record-state record-state-imported"><span /> {t("importedUnverified")}</span></div><p className="record-subtitle">{t("internalRecord")} {patient.id} · {t("sourceRow")} {patient.sourceRowNumber} · {patient.sourceFilename}</p></div><Button onClick={() => toast.info(t("recordActions"))} variant="outline" className="ml-auto hidden h-9 rounded-lg border-slate-200 text-xs sm:flex"><MoreHorizontal className="mr-2 h-4 w-4" /> {t("recordActions")}</Button></div>
       <div className="record-facts"><div><span>Age</span><strong>{patient.age || "Not recorded"}</strong></div><div><span>Sex</span><strong>{patient.sex || "Not recorded"}</strong></div><div><span>Diabetes context</span><strong>{patient.type2 ? "Type 2 recorded" : patient.type1 ? "Type 1 recorded" : patient.gdm ? "GDM recorded" : "Not specified"}</strong></div><div><span>Identified by</span><strong>{patient.identifyBy || "Not recorded"}</strong></div><div><span>Observations</span><strong>{patient.observationCount.toLocaleString()}</strong></div></div>
     </header>
 
@@ -64,7 +66,7 @@ export default function PatientRecord() {
 
     <section className="record-safety"><div className="record-safety-icon"><Info className="h-4 w-4" /></div><div><p><strong>Imported baseline requires clinical confirmation.</strong> Values below are preserved from the source workbook and are not a diagnosis or treatment recommendation.</p><span>Review source context before using this record in care decisions.</span></div><Button onClick={() => toast.info(`Source: ${patient.sourceFilename}, row ${patient.sourceRowNumber}`)} variant="ghost" className="ml-auto hidden h-8 shrink-0 rounded-lg px-2 text-xs text-[#4f7463] sm:block">View provenance</Button></section>
 
-    <nav className="record-tabs" aria-label="Patient record sections">{tabs.map((item) => <button key={item} onClick={() => setTab(item)} className={tab === item ? "active" : ""}>{item}{item === "Observations" && <span>{patient.observationCount.toLocaleString()}</span>}</button>)}</nav>
+    <nav className="record-tabs" aria-label={t("patientRecords")}>{tabs.map((item) => <button key={item} onClick={() => setTab(item)} className={tab === item ? "active" : ""}>{item === "Overview" ? t("overview") : item === "Observations" ? t("observations") : item === "Wounds" ? t("woundProgress") : item === "Timeline" ? t("timeline") : t("auditTrail")}{item === "Observations" && <span>{patient.observationCount.toLocaleString()}</span>}</button>)}</nav>
 
     {tab === "Overview" && <div className="record-grid"><section className="record-section panel-card"><SectionHeading kicker="Current context" title="What needs attention" icon={Flag} /><div className="record-review-list"><ReviewRow icon={ShieldAlert} title="Imported source not clinically verified" detail="Confirm the source context before using these values in patient care." priority="Review" tone="amber" /><ReviewRow icon={CalendarClock} title="No wound assessment on record" detail="Wound status is not available in this imported dataset." priority="Info" /></div></section><section className="record-section panel-card"><SectionHeading kicker="Baseline flags" title="Recorded diabetes context" icon={Activity} /><div className="context-grid"><ContextValue label="Type 1 indicator" value={patient.type1} /><ContextValue label="Type 2 indicator" value={patient.type2} /><ContextValue label="Gestational indicator" value={patient.gdm} /><ContextValue label="Onset field" value={patient.dmOnset} /></div><p className="record-footnote">The source dictionary defines these fields as recorded indicators. The view does not interpret them as a new diagnosis.</p></section><section className="record-section panel-card record-section-wide"><div className="record-section-heading"><div><p className="record-kicker">Latest recorded activity</p><h2>Observation history</h2><p className="record-section-description">Select a row to inspect its source field, value, and period.</p></div><Button onClick={() => setTab("Observations")} variant="ghost" className="h-8 rounded-lg px-2 text-xs font-bold text-[#4f7463]">View all <ChevronDown className="ml-1 h-3.5 w-3.5 -rotate-90" /></Button></div><ObservationList observations={observationRows.slice(0, 6)} loading={observations.isLoading} onSelect={setSelectedObservation} /></section><section className="record-section panel-card"><SectionHeading kicker="Wound care" title="Wound progress" icon={HeartPulse} /><EmptyState icon={ImageOff} title="No wound record available" description="This imported record contains diabetes observations but no wound assessments, photographs, or measurements." /></section><section className="record-section panel-card"><SectionHeading kicker="Care team" title="Assigned people" icon={UserRound} /><EmptyState icon={UserRound} title="No care-team assignment" description="The source workbook does not include an assigned nurse, clinician, or service line." /></section></div>}
 

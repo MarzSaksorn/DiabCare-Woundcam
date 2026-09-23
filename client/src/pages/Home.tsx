@@ -30,6 +30,7 @@ import { useMemo, useState } from "react";
 import { getReviewPriority } from "@shared/dashboard";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const patients = [
   { id: "DC-1048", name: "María Santos", age: 64, wound: "Left plantar foot", status: "Urgent", stage: "Stage 3", trend: "Needs review", updated: "Today, 08:42", initials: "MS", tone: "terracotta" },
@@ -58,6 +59,7 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function Home() {
   const { user } = useAuth();
+  const { language } = useLanguage();
   const diabetesSummary = trpc.diabetes.summary.useQuery(undefined, { enabled: Boolean(user) });
   const diabetesPatients = trpc.diabetes.patients.useQuery({ limit: 100 }, { enabled: Boolean(user) });
   const [query, setQuery] = useState("");
@@ -79,12 +81,12 @@ export default function Home() {
             <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
               <span className="h-2 w-2 rounded-full bg-[#6d9681]" /> Riverside Community Hospital <span className="text-slate-300">/</span> Wound care
             </div>
-            <h1 className="font-display text-4xl leading-none tracking-[-0.04em] text-[#132238] sm:text-5xl">Good morning, Dr. Lee</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Here is the care team view for today. One patient needs immediate review and five follow-ups are coming due this week.</p>
+            <h1 className="font-display text-4xl leading-none tracking-[-0.04em] text-[#132238] sm:text-5xl">{language === "th" ? "สวัสดีตอนเช้า คุณหมอลี" : "Good morning, Dr. Lee"}</h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">{language === "th" ? "มุมมองทีมดูแลสำหรับวันนี้ มีผู้ป่วยหนึ่งรายที่ควรตรวจสอบทันที และมีการติดตามห้ารายการภายในสัปดาห์นี้" : "Here is the care team view for today. One patient needs immediate review and five follow-ups are coming due this week."}</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="h-11 rounded-xl border-slate-200 bg-white px-4 text-slate-600 shadow-sm hover:bg-slate-50"><Bell className="mr-2 h-4 w-4" /> Notifications <span className="ml-1 rounded-full bg-[#c86b52] px-1.5 py-0.5 text-[10px] font-bold text-white">3</span></Button>
-            <Button onClick={() => { setSaved(false); setAssessmentOpen(true); }} className="h-11 rounded-xl bg-[#132238] px-4 text-white shadow-[0_8px_20px_rgba(19,34,56,.16)] hover:bg-[#203552]"><Plus className="mr-2 h-4 w-4" /> New assessment</Button>
+            <Button variant="outline" className="h-11 rounded-xl border-slate-200 bg-white px-4 text-slate-600 shadow-sm hover:bg-slate-50"><Bell className="mr-2 h-4 w-4" /> {language === "th" ? "การแจ้งเตือน" : "Notifications"} <span className="ml-1 rounded-full bg-[#c86b52] px-1.5 py-0.5 text-[10px] font-bold text-white">3</span></Button>
+            <Button onClick={() => { setSaved(false); setAssessmentOpen(true); }} className="h-11 rounded-xl bg-[#132238] px-4 text-white shadow-[0_8px_20px_rgba(19,34,56,.16)] hover:bg-[#203552]"><Plus className="mr-2 h-4 w-4" /> {language === "th" ? "สร้างการประเมิน" : "New assessment"}</Button>
           </div>
         </header>
 
