@@ -9,12 +9,16 @@ import { Link } from "wouter";
 type CaptureState = "idle" | "preview" | "analyzing" | "ready";
 type CameraState = "closed" | "starting" | "live" | "error";
 type InferenceResult = { topSuggestion: { label: string; confidence: number; box: { x: number; y: number; width: number; height: number } } | null; detections: Array<{ label: string; confidence: number; box: { x: number; y: number; width: number; height: number } }>; disclaimer: string };
+type ImageLayout = { naturalWidth: number; naturalHeight: number; viewportWidth: number; viewportHeight: number };
+const MODEL_IMAGE_SIZE = 640;
 
 export default function DiagnosticCamera() {
   const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const previewImageRef = useRef<HTMLImageElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [state, setState] = useState<CaptureState>("idle");
   const [cameraState, setCameraState] = useState<CameraState>("closed");
@@ -23,7 +27,27 @@ export default function DiagnosticCamera() {
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState("");
   const [inferenceResult, setInferenceResult] = useState<InferenceResult | null>(null);
+  const [imageLayout, setImageLayout] = useState<ImageLayout | null>(null);
   const inferMutation = trpc.wound.infer.useMutation();
+
+  function updateImageLayout() {
+    const image = previewImageRef.current;
+    const viewport = viewportRef.current;
+    if (!image || !viewport || !image.naturalWidth || !image.naturalHeight) return;
+    const bounds = viewport.getBoundingClientRect();
+    setImageLayout({ naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight, viewportWidth: bounds.width, viewportHeight: bounds.height });
+  }
+
+  useEffect(() => {
+    if (!previewUrl) {
+      setImageLayout(null);
+      return;
+    }
+    updateImageLayout();
+    const observer = new ResizeObserver(updateImageLayout);
+    if (viewportRef.current) observer.observe(viewportRef.current);
+    return () => observer.disconnect();
+  }, [previewUrl]);
 
   function stopCamera() {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -154,8 +178,8 @@ export default function DiagnosticCamera() {
     <div className="camera-workspace">
       <section className="camera-capture-card panel-card" aria-labelledby="capture-heading">
         <div className="camera-card-header"><div><p className="camera-kicker">{t("stepOne")}</p><h2 id="capture-heading">{t("captureImage")}</h2></div><button type="button" className="camera-help" aria-label={t("cameraHelp")} onClick={() => window.alert(t("cameraHelpText"))}><CircleHelp className="h-4 w-4" /></button></div>
-        <div className={`camera-viewport ${previewUrl ? "has-preview" : ""} ${cameraState === "live" ? "is-live" : ""}`}>
-          {previewUrl ? <><img src={previewUrl} alt={t("uploadedWoundImage")} /><div className="camera-preview-overlay"><span><FileImage className="h-4 w-4" /> {fileName}</span><button type="button" onClick={resetCapture} aria-label={t("removeImage")}><X className="h-4 w-4" /></button></div></> : cameraState === "live" || cameraState === "starting" ? <><video ref={videoRef} className="camera-live-video" autoPlay muted playsInline aria-label={t("cameraLivePreview")} /><div className="camera-frame-guides"><span /><span /><span /><span /></div><div className="camera-live-label"><Video className="h-3.5 w-3.5" /> {cameraState === "starting" ? t("cameraStarting") : t("cameraLive")}</div></> : <><div className="camera-frame-guides"><span /><span /><span /><span /></div><div className="camera-empty"><div className="camera-lens"><Camera className="h-7 w-7" /></div><strong>{cameraState === "error" ? t("cameraPermission") : t("positionWound")}</strong><p>{cameraState === "error" ? cameraError : t("positionWoundDetail")}</p></div><div className="camera-status"><span className="camera-status-dot" /> {cameraState === "error" ? t("cameraPermission") : t("cameraReady")}</div></>}
+        <div ref={viewportRef} className={`camera-viewport ${previewUrl ? "has-preview" : ""} ${cameraState === "live" ? "is-live" : ""}`}>
+          {previewUrl ? <><img ref={previewImageRef} src={previewUrl} alt={t("uploadedWoundImage")} onLoad={updateImageLayout} />{inferenceResult && imageLayout && <DetectionOverlay detections={inferenceResult.detections} layout={imageLayout} /> }<div className="camera-preview-overlay"><span><FileImage className="h-4 w-4" /> {fileName}</span><button type="button" onClick={resetCapture} aria-label={t("removeImage")}><X className="h-4 w-4" /></button></div></> : cameraState === "live" || cameraState === "starting" ? <><video ref={videoRef} className="camera-live-video" autoPlay muted playsInline aria-label={t("cameraLivePreview")} /><div className="camera-frame-guides"><span /><span /><span /><span /></div><div className="camera-live-label"><Video className="h-3.5 w-3.5" /> {cameraState === "starting" ? t("cameraStarting") : t("cameraLive")}</div></> : <><div className="camera-frame-guides"><span /><span /><span /><span /></div><div className="camera-empty"><div className="camera-lens"><Camera className="h-7 w-7" /></div><strong>{cameraState === "error" ? t("cameraPermission") : t("positionWound")}</strong><p>{cameraState === "error" ? cameraError : t("positionWoundDetail")}</p></div><div className="camera-status"><span className="camera-status-dot" /> {cameraState === "error" ? t("cameraPermission") : t("cameraReady")}</div></>}
         </div>
         {cameraError && cameraState !== "error" && <div className="camera-error" role="alert"><Info className="h-4 w-4" /><span>{cameraError}</span></div>}
         <canvas ref={canvasRef} className="sr-only" aria-hidden="true" />
@@ -174,3 +198,22 @@ export default function DiagnosticCamera() {
 }
 
 function ChecklistItem({ done, text }: { done: boolean; text: string }) { return <li><span className={done ? "is-done" : ""}>{done ? <Check className="h-3 w-3" /> : <span />}</span><p>{text}</p></li>; }
+
+function DetectionOverlay({ detections, layout }: { detections: InferenceResult["detections"]; layout: ImageLayout }) {
+  const modelScale = Math.min(MODEL_IMAGE_SIZE / layout.naturalWidth, MODEL_IMAGE_SIZE / layout.naturalHeight);
+  const modelOffsetX = (MODEL_IMAGE_SIZE - layout.naturalWidth * modelScale) / 2;
+  const modelOffsetY = (MODEL_IMAGE_SIZE - layout.naturalHeight * modelScale) / 2;
+  const displayScale = Math.min(layout.viewportWidth / layout.naturalWidth, layout.viewportHeight / layout.naturalHeight);
+  const displayOffsetX = (layout.viewportWidth - layout.naturalWidth * displayScale) / 2;
+  const displayOffsetY = (layout.viewportHeight - layout.naturalHeight * displayScale) / 2;
+
+  return <div className="camera-detection-layer" aria-label={`${detections.length} model detections`} role="img">
+    {detections.map((detection, index) => {
+      const x = displayOffsetX + ((detection.box.x - modelOffsetX) / modelScale) * displayScale;
+      const y = displayOffsetY + ((detection.box.y - modelOffsetY) / modelScale) * displayScale;
+      const width = (detection.box.width / modelScale) * displayScale;
+      const height = (detection.box.height / modelScale) * displayScale;
+      return <div key={`${detection.label}-${index}`} className="camera-detection-box" style={{ left: x, top: y, width, height }} aria-label={`${detection.label.replaceAll("_", " ")} ${Math.round(detection.confidence * 100)} percent`}><span>{detection.label.replaceAll("_", " ")} · {Math.round(detection.confidence * 100)}%</span></div>;
+    })}
+  </div>;
+}
