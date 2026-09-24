@@ -3,6 +3,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import {
   diabetesImportBatches,
+  diabetesExampleImportBatches,
+  diabetesExampleRecords,
   diabetesPatientObservations,
   diabetesPatients,
   InsertUser,
@@ -208,4 +210,67 @@ export async function getDiabetesPatientObservations(patientId: number, limit = 
     .where(eq(diabetesPatientObservations.patientId, patientId))
     .orderBy(desc(diabetesPatientObservations.id))
     .limit(limit);
+}
+
+export async function getDiabetesExampleBatches(limit = 20) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      id: diabetesExampleImportBatches.id,
+      sourceFilename: diabetesExampleImportBatches.sourceFilename,
+      fileSha256: diabetesExampleImportBatches.fileSha256,
+      sourceRecordCount: diabetesExampleImportBatches.sourceRecordCount,
+      exactDuplicateGroupCount: diabetesExampleImportBatches.exactDuplicateGroupCount,
+      exactDuplicateExtraCount: diabetesExampleImportBatches.exactDuplicateExtraCount,
+      mappingVersion: diabetesExampleImportBatches.mappingVersion,
+      status: diabetesExampleImportBatches.status,
+      createdAt: diabetesExampleImportBatches.createdAt,
+    })
+    .from(diabetesExampleImportBatches)
+    .orderBy(desc(diabetesExampleImportBatches.createdAt))
+    .limit(limit);
+}
+
+export async function getDiabetesExampleRecords(batchId: number, offset = 0, limit = 50) {
+  const db = await getDb();
+  if (!db) return { records: [], total: 0, offset, limit, hasMore: false };
+
+  const [countRow] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(diabetesExampleRecords)
+    .where(eq(diabetesExampleRecords.importBatchId, batchId));
+  const total = Number(countRow?.count ?? 0);
+  const records = await db
+    .select({
+      id: diabetesExampleRecords.id,
+      importBatchId: diabetesExampleRecords.importBatchId,
+      sourceRowNumber: diabetesExampleRecords.sourceRowNumber,
+      rowSha256: diabetesExampleRecords.rowSha256,
+      exactDuplicateGroup: diabetesExampleRecords.exactDuplicateGroup,
+      isExactDuplicate: diabetesExampleRecords.isExactDuplicate,
+      year: diabetesExampleRecords.year,
+      gender: diabetesExampleRecords.gender,
+      age: diabetesExampleRecords.age,
+      location: diabetesExampleRecords.location,
+      raceAfricanAmerican: diabetesExampleRecords.raceAfricanAmerican,
+      raceAsian: diabetesExampleRecords.raceAsian,
+      raceCaucasian: diabetesExampleRecords.raceCaucasian,
+      raceHispanic: diabetesExampleRecords.raceHispanic,
+      raceOther: diabetesExampleRecords.raceOther,
+      hypertension: diabetesExampleRecords.hypertension,
+      heartDisease: diabetesExampleRecords.heartDisease,
+      smokingHistory: diabetesExampleRecords.smokingHistory,
+      bmi: diabetesExampleRecords.bmi,
+      hba1cLevel: diabetesExampleRecords.hba1cLevel,
+      bloodGlucoseLevel: diabetesExampleRecords.bloodGlucoseLevel,
+      diabetesLabel: diabetesExampleRecords.diabetesLabel,
+    })
+    .from(diabetesExampleRecords)
+    .where(eq(diabetesExampleRecords.importBatchId, batchId))
+    .orderBy(asc(diabetesExampleRecords.sourceRowNumber))
+    .limit(limit)
+    .offset(offset);
+
+  return { records, total, offset, limit, hasMore: offset + records.length < total };
 }

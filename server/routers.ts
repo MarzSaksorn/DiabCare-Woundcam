@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { getDiabetesImportSummary, getDiabetesPatient, getDiabetesPatientObservations, getDiabetesPatients } from "./db";
+import { getDiabetesExampleBatches, getDiabetesExampleRecords, getDiabetesImportSummary, getDiabetesPatient, getDiabetesPatientObservations, getDiabetesPatients } from "./db";
 import { z } from "zod";
 import { inferWoundImage } from "./woundInference";
 
@@ -25,6 +25,8 @@ export const appRouter = router({
     patients: protectedProcedure.input(z.object({ limit: z.number().int().min(1).max(100).default(100) })).query(({ input }) => getDiabetesPatients(input.limit)),
     detail: protectedProcedure.input(z.object({ patientId: z.number().int().positive() })).query(({ input }) => getDiabetesPatient(input.patientId)),
     observations: protectedProcedure.input(z.object({ patientId: z.number().int().positive(), limit: z.number().int().min(1).max(100).default(24) })).query(({ input }) => getDiabetesPatientObservations(input.patientId, input.limit)),
+    exampleBatches: protectedProcedure.input(z.object({ limit: z.number().int().min(1).max(20).default(20) })).query(({ input }) => getDiabetesExampleBatches(input.limit)),
+    exampleRecords: protectedProcedure.input(z.object({ batchId: z.number().int().positive(), offset: z.number().int().min(0).max(100_000).default(0), limit: z.number().int().min(1).max(100).default(50) })).query(({ input }) => getDiabetesExampleRecords(input.batchId, input.offset, input.limit)),
   }),
 
   wound: router({

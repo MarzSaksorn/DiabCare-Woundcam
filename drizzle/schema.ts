@@ -1,5 +1,6 @@
 import {
   bigint,
+  boolean,
   index,
   integer,
   numeric,
@@ -95,5 +96,59 @@ export const diabetesPatientObservations = pgTable(
 
 export type DiabetesPatientObservation = typeof diabetesPatientObservations.$inferSelect;
 export type InsertDiabetesPatientObservation = typeof diabetesPatientObservations.$inferInsert;
+
+export const diabetesExampleImportBatches = pgTable("diabetes_example_import_batches", {
+  id: bigint("id", { mode: "number" }).generatedByDefaultAsIdentity().primaryKey(),
+  sourceFilename: varchar("source_filename", { length: 255 }).notNull(),
+  fileSha256: varchar("file_sha256", { length: 64 }).notNull().unique(),
+  sourceRecordCount: integer("source_record_count").notNull(),
+  exactDuplicateGroupCount: integer("exact_duplicate_group_count").notNull(),
+  exactDuplicateExtraCount: integer("exact_duplicate_extra_count").notNull(),
+  mappingVersion: varchar("mapping_version", { length: 32 }).notNull(),
+  status: varchar("status", { length: 32 }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+});
+
+export type DiabetesExampleImportBatch = typeof diabetesExampleImportBatches.$inferSelect;
+
+export const diabetesExampleRecords = pgTable(
+  "diabetes_example_records",
+  {
+    id: bigint("id", { mode: "number" }).generatedByDefaultAsIdentity().primaryKey(),
+    importBatchId: bigint("import_batch_id", { mode: "number" })
+      .notNull()
+      .references(() => diabetesExampleImportBatches.id, { onDelete: "restrict" }),
+    sourceRowNumber: integer("source_row_number").notNull(),
+    rowSha256: varchar("row_sha256", { length: 64 }).notNull(),
+    exactDuplicateGroup: varchar("exact_duplicate_group", { length: 64 }),
+    isExactDuplicate: boolean("is_exact_duplicate").notNull().default(false),
+    year: integer("year").notNull(),
+    gender: varchar("gender", { length: 32 }).notNull(),
+    age: numeric("age", { precision: 10, scale: 4, mode: "number" }).notNull(),
+    location: varchar("location", { length: 128 }).notNull(),
+    raceAfricanAmerican: smallint("race_african_american").notNull(),
+    raceAsian: smallint("race_asian").notNull(),
+    raceCaucasian: smallint("race_caucasian").notNull(),
+    raceHispanic: smallint("race_hispanic").notNull(),
+    raceOther: smallint("race_other").notNull(),
+    hypertension: smallint("hypertension").notNull(),
+    heartDisease: smallint("heart_disease").notNull(),
+    smokingHistory: varchar("smoking_history", { length: 32 }).notNull(),
+    bmi: numeric("bmi", { precision: 10, scale: 4, mode: "number" }).notNull(),
+    hba1cLevel: numeric("hba1c_level", { precision: 10, scale: 4, mode: "number" }).notNull(),
+    bloodGlucoseLevel: integer("blood_glucose_level").notNull(),
+    diabetesLabel: smallint("diabetes_label").notNull(),
+    clinicalNotes: text("clinical_notes").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({
+    batchRowUnique: uniqueIndex("diabetes_example_records_batch_row_unique").on(table.importBatchId, table.sourceRowNumber),
+    batchRowIndex: index("diabetes_example_records_batch_row_idx").on(table.importBatchId, table.sourceRowNumber),
+    batchYearIndex: index("diabetes_example_records_batch_year_idx").on(table.importBatchId, table.year),
+    batchLabelIndex: index("diabetes_example_records_batch_label_idx").on(table.importBatchId, table.diabetesLabel),
+  }),
+);
+
+export type DiabetesExampleRecord = typeof diabetesExampleRecords.$inferSelect;
 
 export { patientSex, userRole };
