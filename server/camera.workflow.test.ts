@@ -11,6 +11,13 @@ describe("diagnostic camera workflow", () => {
       "reviewBeforeAnalysis",
       "diagnosticDisclaimer",
       "clinicalDecision",
+      "cameraPermissionDenied",
+      "cameraUnavailable",
+      "cameraStarting",
+      "cameraLive",
+      "capturePhoto",
+      "stopCamera",
+      "captureError",
     ];
 
     expect(requiredKeys.every((key) => translationKeys.includes(key))).toBe(true);
