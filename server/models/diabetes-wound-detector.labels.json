@@ -1,0 +1,13 @@
+{
+  "task": "detect",
+  "imgsz": 640,
+  "classes": {
+    "0": "callus_corn",
+    "1": "dfu_ulcer",
+    "2": "infected_wound",
+    "3": "necrotic_wound",
+    "4": "normal_foot"
+  },
+  "model_source": "best.pt exported to ONNX with Ultralytics 8.3.0",
+  "clinical_note": "Model output is decision support and must not be presented as a diagnosis."
+}
