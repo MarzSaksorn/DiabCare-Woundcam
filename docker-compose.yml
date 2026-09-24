@@ -5,7 +5,8 @@ services:
       dockerfile: Dockerfile
     image: diabcare-woundcam:local
     ports:
-      - "${DIABCARE_PORT:-3000}:3000"
+      # Keep the app off the LAN; Tailscale Serve provides the HTTPS endpoint.
+      - "127.0.0.1:${DIABCARE_PORT:-3000}:3000"
     env_file:
       - path: .env
         required: false

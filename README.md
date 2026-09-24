@@ -78,7 +78,15 @@ docker compose ps
 docker compose logs -f diabcare-woundcam
 ```
 
-The service is published on `http://localhost:3000` by default. Set `DIABCARE_PORT` to change the host port. Compose passes `NODE_ENV=production` and `PORT=3000` into the container and exposes a health check. For an isolated local Docker demo without Manus OAuth, start it with `LOCAL_AUTH_BYPASS=true docker compose up --build`; leave this unset or set it to `false` for shared or production environments. Never commit `.env`, database credentials, OAuth secrets, or patient data.
+The service is bound to `127.0.0.1:3000` by default rather than exposed to the LAN. For phone camera access, run it behind [Tailscale Serve](https://tailscale.com/docs/features/tailscale-serve), which terminates HTTPS using your tailnet DNS name:
+
+```bash
+docker compose up --build -d
+tailscale serve 3000
+tailscale serve status
+```
+
+Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve requires HTTPS to be enabled for the tailnet and keeps the service available only to authorized tailnet devices. The HTTPS origin is required because mobile browsers generally do not allow `getUserMedia()` from an ordinary LAN HTTP address. For an isolated local Docker demo without Manus OAuth, start it with `LOCAL_AUTH_BYPASS=true docker compose up --build -d`; leave this unset or set it to `false` for shared or production environments. Never commit `.env`, database credentials, OAuth secrets, or patient data.
 
 ## Database
 
