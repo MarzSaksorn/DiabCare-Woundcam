@@ -8,14 +8,16 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import Home from "./pages/Home";
 import PatientRecord from "./pages/PatientRecord";
 import Patients from "./pages/Patients";
+import DiagnosticCamera from "./pages/DiagnosticCamera";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/patients/:id"} component={PatientRecord} />
+      <Route path="/camera" component={DiagnosticCamera} />
       <Route path={"/"} component={Home} />
       <Route path="/patients" component={Patients} />
-      <Route path="/assessments" component={Home} />
+      <Route path="/assessments" component={DiagnosticCamera} />
       <Route path="/reports" component={Home} />
       <Route path="/settings" component={Home} />
       <Route path="/404" component={NotFound} />
