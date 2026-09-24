@@ -1,9 +1,15 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import fs from "node:fs";
 import * as ort from "onnxruntime-node";
 import sharp from "sharp";
 
-const MODEL_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), "models", "diabetes-wound-detector.onnx");
+const MODEL_FILENAME = "diabetes-wound-detector.onnx";
+const MODULE_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
+const MODEL_PATH = [
+  path.join(MODULE_DIRECTORY, "models", MODEL_FILENAME),
+  path.resolve(MODULE_DIRECTORY, "..", "server", "models", MODEL_FILENAME),
+].find((candidate) => fs.existsSync(candidate)) ?? path.join(MODULE_DIRECTORY, "models", MODEL_FILENAME);
 const IMAGE_SIZE = 640;
 const CLASS_NAMES = ["callus_corn", "dfu_ulcer", "infected_wound", "necrotic_wound", "normal_foot"] as const;
 const DEFAULT_CONFIDENCE = 0.25;

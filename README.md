@@ -64,6 +64,20 @@ pnpm dev
 
 The development server starts the Express/tRPC backend and Vite frontend together. The application requires authentication before protected patient and assessment workflows can be opened.
 
+## Docker Compose
+
+`Dockerfile` builds the Vite frontend and Express/tRPC backend together. The runtime image includes the checked-in ONNX wound detector under `dist/models`, so the browser UI, API, and local YOLO inference run as one service. The database is intentionally not bundled: configure `DATABASE_URL` for the approved MySQL/TiDB instance rather than creating a second copy of clinical data in a local container.
+
+Create a local `.env` file outside source control with the required server variables such as `DATABASE_URL`, `JWT_SECRET`, `VITE_APP_ID`, and the OAuth settings, then start the stack:
+
+```bash
+docker compose up --build -d
+docker compose ps
+docker compose logs -f diabcare-woundcam
+```
+
+The service is published on `http://localhost:3000` by default. Set `DIABCARE_PORT` to change the host port. Compose passes `NODE_ENV=production` and `PORT=3000` into the container and exposes a health check. Never commit `.env`, database credentials, OAuth secrets, or patient data.
+
 ## Database
 
 Generate and apply Drizzle migrations with:
