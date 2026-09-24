@@ -70,9 +70,11 @@ When `NODE_ENV=development`, the app uses a clearly labeled synthetic **Local Cl
 
 `Dockerfile` builds the Vite frontend and Express/tRPC backend together. The runtime image includes the checked-in ONNX wound detector under `dist/models`, so the browser UI, API, and local YOLO inference run as one service. The database is intentionally not bundled: configure the server-only `DATABASE_URL` for the approved Supabase PostgreSQL connection rather than creating a second copy of clinical data in a local container.
 
-Create a local `.env` file outside source control with the required server variables such as `DATABASE_URL`, `JWT_SECRET`, `VITE_APP_ID`, and the OAuth settings, then start the stack:
+Copy `env.example` to the ignored local `.env` file, then replace the Supabase and secret placeholders before starting the stack:
 
 ```bash
+cp env.example .env
+# Edit .env and set DATABASE_URL to the Supabase connection string.
 docker compose up --build -d
 docker compose ps
 docker compose logs -f diabcare-woundcam
