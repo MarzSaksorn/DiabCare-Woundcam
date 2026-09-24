@@ -3,7 +3,7 @@
 **Status:** Implementation-ready design specification  
 **Product:** DiabCare Woundcam  
 **Audience:** Local village nurses and the clinical teams who supervise their work  
-**Target platform:** Existing responsive React, TypeScript, tRPC, Drizzle, and MySQL/TiDB web application  
+**Target platform:** Existing responsive React, TypeScript, tRPC, Drizzle, and Supabase PostgreSQL web application
 **Data posture:** Sensitive health information; local-data-residency requirement  
 **Author:** Manus AI
 
@@ -44,7 +44,7 @@ The current wound dashboard also contains a demonstration-only wound workflow. I
 | Roles | Village nurses perform routine review and entry. A supervising clinician can review, correct, and sign off. An administrator manages access and configuration. | Use role-based read/write controls and a visible author/audit trail. |
 | Patient identity | The workbook is de-identified. `sourceRowNumber` and internal database IDs are technical references, not patient identifiers. | Do not display a fabricated name or national ID. Add an explicit “Imported cohort record” label until a governed identity-linking workflow exists. |
 | Clinical data | Workbook fields are baseline and periodized observations. Wound data is a separate future domain. | Keep diabetes observations and wound observations related through a patient record, but do not flatten them into one untyped field. |
-| Platform | Use the current React + TypeScript + tRPC + Drizzle + MySQL/TiDB application. | Keep server access behind protected tRPC procedures and use typed shared contracts. |
+| Platform | Use the current React + TypeScript + tRPC + Drizzle + Supabase PostgreSQL application. | Keep server access behind protected tRPC procedures and use typed shared contracts. |
 | Residency | Database, object storage, backups, logs, and audit records must remain in the approved local residency boundary. | Disable unapproved external analytics, third-party image processing, and external AI inference for protected data. |
 | Regulation | No specific jurisdiction was provided. | Use a privacy-by-design baseline and require local legal/compliance review before production use. |
 | Clinical protocol | No hospital-specific wound protocol or threshold set was supplied. | Show configurable review flags only. Do not hard-code diagnostic thresholds as clinical truth. |

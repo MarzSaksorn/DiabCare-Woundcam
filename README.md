@@ -14,7 +14,7 @@ DiabCare Woundcam is a bilingual clinical companion web application for hospital
 - Server-side wound-image inference using the locally packaged ONNX model and `onnxruntime-node`.
 - Five model classes: `callus_corn`, `dfu_ulcer`, `infected_wound`, `necrotic_wound`, and `normal_foot`.
 - Detection bounding boxes mapped onto the captured preview, with confidence scores and a clinician-review disclaimer.
-- Type-safe tRPC procedures, Drizzle ORM schema, MySQL/TiDB database integration, and S3-compatible storage helpers.
+- Type-safe tRPC procedures, Drizzle ORM schema, Supabase PostgreSQL persistence, and S3-compatible storage helpers.
 
 ## Architecture
 
@@ -22,7 +22,7 @@ DiabCare Woundcam is a bilingual clinical companion web application for hospital
 | --- | --- |
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS v4, Wouter, Radix UI, Lucide Icons |
 | API | Express, tRPC 11, Zod validation |
-| Persistence | Drizzle ORM with MySQL/TiDB |
+| Persistence | Supabase PostgreSQL accessed through Drizzle ORM |
 | Inference | Ultralytics YOLO export, ONNX Runtime Node, Sharp preprocessing |
 | Authentication | Manus OAuth/session integration |
 | Storage | S3-compatible object storage helpers; store references, not image bytes, in database rows |
@@ -51,7 +51,7 @@ shared/                      Shared constants and types
 
 - Node.js 22 or a compatible current Node.js runtime.
 - pnpm 10.
-- MySQL or TiDB connection available through `DATABASE_URL`.
+- Supabase PostgreSQL connection available through the server-only `DATABASE_URL`.
 - Required application/authentication environment variables supplied by the deployment environment. Do not commit `.env` files or credentials.
 - A CPU-capable runtime for `onnxruntime-node` and native Sharp dependencies.
 
@@ -68,7 +68,7 @@ When `NODE_ENV=development`, the app uses a clearly labeled synthetic **Local Cl
 
 ## Docker Compose
 
-`Dockerfile` builds the Vite frontend and Express/tRPC backend together. The runtime image includes the checked-in ONNX wound detector under `dist/models`, so the browser UI, API, and local YOLO inference run as one service. The database is intentionally not bundled: configure `DATABASE_URL` for the approved MySQL/TiDB instance rather than creating a second copy of clinical data in a local container.
+`Dockerfile` builds the Vite frontend and Express/tRPC backend together. The runtime image includes the checked-in ONNX wound detector under `dist/models`, so the browser UI, API, and local YOLO inference run as one service. The database is intentionally not bundled: configure the server-only `DATABASE_URL` for the approved Supabase PostgreSQL connection rather than creating a second copy of clinical data in a local container.
 
 Create a local `.env` file outside source control with the required server variables such as `DATABASE_URL`, `JWT_SECRET`, `VITE_APP_ID`, and the OAuth settings, then start the stack:
 
@@ -90,13 +90,11 @@ Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve
 
 ## Database
 
-Generate and apply Drizzle migrations with:
+The application database is the connected Supabase project. The schema migration is versioned at `supabase/migrations/20260924000000_create_diabcare_application_schema.sql`; the server accesses it through Drizzle's PostgreSQL adapter using the server-only `DATABASE_URL`. Copy the connection string from the Supabase Dashboard's **Connect** dialog. For this persistent Docker backend, use the direct connection when the host has IPv6 or the shared **Session pooler** when it is IPv4-only; do not use the browser Data API from the server. Manus OAuth remains the authentication provider, while the `users` table stores the application-side OAuth identity and role record.
 
-```bash
-pnpm db:push
-```
+The approved migration copied the existing source database into Supabase without deleting the source: one application user, one import batch, 100 de-identified patients, and 42,859 observations. All four public tables have RLS enabled, and anonymous/authenticated Data API access is revoked; patient data is read and written by the protected application server connection only.
 
-Do not run schema or data changes against a production database without an explicit review and backup plan. Imported patient data must remain de-identified and must follow the deployment's local data-residency policy.
+For future schema changes, review the SQL migration first and apply it through the Supabase migration workflow. Do not run schema or data changes against a production database without an explicit review and backup plan. Imported patient data must remain de-identified and must follow the deployment's local data-residency policy.
 
 ## Validation commands
 

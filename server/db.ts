@@ -1,17 +1,36 @@
 import { asc, desc, eq, inArray, sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/mysql2";
-import { diabetesImportBatches, diabetesPatientObservations, diabetesPatients, InsertUser, users } from "../drizzle/schema";
-import { ENV } from './_core/env';
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import {
+  diabetesImportBatches,
+  diabetesPatientObservations,
+  diabetesPatients,
+  InsertUser,
+  users,
+} from "../drizzle/schema";
+import { ENV } from "./_core/env";
 
+let _pool: Pool | null = null;
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
+/**
+ * Lazily create a small pool for Supabase/Postgres. The low max connection
+ * count is intentional: the deployment is a single 1 vCPU application and
+ * Supabase connection limits are shared across all application instances.
+ */
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      _pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        max: 5,
+        idleTimeoutMillis: 10_000,
+        connectionTimeoutMillis: 10_000,
+      });
+      _db = drizzle(_pool);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
+      _pool = null;
       _db = null;
     }
   }
@@ -33,7 +52,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     const values: InsertUser = {
       openId: user.openId,
     };
-    const updateSet: Record<string, unknown> = {};
+    const updateSet: Partial<InsertUser> = {};
 
     const textFields = ["name", "email", "loginMethod"] as const;
     type TextField = (typeof textFields)[number];
@@ -56,8 +75,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.role = user.role;
       updateSet.role = user.role;
     } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
+      values.role = "admin";
+      updateSet.role = "admin";
     }
 
     if (!values.lastSignedIn) {
@@ -67,8 +86,10 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     if (Object.keys(updateSet).length === 0) {
       updateSet.lastSignedIn = new Date();
     }
+    updateSet.updatedAt = new Date();
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
+    await db.insert(users).values(values).onConflictDoUpdate({
+      target: users.openId,
       set: updateSet,
     });
   } catch (error) {
@@ -93,14 +114,30 @@ export async function getDiabetesImportSummary() {
   const db = await getDb();
   if (!db) return { batch: null, patientCount: 0, observationCount: 0 };
 
-  const [batch] = await db.select().from(diabetesImportBatches).orderBy(desc(diabetesImportBatches.createdAt)).limit(1);
+  const [batch] = await db
+    .select()
+    .from(diabetesImportBatches)
+    .orderBy(desc(diabetesImportBatches.createdAt))
+    .limit(1);
   if (!batch) return { batch: null, patientCount: 0, observationCount: 0 };
 
-  const [patientCount] = await db.select({ count: sql<number>`count(*)` }).from(diabetesPatients).where(eq(diabetesPatients.importBatchId, batch.id));
-  const [observationCount] = await db.select({ count: sql<number>`count(*)` }).from(diabetesPatientObservations).innerJoin(diabetesPatients, eq(diabetesPatientObservations.patientId, diabetesPatients.id)).where(eq(diabetesPatients.importBatchId, batch.id));
+  const [patientCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(diabetesPatients)
+    .where(eq(diabetesPatients.importBatchId, batch.id));
+  const [observationCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(diabetesPatientObservations)
+    .innerJoin(diabetesPatients, eq(diabetesPatientObservations.patientId, diabetesPatients.id))
+    .where(eq(diabetesPatients.importBatchId, batch.id));
 
   return {
-    batch: { id: batch.id, sourceFilename: batch.sourceFilename, sourceRecordCount: batch.sourceRecordCount, createdAt: batch.createdAt },
+    batch: {
+      id: batch.id,
+      sourceFilename: batch.sourceFilename,
+      sourceRecordCount: batch.sourceRecordCount,
+      createdAt: batch.createdAt,
+    },
     patientCount: Number(patientCount?.count ?? 0),
     observationCount: Number(observationCount?.count ?? 0),
   };
@@ -110,11 +147,19 @@ export async function getDiabetesPatients(limit = 100) {
   const db = await getDb();
   if (!db) return [];
 
-  const patients = await db.select().from(diabetesPatients).orderBy(asc(diabetesPatients.sourceRowNumber)).limit(limit);
+  const patients = await db
+    .select()
+    .from(diabetesPatients)
+    .orderBy(asc(diabetesPatients.sourceRowNumber))
+    .limit(limit);
   if (patients.length === 0) return [];
 
   const patientIds = patients.map((patient) => patient.id);
-  const counts = await db.select({ patientId: diabetesPatientObservations.patientId, count: sql<number>`count(*)` }).from(diabetesPatientObservations).where(inArray(diabetesPatientObservations.patientId, patientIds)).groupBy(diabetesPatientObservations.patientId);
+  const counts = await db
+    .select({ patientId: diabetesPatientObservations.patientId, count: sql<number>`count(*)` })
+    .from(diabetesPatientObservations)
+    .where(inArray(diabetesPatientObservations.patientId, patientIds))
+    .groupBy(diabetesPatientObservations.patientId);
   const countByPatient = new Map(counts.map((row) => [row.patientId, Number(row.count)]));
 
   return patients.map((patient) => ({ ...patient, observationCount: countByPatient.get(patient.id) ?? 0 }));
@@ -124,15 +169,32 @@ export async function getDiabetesPatient(patientId: number) {
   const db = await getDb();
   if (!db) return null;
 
-  const [row] = await db.select({ patient: diabetesPatients, batch: diabetesImportBatches }).from(diabetesPatients).innerJoin(diabetesImportBatches, eq(diabetesPatients.importBatchId, diabetesImportBatches.id)).where(eq(diabetesPatients.id, patientId)).limit(1);
+  const [row] = await db
+    .select({ patient: diabetesPatients, batch: diabetesImportBatches })
+    .from(diabetesPatients)
+    .innerJoin(diabetesImportBatches, eq(diabetesPatients.importBatchId, diabetesImportBatches.id))
+    .where(eq(diabetesPatients.id, patientId))
+    .limit(1);
   if (!row) return null;
 
-  const [observationCount] = await db.select({ count: sql<number>`count(*)` }).from(diabetesPatientObservations).where(eq(diabetesPatientObservations.patientId, patientId));
-  return { ...row.patient, sourceFilename: row.batch.sourceFilename, observationCount: Number(observationCount?.count ?? 0) };
+  const [observationCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(diabetesPatientObservations)
+    .where(eq(diabetesPatientObservations.patientId, patientId));
+  return {
+    ...row.patient,
+    sourceFilename: row.batch.sourceFilename,
+    observationCount: Number(observationCount?.count ?? 0),
+  };
 }
 
 export async function getDiabetesPatientObservations(patientId: number, limit = 24) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(diabetesPatientObservations).where(eq(diabetesPatientObservations.patientId, patientId)).orderBy(desc(diabetesPatientObservations.id)).limit(limit);
+  return db
+    .select()
+    .from(diabetesPatientObservations)
+    .where(eq(diabetesPatientObservations.patientId, patientId))
+    .orderBy(desc(diabetesPatientObservations.id))
+    .limit(limit);
 }

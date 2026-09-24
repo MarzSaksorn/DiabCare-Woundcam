@@ -3,7 +3,7 @@
 **Prompt version:** 1.0  
 **Target:** UI/UX design or implementation model  
 **Product:** DiabCare Woundcam  
-**Platform:** Responsive web application using React, TypeScript, TailwindCSS, tRPC, Drizzle, and MySQL/TiDB  
+**Platform:** Responsive web application using React, TypeScript, TailwindCSS, tRPC, Drizzle, and Supabase PostgreSQL
 **Primary users:** Local village nurses and supervising clinicians  
 **Clinical safety posture:** Decision support and record review only; never diagnose or prescribe
 
@@ -16,7 +16,7 @@ Your task is to design and implement a polished, responsive Patients list page t
 
 PRODUCT CONTEXT
 - DiabCare Woundcam monitors diabetes-related clinical observations and wound-healing progress.
-- The current application is React + TypeScript + TailwindCSS + tRPC + Drizzle + MySQL/TiDB.
+- The current application is React + TypeScript + TailwindCSS + tRPC + Drizzle + Supabase PostgreSQL.
 - Authentication already exists. Patient data must be protected by server-side role and assignment checks.
 - The imported workbook contains 100 de-identified diabetes records and periodized observations. It does not contain patient names, contact details, national IDs, wound records, photographs, or clinician-authored notes.
 - The current database separates authentication users from clinical records. Do not use the users table as a patient table.
@@ -29,8 +29,7 @@ Create a calm, dense-but-readable clinical operations interface. Preserve the ex
 - Muted sage for improving or complete states: #6D9681
 - Terracotta for urgent review prompts: #C86B52
 - Amber for due or incomplete states: #D9A441
-- Fraunces for page headings and patient-record labels
-- DM Sans for controls, tables, metadata, and body text
+- IBM Plex Sans Thai for headings, controls, tables, metadata, and body text in both English and Thai
 - 8px spacing rhythm
 - 14–16px panel radii
 - Soft shadows instead of heavy borders
