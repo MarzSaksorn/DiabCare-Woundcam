@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -113,6 +113,8 @@ button { cursor: pointer; }
 .reference-section { padding: 22px 24px; }
 .reference-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
 .reference-section-heading h2 { margin: 0; color: #172c40; font-family: 'Noto Sans Thai', sans-serif; font-size: 22px; letter-spacing: -.03em; }
+.record-reference-page .reference-section, .record-reference-page .reference-section * { font-family: 'Kanit', sans-serif; }
+.record-reference-page .reference-section code, .record-reference-page .reference-section .observation-source { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .reference-profile-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .reference-info-pair { min-width: 0; border: 1px solid #eef2f0; border-radius: 10px; background: #fbfcfb; padding: 12px 14px; }
 .reference-info-pair span, .reference-mini-stat span { display: block; color: #95a1aa; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
