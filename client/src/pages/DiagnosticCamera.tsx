@@ -12,6 +12,11 @@ type InferenceResult = { topSuggestion: { label: string; confidence: number; box
 type ImageLayout = { naturalWidth: number; naturalHeight: number; viewportWidth: number; viewportHeight: number };
 const MODEL_IMAGE_SIZE = 640;
 
+function canRequestCamera() {
+  if (typeof window === "undefined") return false;
+  return window.isSecureContext || ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname);
+}
+
 export default function DiagnosticCamera() {
   const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +67,11 @@ export default function DiagnosticCamera() {
   }, [previewUrl]);
 
   async function startCamera() {
+    if (!canRequestCamera()) {
+      setCameraError(t("cameraSecureContext"));
+      setCameraState("error");
+      return;
+    }
     if (!navigator.mediaDevices?.getUserMedia) {
       setCameraError(t("cameraUnavailable"));
       setCameraState("error");
@@ -72,15 +82,28 @@ export default function DiagnosticCamera() {
     setCameraError("");
     setCameraState("starting");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        });
+      } catch (error) {
+        // Some mobile browsers reject ideal facingMode/size constraints even
+        // though they can provide a camera. Retry with the minimal contract.
+        if (!(error instanceof DOMException) || error.name !== "OverconstrainedError") throw error;
+        stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
       }
+      streamRef.current = stream;
+      const video = videoRef.current;
+      if (!video) throw new Error("Camera preview is unavailable");
+      video.srcObject = stream;
+      await new Promise<void>((resolve) => {
+        const onMetadata = () => { video.removeEventListener("loadedmetadata", onMetadata); resolve(); };
+        video.addEventListener("loadedmetadata", onMetadata, { once: true });
+        if (video.readyState >= HTMLMediaElement.HAVE_METADATA) onMetadata();
+      });
+      await video.play();
       setCameraState("live");
     } catch (error) {
       const denied = error instanceof DOMException && (error.name === "NotAllowedError" || error.name === "SecurityError");
@@ -183,7 +206,7 @@ export default function DiagnosticCamera() {
         </div>
         {cameraError && cameraState !== "error" && <div className="camera-error" role="alert"><Info className="h-4 w-4" /><span>{cameraError}</span></div>}
         <canvas ref={canvasRef} className="sr-only" aria-hidden="true" />
-        <div className="camera-capture-actions"><input ref={inputRef} type="file" accept="image/*" className="sr-only" onChange={(event) => handleFile(event.target.files?.[0])} />{previewUrl ? <><Button onClick={resetCapture} variant="outline" className="h-11 flex-1 rounded-xl border-slate-200"><RefreshCcw className="mr-2 h-4 w-4" /> {t("retake")}</Button><Button onClick={beginReview} disabled={state === "analyzing"} className="h-11 flex-1 rounded-xl bg-[#132238] text-white hover:bg-[#223750]">{state === "analyzing" ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("preparing")}</> : <><Sparkles className="mr-2 h-4 w-4" /> {t("reviewImage")}</>}</Button></> : cameraState === "live" ? <><Button onClick={captureFrame} className="h-11 flex-1 rounded-xl bg-[#132238] text-white hover:bg-[#223750]"><Camera className="mr-2 h-4 w-4" /> {t("capturePhoto")}</Button><Button onClick={stopCamera} variant="outline" className="h-11 rounded-xl border-slate-200 px-4"><X className="mr-2 h-4 w-4" /> {t("stopCamera")}</Button></> : <><Button onClick={startCamera} disabled={cameraState === "starting"} className="h-11 flex-1 rounded-xl bg-[#132238] text-white hover:bg-[#223750]">{cameraState === "starting" ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("cameraStarting")}</> : <><Camera className="mr-2 h-4 w-4" /> {t("openCamera")}</>}</Button><Button onClick={() => inputRef.current?.click()} variant="outline" className="h-11 rounded-xl border-slate-200 px-4" aria-label={t("uploadImage")}><Upload className="h-4 w-4" /></Button></>}</div>
+        <div className="camera-capture-actions"><input ref={inputRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={(event) => handleFile(event.target.files?.[0])} />{previewUrl ? <><Button onClick={resetCapture} variant="outline" className="h-11 flex-1 rounded-xl border-slate-200"><RefreshCcw className="mr-2 h-4 w-4" /> {t("retake")}</Button><Button onClick={beginReview} disabled={state === "analyzing"} className="h-11 flex-1 rounded-xl bg-[#132238] text-white hover:bg-[#223750]">{state === "analyzing" ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("preparing")}</> : <><Sparkles className="mr-2 h-4 w-4" /> {t("reviewImage")}</>}</Button></> : cameraState === "live" ? <><Button onClick={captureFrame} className="h-11 flex-1 rounded-xl bg-[#132238] text-white hover:bg-[#223750]"><Camera className="mr-2 h-4 w-4" /> {t("capturePhoto")}</Button><Button onClick={stopCamera} variant="outline" className="h-11 rounded-xl border-slate-200 px-4"><X className="mr-2 h-4 w-4" /> {t("stopCamera")}</Button></> : <><Button onClick={startCamera} disabled={cameraState === "starting"} className="h-11 flex-1 rounded-xl bg-[#132238] text-white hover:bg-[#223750]">{cameraState === "starting" ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("cameraStarting")}</> : <><Camera className="mr-2 h-4 w-4" /> {t("openCamera")}</>}</Button><Button onClick={() => inputRef.current?.click()} variant="outline" className="h-11 rounded-xl border-slate-200 px-4" aria-label={t("uploadImage")}><Upload className="h-4 w-4" /></Button></>}</div>
         <div className="camera-trust-note"><ShieldCheck className="h-4 w-4" /><span>{t("imagePrivacy")}</span></div>
       </section>
 

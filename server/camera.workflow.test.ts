@@ -12,6 +12,7 @@ describe("diagnostic camera workflow", () => {
       "diagnosticDisclaimer",
       "clinicalDecision",
       "cameraPermissionDenied",
+      "cameraSecureContext",
       "cameraUnavailable",
       "cameraStarting",
       "cameraLive",
