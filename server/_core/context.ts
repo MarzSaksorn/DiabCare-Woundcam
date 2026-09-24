@@ -8,6 +8,27 @@ export type TrpcContext = {
   user: User | null;
 };
 
+export function isLocalAuthBypassEnabled(env: NodeJS.ProcessEnv = process.env) {
+  // Local Vite/tsx development has no Manus session. Never enable this fallback
+  // for production unless the operator explicitly opts in (for an isolated demo).
+  return env.LOCAL_AUTH_BYPASS === "true" || (env.NODE_ENV !== "production" && env.LOCAL_AUTH_BYPASS !== "false");
+}
+
+export function createLocalDevelopmentUser(): User {
+  const now = new Date();
+  return {
+    id: 0,
+    openId: "local-development-user",
+    name: "Local Clinician",
+    email: "local@diabcare.local",
+    loginMethod: "local-development",
+    role: "admin",
+    createdAt: now,
+    updatedAt: now,
+    lastSignedIn: now,
+  };
+}
+
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
@@ -18,6 +39,10 @@ export async function createContext(
   } catch (error) {
     // Authentication is optional for public procedures.
     user = null;
+  }
+
+  if (!user && isLocalAuthBypassEnabled()) {
+    user = createLocalDevelopmentUser();
   }
 
   return {

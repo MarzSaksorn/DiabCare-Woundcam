@@ -12,6 +12,8 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      # Set LOCAL_AUTH_BYPASS=true only for an isolated local demo.
+      LOCAL_AUTH_BYPASS: ${LOCAL_AUTH_BYPASS:-false}
     restart: unless-stopped
     init: true
     healthcheck:

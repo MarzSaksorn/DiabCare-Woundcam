@@ -64,6 +64,8 @@ pnpm dev
 
 The development server starts the Express/tRPC backend and Vite frontend together. The application requires authentication before protected patient and assessment workflows can be opened.
 
+When `NODE_ENV=development`, the app uses a clearly labeled synthetic **Local Clinician** identity by default, so a local checkout does not redirect to Manus OAuth. This bypass is development-only; set `LOCAL_AUTH_BYPASS=false` to test the unauthenticated flow. Production keeps Manus authentication enabled unless `LOCAL_AUTH_BYPASS=true` is explicitly set.
+
 ## Docker Compose
 
 `Dockerfile` builds the Vite frontend and Express/tRPC backend together. The runtime image includes the checked-in ONNX wound detector under `dist/models`, so the browser UI, API, and local YOLO inference run as one service. The database is intentionally not bundled: configure `DATABASE_URL` for the approved MySQL/TiDB instance rather than creating a second copy of clinical data in a local container.
@@ -76,7 +78,7 @@ docker compose ps
 docker compose logs -f diabcare-woundcam
 ```
 
-The service is published on `http://localhost:3000` by default. Set `DIABCARE_PORT` to change the host port. Compose passes `NODE_ENV=production` and `PORT=3000` into the container and exposes a health check. Never commit `.env`, database credentials, OAuth secrets, or patient data.
+The service is published on `http://localhost:3000` by default. Set `DIABCARE_PORT` to change the host port. Compose passes `NODE_ENV=production` and `PORT=3000` into the container and exposes a health check. For an isolated local Docker demo without Manus OAuth, start it with `LOCAL_AUTH_BYPASS=true docker compose up --build`; leave this unset or set it to `false` for shared or production environments. Never commit `.env`, database credentials, OAuth secrets, or patient data.
 
 ## Database
 
