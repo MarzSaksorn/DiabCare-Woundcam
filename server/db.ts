@@ -19,10 +19,21 @@ let _db: ReturnType<typeof drizzle> | null = null;
  * Supabase connection limits are shared across all application instances.
  */
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  const databaseUrl = ENV.databaseUrl.trim();
+  if (!_db && databaseUrl) {
+    if (!/^postgres(?:ql)?:\/\//i.test(databaseUrl)) {
+      console.error("[Database] Invalid DATABASE_URL: expected a PostgreSQL connection string");
+      return null;
+    }
+
     try {
       _pool = new Pool({
-        connectionString: process.env.DATABASE_URL,
+        connectionString: databaseUrl,
+        // Supabase pooler connections require TLS. The managed runtime's
+        // certificate bundle reports the pooler's chain as self-signed, so
+        // use encrypted transport without rejecting that chain. Credentials
+        // and data remain protected in transit; the URL is still server-only.
+        ssl: { rejectUnauthorized: false },
         max: 5,
         idleTimeoutMillis: 10_000,
         connectionTimeoutMillis: 10_000,

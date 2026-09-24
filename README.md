@@ -51,7 +51,7 @@ shared/                      Shared constants and types
 
 - Node.js 22 or a compatible current Node.js runtime.
 - pnpm 10.
-- Supabase PostgreSQL connection available through the server-only `DATABASE_URL`.
+- Supabase PostgreSQL connection available through the server-only `SUPABASE_DATABASE_URL`.
 - Required application/authentication environment variables supplied by the deployment environment. Do not commit `.env` files or credentials.
 - A CPU-capable runtime for `onnxruntime-node` and native Sharp dependencies.
 
@@ -68,13 +68,13 @@ When `NODE_ENV=development`, the app uses a clearly labeled synthetic **Local Cl
 
 ## Docker Compose
 
-`Dockerfile` builds the Vite frontend and Express/tRPC backend together. The runtime image includes the checked-in ONNX wound detector under `dist/models`, so the browser UI, API, and local YOLO inference run as one service. The database is intentionally not bundled: configure the server-only `DATABASE_URL` for the approved Supabase PostgreSQL connection rather than creating a second copy of clinical data in a local container.
+`Dockerfile` builds the Vite frontend and Express/tRPC backend together. The runtime image includes the checked-in ONNX wound detector under `dist/models`, so the browser UI, API, and local YOLO inference run as one service. The database is intentionally not bundled: configure the server-only `SUPABASE_DATABASE_URL` for the approved Supabase PostgreSQL connection rather than creating a second copy of clinical data in a local container.
 
 Copy `env.example` to the ignored local `.env` file, then replace the Supabase and secret placeholders before starting the stack:
 
 ```bash
 cp env.example .env
-# Edit .env and set DATABASE_URL to the Supabase connection string.
+# Edit .env and set SUPABASE_DATABASE_URL to the Supabase Session pooler URL.
 docker compose up --build -d
 docker compose ps
 docker compose logs -f diabcare-woundcam
@@ -92,7 +92,7 @@ Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve
 
 ## Database
 
-The application database is the connected Supabase project. The schema migration is versioned at `supabase/migrations/20260924000000_create_diabcare_application_schema.sql`; the server accesses it through Drizzle's PostgreSQL adapter using the server-only `DATABASE_URL`. Copy the connection string from the Supabase Dashboard's **Connect** dialog. For this persistent Docker backend, use the direct connection when the host has IPv6 or the shared **Session pooler** when it is IPv4-only; do not use the browser Data API from the server. Manus OAuth remains the authentication provider, while the `users` table stores the application-side OAuth identity and role record.
+The application database is the connected Supabase project. The schema migration is versioned at `supabase/migrations/20260924000000_create_diabcare_application_schema.sql`; the server accesses it through Drizzle's PostgreSQL adapter using the server-only `SUPABASE_DATABASE_URL`. Copy the connection string from the Supabase Dashboard's **Connect** dialog. For this runtime, use the IPv4-compatible shared **Session pooler** URL on port 5432; the direct `db.<project-ref>.supabase.co` URL resolves to IPv6 and is not reachable here. Do not use the browser Data API from the server. Manus OAuth remains the authentication provider, while the `users` table stores the application-side OAuth identity and role record.
 
 The approved migration copied the existing source database into Supabase without deleting the source: one application user, one import batch, 100 de-identified patients, and 42,859 observations. All four public tables have RLS enabled, and anonymous/authenticated Data API access is revoked; patient data is read and written by the protected application server connection only.
 
