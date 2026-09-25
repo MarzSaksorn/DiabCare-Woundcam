@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { addPatientMedication, addPatientWoundAssessment, addPatientWoundMedia, archiveRegisteredPatient, createRegisteredPatient, exportRegisteredPatient, getDiabetesExampleBatches, getDiabetesExampleRecords, getDiabetesImportSummary, getDiabetesPatient, getDiabetesPatientObservations, getDiabetesPatients, getRegisteredPatientRecord, getRegisteredPatients, getWoundPhotoHistory, restoreRegisteredPatient, updateRegisteredPatient } from "./db";
+import { addPatientMedication, addPatientWoundAssessment, addPatientWoundMedia, archiveRegisteredPatient, createRegisteredPatient, deletePatientWoundMedia, exportRegisteredPatient, getDiabetesExampleBatches, getDiabetesExampleRecords, getDiabetesImportSummary, getDiabetesPatient, getDiabetesPatientObservations, getDiabetesPatients, getRegisteredPatientRecord, getRegisteredPatients, getWoundPhotoHistory, restoreRegisteredPatient, setPatientWoundMediaHidden, updateRegisteredPatient } from "./db";
 import { z } from "zod";
 import { inferWoundImage } from "./woundInference";
 import { TRPCError } from "@trpc/server";
@@ -67,6 +67,8 @@ export const appRouter = router({
       if (Number.isNaN(capturedAt.getTime())) throw new TRPCError({ code: "BAD_REQUEST", message: "Photo date and time is invalid" });
       return addPatientWoundMedia({ patientId: input.patientId, woundAssessmentId: input.woundAssessmentId ?? null, fileName: input.fileName, mimeType: input.mimeType, fileSizeBytes: imageBuffer.length, capturedOn: capturedAt.toISOString().slice(0, 10), capturedAt, caption: input.caption ?? null, recordedByUserId: ctx.user && ctx.user.id > 0 ? ctx.user.id : null, imageBuffer });
     }),
+    setWoundPhotoVisibility: protectedProcedure.input(z.object({ mediaId: z.number().int().positive(), hidden: z.boolean(), reason: z.string().trim().max(500).optional() })).mutation(({ input, ctx }) => setPatientWoundMediaHidden(input.mediaId, input.hidden, ctx.user && ctx.user.id > 0 ? ctx.user.id : null, input.reason)),
+    deleteWoundPhoto: protectedProcedure.input(z.object({ mediaId: z.number().int().positive() })).mutation(({ input, ctx }) => deletePatientWoundMedia(input.mediaId, ctx.user && ctx.user.id > 0 ? ctx.user.id : null)),
     archivePatient: protectedProcedure.input(z.object({ patientId: z.number().int().positive(), reason: z.string().trim().min(2).max(500) })).mutation(({ input, ctx }) => archiveRegisteredPatient(input.patientId, ctx.user && ctx.user.id > 0 ? ctx.user.id : null, input.reason)),
     restorePatient: protectedProcedure.input(z.object({ patientId: z.number().int().positive() })).mutation(({ input, ctx }) => restoreRegisteredPatient(input.patientId, ctx.user && ctx.user.id > 0 ? ctx.user.id : null)),
     exportPatient: protectedProcedure.input(z.object({ patientId: z.number().int().positive() })).mutation(({ input, ctx }) => exportRegisteredPatient(input.patientId, ctx.user && ctx.user.id > 0 ? ctx.user.id : null)),
