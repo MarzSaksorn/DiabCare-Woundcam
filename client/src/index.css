@@ -214,6 +214,16 @@ button { cursor: pointer; }
 .camera-kicker { color: #6f9780; letter-spacing: .19em; }
 .camera-help { border: 1px solid #deebe2; background: #f5faf6; transition: background 160ms ease-out, transform 160ms ease-out; }
 .camera-help:hover { background: #e8f3eb; transform: rotate(6deg); }
+.camera-help-anchor { position: relative; }
+.camera-help-popup { position: absolute; z-index: 30; top: calc(100% + 10px); right: 0; width: min(320px, calc(100vw - 48px)); padding: 16px; border: 1px solid #d9e7de; border-radius: 16px; background: #fff; box-shadow: 0 18px 44px rgba(19, 34, 56, .16); color: #536776; font-size: 13px; line-height: 1.65; }
+.camera-help-popup::before { content: ""; position: absolute; top: -6px; right: 12px; width: 11px; height: 11px; border-top: 1px solid #d9e7de; border-left: 1px solid #d9e7de; background: #fff; transform: rotate(45deg); }
+.camera-help-popup-heading { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.camera-help-popup-heading .camera-kicker { display: block; margin-bottom: 3px; }
+.camera-help-popup-heading strong { display: block; color: #17314c; font-family: 'Noto Sans Thai', sans-serif; font-size: 15px; line-height: 1.35; }
+.camera-help-popup p { margin: 0; }
+.camera-help-popup-close { display: inline-flex; flex: 0 0 auto; height: 28px; width: 28px; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: #f1f6f3; color: #5b866f; }
+.camera-help-popup-close:hover { background: #e5f0e9; }
+@media (max-width: 520px) { .camera-help-popup { right: -8px; } }
 .camera-viewport {
   min-height: clamp(420px, 52vw, 570px);
   border-color: #294552;
