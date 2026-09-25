@@ -1,4 +1,4 @@
-import { asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import {
@@ -6,6 +6,9 @@ import {
   diabetesExampleImportBatches,
   diabetesExampleRecords,
   registeredPatients,
+  patientMedications,
+  patientWoundAssessments,
+  patientRecordAuditEvents,
   diabetesPatientObservations,
   diabetesPatients,
   InsertUser,
@@ -289,6 +292,10 @@ export type NewRegisteredPatient = {
   gdm: number;
   sex: "FEMALE" | "MALE";
   clinicalNotes?: string | null;
+  allergiesSummary?: string | null;
+  diagnosesSummary?: string | null;
+  riskFlags?: string | null;
+  careTeam?: string | null;
   createdByUserId?: number | null;
 };
 
@@ -325,6 +332,109 @@ export async function getRegisteredPatients(limit = 100) {
       createdAt: registeredPatients.createdAt,
     })
     .from(registeredPatients)
+    .where(isNull(registeredPatients.archivedAt))
     .orderBy(desc(registeredPatients.createdAt))
     .limit(limit);
+}
+
+export type RegisteredPatientProfileUpdate = Omit<NewRegisteredPatient, "patientCode" | "createdByUserId">;
+export type NewPatientMedication = {
+  patientId: number;
+  medicationName: string;
+  dose?: string | null;
+  route?: string | null;
+  frequency?: string | null;
+  startedOn?: string | null;
+  endedOn?: string | null;
+  status: "active" | "paused" | "stopped" | "completed";
+  notes?: string | null;
+  recordedByUserId: number | null;
+};
+export type NewPatientWoundAssessment = {
+  patientId: number;
+  woundLabel: string;
+  location: string;
+  assessedOn: string;
+  classification?: string | null;
+  lengthCm?: number | null;
+  widthCm?: number | null;
+  depthCm?: number | null;
+  tissueCharacteristics?: string | null;
+  drainage?: string | null;
+  odor?: string | null;
+  painScore?: number | null;
+  infectionIndicators?: string | null;
+  treatmentPlan?: string | null;
+  clinicianNotes?: string | null;
+  mediaReference?: string | null;
+  recordedByUserId: number | null;
+};
+
+async function recordPatientAudit(patientId: number, actorUserId: number | null, eventType: string, summary: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  await db.insert(patientRecordAuditEvents).values({ patientId, actorUserId, eventType, summary });
+}
+
+export async function getRegisteredPatientRecord(patientId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [patient] = await db.select().from(registeredPatients).where(eq(registeredPatients.id, patientId)).limit(1);
+  if (!patient) return null;
+  const [medications, woundAssessments, auditEvents] = await Promise.all([
+    db.select().from(patientMedications).where(eq(patientMedications.patientId, patientId)).orderBy(desc(patientMedications.createdAt)).limit(100),
+    db.select().from(patientWoundAssessments).where(eq(patientWoundAssessments.patientId, patientId)).orderBy(desc(patientWoundAssessments.assessedOn)).limit(100),
+    db.select().from(patientRecordAuditEvents).where(eq(patientRecordAuditEvents.patientId, patientId)).orderBy(desc(patientRecordAuditEvents.createdAt)).limit(100),
+  ]);
+  return { patient, medications, woundAssessments, auditEvents };
+}
+
+export async function updateRegisteredPatient(patientId: number, input: RegisteredPatientProfileUpdate, actorUserId: number | null) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  const [patient] = await db.update(registeredPatients).set({ ...input, updatedAt: new Date() }).where(and(eq(registeredPatients.id, patientId), isNull(registeredPatients.archivedAt))).returning();
+  if (!patient) return null;
+  await recordPatientAudit(patientId, actorUserId, "profile_updated", "Patient profile updated");
+  return patient;
+}
+
+export async function addPatientMedication(input: NewPatientMedication) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  const [medication] = await db.insert(patientMedications).values(input).returning();
+  await recordPatientAudit(input.patientId, input.recordedByUserId, "medication_added", `Medication added: ${input.medicationName}`);
+  return medication;
+}
+
+export async function addPatientWoundAssessment(input: NewPatientWoundAssessment) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  const [assessment] = await db.insert(patientWoundAssessments).values(input).returning();
+  await recordPatientAudit(input.patientId, input.recordedByUserId, "wound_assessment_added", `Wound assessment added: ${input.woundLabel}`);
+  return assessment;
+}
+
+export async function archiveRegisteredPatient(patientId: number, actorUserId: number | null, archiveReason: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  const [patient] = await db.update(registeredPatients).set({ archivedAt: new Date(), archivedByUserId: actorUserId, archiveReason, updatedAt: new Date() }).where(and(eq(registeredPatients.id, patientId), isNull(registeredPatients.archivedAt))).returning({ id: registeredPatients.id, patientCode: registeredPatients.patientCode, archivedAt: registeredPatients.archivedAt });
+  if (!patient) return null;
+  await recordPatientAudit(patientId, actorUserId, "patient_archived", `Patient archived: ${archiveReason}`);
+  return patient;
+}
+
+export async function restoreRegisteredPatient(patientId: number, actorUserId: number | null) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  const [patient] = await db.update(registeredPatients).set({ archivedAt: null, archivedByUserId: null, archiveReason: null, updatedAt: new Date() }).where(eq(registeredPatients.id, patientId)).returning({ id: registeredPatients.id, patientCode: registeredPatients.patientCode });
+  if (!patient) return null;
+  await recordPatientAudit(patientId, actorUserId, "patient_restored", "Patient restored to active records");
+  return patient;
+}
+
+export async function exportRegisteredPatient(patientId: number, actorUserId: number | null) {
+  const record = await getRegisteredPatientRecord(patientId);
+  if (!record) return null;
+  await recordPatientAudit(patientId, actorUserId, "record_exported", "Patient record exported");
+  return record;
 }

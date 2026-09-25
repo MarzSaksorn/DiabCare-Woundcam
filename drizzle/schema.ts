@@ -168,6 +168,13 @@ export const registeredPatients = pgTable(
     gdm: smallint("gdm").notNull().default(0),
     sex: patientSex("sex").notNull(),
     clinicalNotes: text("clinical_notes"),
+    allergiesSummary: text("allergies_summary"),
+    diagnosesSummary: text("diagnoses_summary"),
+    riskFlags: text("risk_flags"),
+    careTeam: text("care_team"),
+    archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
+    archivedByUserId: bigint("archived_by_user_id", { mode: "number" }).references(() => users.id, { onDelete: "set null" }),
+    archiveReason: text("archive_reason"),
     createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
@@ -179,5 +186,71 @@ export const registeredPatients = pgTable(
 );
 
 export type RegisteredPatient = typeof registeredPatients.$inferSelect;
+
+export const patientMedications = pgTable(
+  "patient_medications",
+  {
+    id: bigint("id", { mode: "number" }).generatedByDefaultAsIdentity().primaryKey(),
+    patientId: bigint("patient_id", { mode: "number" }).notNull().references(() => registeredPatients.id, { onDelete: "restrict" }),
+    medicationName: varchar("medication_name", { length: 160 }).notNull(),
+    dose: varchar("dose", { length: 80 }),
+    route: varchar("route", { length: 80 }),
+    frequency: varchar("frequency", { length: 120 }),
+    startedOn: date("started_on", { mode: "string" }),
+    endedOn: date("ended_on", { mode: "string" }),
+    status: varchar("status", { length: 32 }).notNull().default("active"),
+    notes: text("notes"),
+    recordedByUserId: bigint("recorded_by_user_id", { mode: "number" }).references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({ patientIndex: index("patient_medications_patient_idx").on(table.patientId, table.createdAt) }),
+);
+
+export type PatientMedication = typeof patientMedications.$inferSelect;
+
+export const patientWoundAssessments = pgTable(
+  "patient_wound_assessments",
+  {
+    id: bigint("id", { mode: "number" }).generatedByDefaultAsIdentity().primaryKey(),
+    patientId: bigint("patient_id", { mode: "number" }).notNull().references(() => registeredPatients.id, { onDelete: "restrict" }),
+    woundLabel: varchar("wound_label", { length: 160 }).notNull(),
+    location: varchar("location", { length: 160 }).notNull(),
+    assessedOn: date("assessed_on", { mode: "string" }).notNull(),
+    classification: varchar("classification", { length: 80 }),
+    lengthCm: numeric("length_cm", { precision: 10, scale: 2, mode: "number" }),
+    widthCm: numeric("width_cm", { precision: 10, scale: 2, mode: "number" }),
+    depthCm: numeric("depth_cm", { precision: 10, scale: 2, mode: "number" }),
+    tissueCharacteristics: text("tissue_characteristics"),
+    drainage: varchar("drainage", { length: 80 }),
+    odor: varchar("odor", { length: 80 }),
+    painScore: integer("pain_score"),
+    infectionIndicators: text("infection_indicators"),
+    treatmentPlan: text("treatment_plan"),
+    clinicianNotes: text("clinician_notes"),
+    mediaReference: text("media_reference"),
+    recordedByUserId: bigint("recorded_by_user_id", { mode: "number" }).references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({ patientDateIndex: index("patient_wound_assessments_patient_date_idx").on(table.patientId, table.assessedOn) }),
+);
+
+export type PatientWoundAssessment = typeof patientWoundAssessments.$inferSelect;
+
+export const patientRecordAuditEvents = pgTable(
+  "patient_record_audit_events",
+  {
+    id: bigint("id", { mode: "number" }).generatedByDefaultAsIdentity().primaryKey(),
+    patientId: bigint("patient_id", { mode: "number" }).notNull().references(() => registeredPatients.id, { onDelete: "restrict" }),
+    actorUserId: bigint("actor_user_id", { mode: "number" }).references(() => users.id, { onDelete: "set null" }),
+    eventType: varchar("event_type", { length: 48 }).notNull(),
+    summary: varchar("summary", { length: 240 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({ patientDateIndex: index("patient_record_audit_patient_date_idx").on(table.patientId, table.createdAt) }),
+);
+
+export type PatientRecordAuditEvent = typeof patientRecordAuditEvents.$inferSelect;
 
 export { patientSex, userRole };
