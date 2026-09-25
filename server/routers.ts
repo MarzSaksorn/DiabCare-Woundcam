@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { addPatientMedication, addPatientWoundAssessment, addPatientWoundMedia, archiveRegisteredPatient, createRegisteredPatient, exportRegisteredPatient, getDiabetesExampleBatches, getDiabetesExampleRecords, getDiabetesImportSummary, getDiabetesPatient, getDiabetesPatientObservations, getDiabetesPatients, getRegisteredPatientRecord, getRegisteredPatients, restoreRegisteredPatient, updateRegisteredPatient } from "./db";
+import { addPatientMedication, addPatientWoundAssessment, addPatientWoundMedia, archiveRegisteredPatient, createRegisteredPatient, exportRegisteredPatient, getDiabetesExampleBatches, getDiabetesExampleRecords, getDiabetesImportSummary, getDiabetesPatient, getDiabetesPatientObservations, getDiabetesPatients, getRegisteredPatientRecord, getRegisteredPatients, getWoundPhotoHistory, restoreRegisteredPatient, updateRegisteredPatient } from "./db";
 import { z } from "zod";
 import { inferWoundImage } from "./woundInference";
 import { TRPCError } from "@trpc/server";
@@ -30,6 +30,7 @@ export const appRouter = router({
     exampleRecords: protectedProcedure.input(z.object({ batchId: z.number().int().positive(), offset: z.number().int().min(0).max(100_000).default(0), limit: z.number().int().min(1).max(100).default(50) })).query(({ input }) => getDiabetesExampleRecords(input.batchId, input.offset, input.limit)),
     registeredPatients: protectedProcedure.input(z.object({ limit: z.number().int().min(1).max(100).default(100) })).query(({ input }) => getRegisteredPatients(input.limit)),
     registeredPatientRecord: protectedProcedure.input(z.object({ patientId: z.number().int().positive() })).query(({ input }) => getRegisteredPatientRecord(input.patientId)),
+    photoHistory: protectedProcedure.input(z.object({ patientId: z.number().int().positive().optional(), from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), offset: z.number().int().min(0).max(100_000).default(0), limit: z.number().int().min(1).max(100).default(30) })).query(({ input }) => getWoundPhotoHistory({ patientId: input.patientId, from: input.from ? new Date(`${input.from}T00:00:00`) : undefined, to: input.to ? new Date(`${input.to}T23:59:59.999`) : undefined, offset: input.offset, limit: input.limit })),
     registerPatient: protectedProcedure.input(z.object({
       patientCode: z.string().trim().min(2).max(64),
       displayName: z.string().trim().max(160).optional(),

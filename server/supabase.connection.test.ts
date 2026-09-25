@@ -67,4 +67,17 @@ describe("Supabase-backed diabetes API", () => {
     const record = await caller.diabetes.registeredPatientRecord({ patientId: registered[0].id });
     expect(Array.isArray(record?.media)).toBe(true);
   }, 20_000);
+
+  it("supports filtered diagnostic capture history", async () => {
+    const caller = appRouter.createCaller({
+      req: {} as never,
+      res: {} as never,
+      user: createLocalDevelopmentUser(),
+    });
+
+    const history = await caller.diabetes.photoHistory({ offset: 0, limit: 10 });
+    expect(history.total).toBeGreaterThanOrEqual(0);
+    expect(history.photos.length).toBeLessThanOrEqual(10);
+    expect(typeof history.hasMore).toBe("boolean");
+  }, 20_000);
 });

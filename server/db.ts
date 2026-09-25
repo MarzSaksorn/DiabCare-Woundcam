@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import {
@@ -402,6 +402,19 @@ export async function getRegisteredPatientRecord(patientId: number) {
     db.select().from(patientRecordAuditEvents).where(eq(patientRecordAuditEvents.patientId, patientId)).orderBy(desc(patientRecordAuditEvents.createdAt)).limit(100),
   ]);
   return { patient, medications, woundAssessments, media, auditEvents };
+}
+
+export async function getWoundPhotoHistory(input: { patientId?: number; from?: Date; to?: Date; limit: number; offset: number }) {
+  const db = await getDb();
+  if (!db) return { photos: [], total: 0, hasMore: false };
+  const filters = [input.patientId ? eq(patientWoundMedia.patientId, input.patientId) : undefined, input.from ? gte(patientWoundMedia.capturedAt, input.from) : undefined, input.to ? lte(patientWoundMedia.capturedAt, input.to) : undefined].filter(Boolean);
+  const where = filters.length ? and(...filters) : undefined;
+  const [photos, totalRows] = await Promise.all([
+    db.select({ id: patientWoundMedia.id, patientId: patientWoundMedia.patientId, patientCode: registeredPatients.patientCode, displayName: registeredPatients.displayName, registrationLocation: registeredPatients.registrationLocation, woundAssessmentId: patientWoundMedia.woundAssessmentId, storageUrl: patientWoundMedia.storageUrl, fileName: patientWoundMedia.fileName, mimeType: patientWoundMedia.mimeType, fileSizeBytes: patientWoundMedia.fileSizeBytes, caption: patientWoundMedia.caption, capturedOn: patientWoundMedia.capturedOn, capturedAt: patientWoundMedia.capturedAt, createdAt: patientWoundMedia.createdAt }).from(patientWoundMedia).innerJoin(registeredPatients, eq(patientWoundMedia.patientId, registeredPatients.id)).where(where).orderBy(desc(patientWoundMedia.capturedAt), desc(patientWoundMedia.createdAt)).limit(input.limit).offset(input.offset),
+    db.select({ count: sql<number>`count(*)` }).from(patientWoundMedia).where(where),
+  ]);
+  const total = Number(totalRows[0]?.count ?? 0);
+  return { photos, total, hasMore: input.offset + photos.length < total };
 }
 
 export async function updateRegisteredPatient(patientId: number, input: RegisteredPatientProfileUpdate, actorUserId: number | null) {
