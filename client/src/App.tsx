@@ -11,11 +11,13 @@ import Patients from "./pages/Patients";
 import DiagnosticCamera from "./pages/DiagnosticCamera";
 import PatientRegistration from "./pages/PatientRegistration";
 import RegisteredPatientRecord from "./pages/RegisteredPatientRecord";
+import RegisteredPatientEdit from "./pages/RegisteredPatientEdit";
 
 function Router() {
   return (
     <Switch>
       <Route path="/patients/new" component={PatientRegistration} />
+      <Route path="/patients/registered/:id/edit" component={RegisteredPatientEdit} />
       <Route path="/patients/registered/:id" component={RegisteredPatientRecord} />
       <Route path={"/patients/:id"} component={PatientRecord} />
       <Route path="/camera" component={DiagnosticCamera} />
