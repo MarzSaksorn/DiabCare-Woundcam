@@ -42,4 +42,16 @@ describe("Supabase-backed diabetes API", () => {
     expect(page.records[0]).not.toHaveProperty("clinicalNotes");
     expect(page.hasMore).toBe(true);
   }, 20_000);
+
+  it("serves registered patients through the protected collection procedure", async () => {
+    const caller = appRouter.createCaller({
+      req: {} as never,
+      res: {} as never,
+      user: createLocalDevelopmentUser(),
+    });
+
+    const registered = await caller.diabetes.registeredPatients({ limit: 1 });
+    expect(Array.isArray(registered)).toBe(true);
+    if (registered[0]) expect(registered[0]).not.toHaveProperty("clinicalNotes");
+  }, 20_000);
 });

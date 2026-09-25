@@ -5,6 +5,7 @@ import {
   diabetesImportBatches,
   diabetesExampleImportBatches,
   diabetesExampleRecords,
+  registeredPatients,
   diabetesPatientObservations,
   diabetesPatients,
   InsertUser,
@@ -273,4 +274,57 @@ export async function getDiabetesExampleRecords(batchId: number, offset = 0, lim
     .offset(offset);
 
   return { records, total, offset, limit, hasMore: offset + records.length < total };
+}
+
+export type NewRegisteredPatient = {
+  patientCode: string;
+  displayName?: string | null;
+  phone?: string | null;
+  dateOfBirth?: string | null;
+  age?: number | null;
+  registrationLocation: string;
+  identifyBy: string;
+  type1: number;
+  type2: number;
+  gdm: number;
+  sex: "FEMALE" | "MALE";
+  clinicalNotes?: string | null;
+  createdByUserId?: number | null;
+};
+
+export async function createRegisteredPatient(input: NewRegisteredPatient) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  const [patient] = await db.insert(registeredPatients).values(input).returning({
+    id: registeredPatients.id,
+    patientCode: registeredPatients.patientCode,
+    displayName: registeredPatients.displayName,
+    registrationLocation: registeredPatients.registrationLocation,
+    createdAt: registeredPatients.createdAt,
+  });
+  return patient;
+}
+
+export async function getRegisteredPatients(limit = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      id: registeredPatients.id,
+      patientCode: registeredPatients.patientCode,
+      displayName: registeredPatients.displayName,
+      phone: registeredPatients.phone,
+      dateOfBirth: registeredPatients.dateOfBirth,
+      age: registeredPatients.age,
+      registrationLocation: registeredPatients.registrationLocation,
+      identifyBy: registeredPatients.identifyBy,
+      type1: registeredPatients.type1,
+      type2: registeredPatients.type2,
+      gdm: registeredPatients.gdm,
+      sex: registeredPatients.sex,
+      createdAt: registeredPatients.createdAt,
+    })
+    .from(registeredPatients)
+    .orderBy(desc(registeredPatients.createdAt))
+    .limit(limit);
 }

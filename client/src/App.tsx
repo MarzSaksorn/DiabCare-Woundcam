@@ -9,10 +9,12 @@ import Home from "./pages/Home";
 import PatientRecord from "./pages/PatientRecord";
 import Patients from "./pages/Patients";
 import DiagnosticCamera from "./pages/DiagnosticCamera";
+import PatientRegistration from "./pages/PatientRegistration";
 
 function Router() {
   return (
     <Switch>
+      <Route path="/patients/new" component={PatientRegistration} />
       <Route path={"/patients/:id"} component={PatientRecord} />
       <Route path="/camera" component={DiagnosticCamera} />
       <Route path={"/"} component={Home} />

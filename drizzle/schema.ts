@@ -1,6 +1,7 @@
 import {
   bigint,
   boolean,
+  date,
   index,
   integer,
   numeric,
@@ -150,5 +151,33 @@ export const diabetesExampleRecords = pgTable(
 );
 
 export type DiabetesExampleRecord = typeof diabetesExampleRecords.$inferSelect;
+
+export const registeredPatients = pgTable(
+  "registered_patients",
+  {
+    id: bigint("id", { mode: "number" }).generatedByDefaultAsIdentity().primaryKey(),
+    patientCode: varchar("patient_code", { length: 64 }).notNull().unique(),
+    displayName: varchar("display_name", { length: 160 }),
+    phone: varchar("phone", { length: 32 }),
+    dateOfBirth: date("date_of_birth", { mode: "string" }),
+    age: integer("age"),
+    registrationLocation: varchar("registration_location", { length: 160 }).notNull(),
+    identifyBy: varchar("identify_by", { length: 32 }).notNull(),
+    type1: smallint("type1").notNull().default(0),
+    type2: smallint("type2").notNull().default(0),
+    gdm: smallint("gdm").notNull().default(0),
+    sex: patientSex("sex").notNull(),
+    clinicalNotes: text("clinical_notes"),
+    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({
+    createdAtIndex: index("registered_patients_created_at_idx").on(table.createdAt),
+    locationIndex: index("registered_patients_location_idx").on(table.registrationLocation),
+  }),
+);
+
+export type RegisteredPatient = typeof registeredPatients.$inferSelect;
 
 export { patientSex, userRole };
