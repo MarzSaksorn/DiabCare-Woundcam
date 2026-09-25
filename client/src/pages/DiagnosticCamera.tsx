@@ -5,12 +5,14 @@ import { trpc } from "@/lib/trpc";
 import { Camera, Check, ChevronLeft, CircleHelp, FileImage, ImagePlus, Info, Loader2, RefreshCcw, ShieldCheck, Sparkles, Upload, Video, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
+import { toast } from "sonner";
 
 type CaptureState = "idle" | "preview" | "analyzing" | "ready";
 type CameraState = "closed" | "starting" | "live" | "error";
 type InferenceResult = { topSuggestion: { label: string; confidence: number; box: { x: number; y: number; width: number; height: number } } | null; detections: Array<{ label: string; confidence: number; box: { x: number; y: number; width: number; height: number } }>; disclaimer: string };
 type ImageLayout = { naturalWidth: number; naturalHeight: number; viewportWidth: number; viewportHeight: number };
 const MODEL_IMAGE_SIZE = 640;
+const localDateTimeValue = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
 
 function canRequestCamera() {
   if (typeof window === "undefined") return false;
@@ -33,7 +35,11 @@ export default function DiagnosticCamera() {
   const [fileName, setFileName] = useState("");
   const [inferenceResult, setInferenceResult] = useState<InferenceResult | null>(null);
   const [imageLayout, setImageLayout] = useState<ImageLayout | null>(null);
+  const [assignedPatientId, setAssignedPatientId] = useState("");
+  const [capturedAt, setCapturedAt] = useState("");
   const inferMutation = trpc.wound.infer.useMutation();
+  const patientsQuery = trpc.diabetes.registeredPatients.useQuery({ limit: 100 });
+  const savePhotoMutation = trpc.diabetes.uploadWoundPhoto.useMutation({ onSuccess: () => toast.success(t("diagnosticPhotoSaved")), onError: (error) => toast.error(error.message) });
 
   function updateImageLayout() {
     const image = previewImageRef.current;
@@ -122,6 +128,7 @@ export default function DiagnosticCamera() {
     reader.onload = () => setImageDataUrl(typeof reader.result === "string" ? reader.result : null);
     reader.readAsDataURL(file);
     setInferenceResult(null);
+    setCapturedAt(localDateTimeValue());
     setState("preview");
   }
 
@@ -159,6 +166,7 @@ export default function DiagnosticCamera() {
         setPreviewUrl(URL.createObjectURL(blob));
         setImageDataUrl(dataUrl);
         setFileName(`wound-capture-${new Date().toISOString().replace(/[:.]/g, "-")}.jpg`);
+        setCapturedAt(localDateTimeValue());
         setInferenceResult(null);
         setState("preview");
         stopCamera();
@@ -173,6 +181,8 @@ export default function DiagnosticCamera() {
     setImageDataUrl(null);
     setFileName("");
     setInferenceResult(null);
+    setAssignedPatientId("");
+    setCapturedAt("");
     setCameraError("");
     setState("idle");
     if (inputRef.current) inputRef.current.value = "";
@@ -195,6 +205,14 @@ export default function DiagnosticCamera() {
     }
   }
 
+  function saveToPatient() {
+    if (!imageDataUrl || !assignedPatientId) { toast.error(t("selectPatientForPhoto")); return; }
+    if (!capturedAt) { toast.error(t("selectPhotoDateTime")); return; }
+    const patient = (patientsQuery.data ?? []).find((item) => item.id === Number(assignedPatientId));
+    if (!patient) { toast.error(t("patientUnavailable")); return; }
+    savePhotoMutation.mutate({ patientId: patient.id, fileName, mimeType: "image/jpeg", capturedAt: new Date(capturedAt).toISOString(), caption: inferenceResult?.topSuggestion ? `${t("decisionSupport")}: ${inferenceResult.topSuggestion.label.replaceAll("_", " ")}` : null, imageData: imageDataUrl });
+  }
+
   return <DashboardLayout><div className="camera-page">
     <header className="camera-page-header"><div><Link href="/" className="camera-back"><ChevronLeft className="h-4 w-4" /> {t("overview")}</Link><div className="camera-eyebrow"><span /> {t("woundcam")} / {t("cameraWorkflow")}</div><h1>{t("cameraTitle")}</h1><p>{t("cameraSubtitle")}</p></div><div className="camera-header-badge"><ShieldCheck className="h-4 w-4" /> {t("localOnly")}</div></header>
 
@@ -212,7 +230,7 @@ export default function DiagnosticCamera() {
 
       <aside className="camera-review-column" aria-label={t("cameraReviewPanel")}>
         <section className="camera-guidance-card panel-card"><div className="camera-card-header"><div><p className="camera-kicker">{t("beforeYouCapture")}</p><h2>{t("imageGuidance")}</h2></div><Info className="h-4 w-4 text-[#79a58c]" /></div><ul className="camera-checklist"><ChecklistItem done={false} text={t("guidanceLight")} /><ChecklistItem done={false} text={t("guidanceFocus")} /><ChecklistItem done={false} text={t("guidanceDistance")} /><ChecklistItem done={false} text={t("guidanceClean")} /></ul><div className="camera-guidance-tip"><Sparkles className="h-4 w-4" /><p>{t("guidanceTip")}</p></div></section>
-        <section className="camera-analysis-card panel-card"><div className="camera-card-header"><div><p className="camera-kicker">{t("stepTwo")}</p><h2>{t("reviewBeforeAnalysis")}</h2></div><span className={`camera-state-pill ${state === "ready" ? "is-ready" : ""}`}>{state === "ready" ? t("ready") : t("waiting")}</span></div><div className="camera-review-placeholder">{state === "idle" ? <><ImagePlus className="h-6 w-6" /><strong>{t("noImageYet")}</strong><p>{t("noImageYetDetail")}</p></> : state === "analyzing" ? <><Loader2 className="h-6 w-6 animate-spin" /><strong>{t("preparingReview")}</strong><p>{t("preparingReviewDetail")}</p></> : <><Check className="h-6 w-6 text-[#4f8b68]" /><strong>{t("imageReady")}</strong><p>{t("imageReadyDetail")}</p></>}</div>{inferenceResult && <div className="camera-inference-result" role="status"><div className="camera-inference-heading"><span>{t("modelSuggestion")}</span><span>{inferenceResult.detections.length} {t("detectionsFound")}</span></div>{inferenceResult.topSuggestion ? <><strong>{inferenceResult.topSuggestion.label.replaceAll("_", " ")}</strong><p>{t("confidence")}: {Math.round(inferenceResult.topSuggestion.confidence * 100)}%</p><small>{inferenceResult.disclaimer}</small></> : <><strong>{t("noDetections")}</strong><p>{inferenceResult.disclaimer}</p></>}</div>}<div className="camera-disclaimer"><ShieldCheck className="h-4 w-4" /><p>{t("diagnosticDisclaimer")}</p></div></section>
+        <section className="camera-analysis-card panel-card"><div className="camera-card-header"><div><p className="camera-kicker">{t("stepTwo")}</p><h2>{t("reviewBeforeAnalysis")}</h2></div><span className={`camera-state-pill ${state === "ready" ? "is-ready" : ""}`}>{state === "ready" ? t("ready") : t("waiting")}</span></div><div className="camera-review-placeholder">{state === "idle" ? <><ImagePlus className="h-6 w-6" /><strong>{t("noImageYet")}</strong><p>{t("noImageYetDetail")}</p></> : state === "analyzing" ? <><Loader2 className="h-6 w-6 animate-spin" /><strong>{t("preparingReview")}</strong><p>{t("preparingReviewDetail")}</p></> : <><Check className="h-6 w-6 text-[#4f8b68]" /><strong>{t("imageReady")}</strong><p>{t("imageReadyDetail")}</p></>}</div>{inferenceResult && <div className="camera-inference-result" role="status"><div className="camera-inference-heading"><span>{t("modelSuggestion")}</span><span>{inferenceResult.detections.length} {t("detectionsFound")}</span></div>{inferenceResult.topSuggestion ? <><strong>{inferenceResult.topSuggestion.label.replaceAll("_", " ")}</strong><p>{t("confidence")}: {Math.round(inferenceResult.topSuggestion.confidence * 100)}%</p><small>{inferenceResult.disclaimer}</small></> : <><strong>{t("noDetections")}</strong><p>{inferenceResult.disclaimer}</p></>}</div>}{previewUrl && <div className="mt-5 rounded-2xl border border-[#bfd8c8] bg-[#f7faf8] p-4"><div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#25354a]"><Upload className="h-4 w-4 text-[#4f7463]" />{t("assignPhotoToPatient")}</div><label className="grid gap-1.5 text-sm font-semibold text-slate-600"><span>{t("patient")}</span><select value={assignedPatientId} onChange={(event) => setAssignedPatientId(event.target.value)} className="field-control h-10 w-full bg-white" disabled={savePhotoMutation.isPending}><option value="">{patientsQuery.isLoading ? t("loadingPatients") : t("choosePatient")}</option>{(patientsQuery.data ?? []).map((patient) => <option key={patient.id} value={patient.id}>{patient.patientCode} · {patient.displayName || t("registeredPatient")} · {patient.registrationLocation}</option>)}</select></label><label className="mt-3 grid gap-1.5 text-sm font-semibold text-slate-600"><span>{t("photoDateTime")}</span><input type="datetime-local" value={capturedAt} onChange={(event) => setCapturedAt(event.target.value)} className="field-control h-10 w-full bg-white" disabled={savePhotoMutation.isPending} /></label><Button onClick={saveToPatient} disabled={savePhotoMutation.isPending || !assignedPatientId || !capturedAt} className="mt-4 h-10 w-full rounded-xl bg-[#132238] text-white">{savePhotoMutation.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t("savingPhoto")}</> : <><Upload className="mr-2 h-4 w-4" />{t("savePhotoToPatient")}</>}</Button><p className="mt-2 text-xs leading-5 text-slate-400">{t("photoAssignmentNote")}</p></div>}<div className="camera-disclaimer"><ShieldCheck className="h-4 w-4" /><p>{t("diagnosticDisclaimer")}</p></div></section>
       </aside>
     </div>
 
