@@ -317,7 +317,7 @@ export async function createRegisteredPatient(input: NewRegisteredPatient) {
 export async function getRegisteredPatients(limit = 100) {
   const db = await getDb();
   if (!db) return [];
-  return db
+  const patients = await db
     .select({
       id: registeredPatients.id,
       patientCode: registeredPatients.patientCode,
@@ -331,12 +331,19 @@ export async function getRegisteredPatients(limit = 100) {
       type2: registeredPatients.type2,
       gdm: registeredPatients.gdm,
       sex: registeredPatients.sex,
+      careTeam: registeredPatients.careTeam,
+      importedPatientId: registeredPatients.importedPatientId,
       createdAt: registeredPatients.createdAt,
     })
     .from(registeredPatients)
     .where(isNull(registeredPatients.archivedAt))
     .orderBy(desc(registeredPatients.createdAt))
     .limit(limit);
+  const importedIds = patients.map((patient) => patient.importedPatientId).filter((id): id is number => Boolean(id));
+  if (importedIds.length === 0) return patients.map((patient) => ({ ...patient, observationCount: 0 }));
+  const counts = await db.select({ patientId: diabetesPatientObservations.patientId, count: sql<number>`count(*)` }).from(diabetesPatientObservations).where(inArray(diabetesPatientObservations.patientId, importedIds)).groupBy(diabetesPatientObservations.patientId);
+  const countByPatient = new Map(counts.map((row) => [row.patientId, Number(row.count)]));
+  return patients.map((patient) => ({ ...patient, observationCount: patient.importedPatientId ? countByPatient.get(patient.importedPatientId) ?? 0 : 0 }));
 }
 
 export type RegisteredPatientProfileUpdate = Omit<NewRegisteredPatient, "patientCode" | "createdByUserId">;
@@ -395,13 +402,14 @@ export async function getRegisteredPatientRecord(patientId: number) {
   if (!db) return null;
   const [patient] = await db.select().from(registeredPatients).where(eq(registeredPatients.id, patientId)).limit(1);
   if (!patient) return null;
-  const [medications, woundAssessments, media, auditEvents] = await Promise.all([
+  const [medications, woundAssessments, media, auditEvents, importedObservations] = await Promise.all([
     db.select().from(patientMedications).where(eq(patientMedications.patientId, patientId)).orderBy(desc(patientMedications.createdAt)).limit(100),
     db.select().from(patientWoundAssessments).where(eq(patientWoundAssessments.patientId, patientId)).orderBy(desc(patientWoundAssessments.assessedOn)).limit(100),
     db.select().from(patientWoundMedia).where(eq(patientWoundMedia.patientId, patientId)).orderBy(desc(patientWoundMedia.createdAt)).limit(100),
     db.select().from(patientRecordAuditEvents).where(eq(patientRecordAuditEvents.patientId, patientId)).orderBy(desc(patientRecordAuditEvents.createdAt)).limit(100),
+    patient.importedPatientId ? db.select().from(diabetesPatientObservations).where(eq(diabetesPatientObservations.patientId, patient.importedPatientId)).orderBy(desc(diabetesPatientObservations.id)).limit(500) : Promise.resolve([]),
   ]);
-  return { patient, medications, woundAssessments, media, auditEvents };
+  return { patient, medications, woundAssessments, media, auditEvents, importedObservations };
 }
 
 export async function getWoundPhotoHistory(input: { patientId?: number; from?: Date; to?: Date; limit: number; offset: number }) {

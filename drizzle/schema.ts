@@ -172,6 +172,7 @@ export const registeredPatients = pgTable(
     diagnosesSummary: text("diagnoses_summary"),
     riskFlags: text("risk_flags"),
     careTeam: text("care_team"),
+    importedPatientId: bigint("imported_patient_id", { mode: "number" }).references(() => diabetesPatients.id, { onDelete: "restrict" }),
     archivedAt: timestamp("archived_at", { withTimezone: true, mode: "date" }),
     archivedByUserId: bigint("archived_by_user_id", { mode: "number" }).references(() => users.id, { onDelete: "set null" }),
     archiveReason: text("archive_reason"),

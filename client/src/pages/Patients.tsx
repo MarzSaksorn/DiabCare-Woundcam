@@ -26,6 +26,7 @@ type PatientListRow = {
   type2: number;
   gdm: number;
   observationCount: number;
+  importedPatientId?: number | null;
   createdAt: Date | string | null;
 };
 const PAGE_SIZE = 12;
@@ -44,12 +45,13 @@ function PatientsPageContent() {
 
   const rows = useMemo<PatientListRow[]>(() => {
     const normalized = query.trim().toLowerCase();
-    const importedRows: PatientListRow[] = (patientsQuery.data ?? []).map((patient) => ({ ...patient, recordKind: "imported" as const }));
+    const linkedImportedIds = new Set((registeredPatientsQuery.data ?? []).map((patient) => patient.importedPatientId).filter((id): id is number => Boolean(id)));
+    const importedRows: PatientListRow[] = (patientsQuery.data ?? []).filter((patient) => !linkedImportedIds.has(patient.id)).map((patient) => ({ ...patient, recordKind: "imported" as const }));
     const registeredRows: PatientListRow[] = (registeredPatientsQuery.data ?? []).map((patient) => ({
       ...patient,
       recordKind: "registered" as const,
       identifyBy: patient.identifyBy,
-      observationCount: 0,
+      observationCount: patient.observationCount,
       age: patient.age,
     }));
     return [...importedRows, ...registeredRows].filter((patient) => {
