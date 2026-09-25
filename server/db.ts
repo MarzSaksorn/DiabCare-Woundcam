@@ -8,6 +8,7 @@ import {
   registeredPatients,
   patientMedications,
   patientWoundAssessments,
+  patientWoundMedia,
   patientRecordAuditEvents,
   diabetesPatientObservations,
   diabetesPatients,
@@ -15,6 +16,7 @@ import {
   users,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
+import { storagePut } from "./storage";
 
 let _pool: Pool | null = null;
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -370,6 +372,17 @@ export type NewPatientWoundAssessment = {
   recordedByUserId: number | null;
 };
 
+export type NewPatientWoundMedia = {
+  patientId: number;
+  woundAssessmentId?: number | null;
+  fileName: string;
+  mimeType: "image/jpeg" | "image/png" | "image/webp";
+  fileSizeBytes: number;
+  caption?: string | null;
+  capturedOn?: string | null;
+  recordedByUserId: number | null;
+};
+
 async function recordPatientAudit(patientId: number, actorUserId: number | null, eventType: string, summary: string) {
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable");
@@ -381,12 +394,13 @@ export async function getRegisteredPatientRecord(patientId: number) {
   if (!db) return null;
   const [patient] = await db.select().from(registeredPatients).where(eq(registeredPatients.id, patientId)).limit(1);
   if (!patient) return null;
-  const [medications, woundAssessments, auditEvents] = await Promise.all([
+  const [medications, woundAssessments, media, auditEvents] = await Promise.all([
     db.select().from(patientMedications).where(eq(patientMedications.patientId, patientId)).orderBy(desc(patientMedications.createdAt)).limit(100),
     db.select().from(patientWoundAssessments).where(eq(patientWoundAssessments.patientId, patientId)).orderBy(desc(patientWoundAssessments.assessedOn)).limit(100),
+    db.select().from(patientWoundMedia).where(eq(patientWoundMedia.patientId, patientId)).orderBy(desc(patientWoundMedia.createdAt)).limit(100),
     db.select().from(patientRecordAuditEvents).where(eq(patientRecordAuditEvents.patientId, patientId)).orderBy(desc(patientRecordAuditEvents.createdAt)).limit(100),
   ]);
-  return { patient, medications, woundAssessments, auditEvents };
+  return { patient, medications, woundAssessments, media, auditEvents };
 }
 
 export async function updateRegisteredPatient(patientId: number, input: RegisteredPatientProfileUpdate, actorUserId: number | null) {
@@ -412,6 +426,20 @@ export async function addPatientWoundAssessment(input: NewPatientWoundAssessment
   const [assessment] = await db.insert(patientWoundAssessments).values(input).returning();
   await recordPatientAudit(input.patientId, input.recordedByUserId, "wound_assessment_added", `Wound assessment added: ${input.woundLabel}`);
   return assessment;
+}
+
+export async function addPatientWoundMedia(input: NewPatientWoundMedia & { imageBuffer: Buffer }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  if (input.woundAssessmentId) {
+    const [assessment] = await db.select({ id: patientWoundAssessments.id }).from(patientWoundAssessments).where(and(eq(patientWoundAssessments.id, input.woundAssessmentId), eq(patientWoundAssessments.patientId, input.patientId))).limit(1);
+    if (!assessment) throw new Error("Wound assessment does not belong to this patient");
+  }
+  const safeName = input.fileName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-160) || "wound-photo";
+  const stored = await storagePut(`patient-wound-media/${input.patientId}/${safeName}`, input.imageBuffer, input.mimeType);
+  const [media] = await db.insert(patientWoundMedia).values({ patientId: input.patientId, woundAssessmentId: input.woundAssessmentId ?? null, storageKey: stored.key, storageUrl: stored.url, fileName: input.fileName, mimeType: input.mimeType, fileSizeBytes: input.fileSizeBytes, caption: input.caption ?? null, capturedOn: input.capturedOn ?? null, recordedByUserId: input.recordedByUserId }).returning();
+  await recordPatientAudit(input.patientId, input.recordedByUserId, "wound_photo_uploaded", `Wound photo uploaded: ${input.fileName}`);
+  return media;
 }
 
 export async function archiveRegisteredPatient(patientId: number, actorUserId: number | null, archiveReason: string) {

@@ -54,4 +54,17 @@ describe("Supabase-backed diabetes API", () => {
     expect(Array.isArray(registered)).toBe(true);
     if (registered[0]) expect(registered[0]).not.toHaveProperty("clinicalNotes");
   }, 20_000);
+
+  it("includes wound-photo history in a registered patient record", async () => {
+    const caller = appRouter.createCaller({
+      req: {} as never,
+      res: {} as never,
+      user: createLocalDevelopmentUser(),
+    });
+
+    const registered = await caller.diabetes.registeredPatients({ limit: 1 });
+    if (!registered[0]) return;
+    const record = await caller.diabetes.registeredPatientRecord({ patientId: registered[0].id });
+    expect(Array.isArray(record?.media)).toBe(true);
+  }, 20_000);
 });

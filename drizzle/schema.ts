@@ -238,6 +238,27 @@ export const patientWoundAssessments = pgTable(
 
 export type PatientWoundAssessment = typeof patientWoundAssessments.$inferSelect;
 
+export const patientWoundMedia = pgTable(
+  "patient_wound_media",
+  {
+    id: bigint("id", { mode: "number" }).generatedByDefaultAsIdentity().primaryKey(),
+    patientId: bigint("patient_id", { mode: "number" }).notNull().references(() => registeredPatients.id, { onDelete: "restrict" }),
+    woundAssessmentId: bigint("wound_assessment_id", { mode: "number" }).references(() => patientWoundAssessments.id, { onDelete: "set null" }),
+    storageKey: text("storage_key").notNull().unique(),
+    storageUrl: text("storage_url").notNull(),
+    fileName: varchar("file_name", { length: 240 }).notNull(),
+    mimeType: varchar("mime_type", { length: 80 }).notNull(),
+    fileSizeBytes: integer("file_size_bytes").notNull(),
+    caption: varchar("caption", { length: 500 }),
+    capturedOn: date("captured_on", { mode: "string" }),
+    recordedByUserId: bigint("recorded_by_user_id", { mode: "number" }).references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({ patientDateIndex: index("patient_wound_media_patient_date_idx").on(table.patientId, table.createdAt), woundIndex: index("patient_wound_media_wound_idx").on(table.woundAssessmentId) }),
+);
+
+export type PatientWoundMedia = typeof patientWoundMedia.$inferSelect;
+
 export const patientRecordAuditEvents = pgTable(
   "patient_record_audit_events",
   {

@@ -1,14 +1,15 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Activity, ArrowLeft, CalendarClock, ClipboardList, Clock3, Download, Edit3, FileText, Flag, HeartPulse, Info, LockKeyhole, Ruler, ShieldAlert, UserRound } from "lucide-react";
+import { Activity, ArrowLeft, CalendarClock, ClipboardList, Clock3, Download, Edit3, FileText, Flag, HeartPulse, Image, Info, LockKeyhole, Ruler, ShieldAlert, UserRound } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import { Link, useLocation, useRoute } from "wouter";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDate, formatNumber } from "@/lib/locale";
+import { WoundPhotoGallery } from "@/components/WoundPhotoGallery";
 
-type Tab = "Overview" | "Medications" | "Wounds" | "Timeline" | "Audit trail";
-const tabs: Tab[] = ["Overview", "Medications", "Wounds", "Timeline", "Audit trail"];
+type Tab = "Overview" | "Medications" | "Wounds" | "Photos" | "Timeline" | "Audit trail";
+const tabs: Tab[] = ["Overview", "Medications", "Wounds", "Photos", "Timeline", "Audit trail"];
 
 type WoundPoint = { assessedOn: string; area: number | null; label: string };
 
@@ -24,6 +25,7 @@ export default function RegisteredPatientRecord() {
   const medications = record.data?.medications ?? [];
   const wounds = record.data?.woundAssessments ?? [];
   const audits = record.data?.auditEvents ?? [];
+  const media = record.data?.media ?? [];
 
   const woundPoints = useMemo<WoundPoint[]>(() => wounds.slice().reverse().map((item) => ({ assessedOn: item.assessedOn, area: item.lengthCm !== null && item.widthCm !== null ? item.lengthCm * item.widthCm : null, label: item.woundLabel })), [wounds]);
   const latestWound = wounds[0];
@@ -57,7 +59,7 @@ export default function RegisteredPatientRecord() {
       <div className="reference-action-bar"><HeartPulse className="h-4 w-4" /> {t("registeredRecordBanner")}</div>
     </header>
     <section className="record-safety"><div className="record-safety-icon"><Info className="h-4 w-4" /></div><div><p><strong>{t("clinicalOverview")}</strong> {t("clinicalOverviewDetail")}</p><span>{t("decisionSupport")}</span></div><div className="ml-auto flex gap-2"><Button onClick={() => downloadExport("json")} variant="ghost" className="hidden h-8 rounded-lg px-2 text-xs text-[#4f7463] sm:block">{t("exportJson")}</Button><Button onClick={() => downloadExport("csv")} variant="ghost" className="hidden h-8 rounded-lg px-2 text-xs text-[#4f7463] sm:block">{t("exportCsv")}</Button></div></section>
-    <nav className="record-tabs" aria-label={t("patientRecords")}>{tabs.map((item) => <button key={item} onClick={() => setTab(item)} className={tab === item ? "active" : ""}>{item === "Overview" ? t("overview") : item === "Medications" ? t("medicationsSection") : item === "Wounds" ? t("woundProgress") : item === "Timeline" ? t("timeline") : t("auditTrail")}{item === "Medications" && <span>{formatNumber(medications.length, language)}</span>}{item === "Wounds" && <span>{formatNumber(wounds.length, language)}</span>}</button>)}</nav>
+    <nav className="record-tabs" aria-label={t("patientRecords")}>{tabs.map((item) => <button key={item} onClick={() => setTab(item)} className={tab === item ? "active" : ""}>{item === "Overview" ? t("overview") : item === "Medications" ? t("medicationsSection") : item === "Wounds" ? t("woundProgress") : item === "Photos" ? t("woundPhotos") : item === "Timeline" ? t("timeline") : t("auditTrail")}{item === "Medications" && <span>{formatNumber(medications.length, language)}</span>}{item === "Wounds" && <span>{formatNumber(wounds.length, language)}</span>}{item === "Photos" && <span>{formatNumber(media.length, language)}</span>}</button>)}</nav>
 
     {tab === "Overview" && <div className="reference-stack">
       <ReferenceSection icon={UserRound} title={t("patientProfile")} kicker={t("patientInformation")}><div className="reference-profile-grid"><InfoPair label={t("patientCode")} value={patient.patientCode} /><InfoPair label={t("age")} value={patient.age === null ? t("notRecorded") : formatNumber(patient.age, language)} /><InfoPair label={t("sex")} value={patient.sex === "FEMALE" ? t("female") : t("male")} /><InfoPair label={t("diabetesContext")} value={diabetesContext} /><InfoPair label={t("identifiedBy")} value={patient.identifyBy} /><InfoPair label={t("careTeam")} value={patient.careTeam || t("notRecorded")} /></div><div className="reference-note-grid"><InfoPair label={t("diagnoses")} value={patient.diagnosesSummary || t("notRecorded")} /><InfoPair label={t("allergies")} value={patient.allergiesSummary || t("notRecorded")} /><InfoPair label={t("riskFlags")} value={patient.riskFlags || t("notRecorded")} /><InfoPair label={t("clinicalNotes")} value={patient.clinicalNotes || t("notRecorded")} /></div></ReferenceSection>
@@ -66,9 +68,11 @@ export default function RegisteredPatientRecord() {
       <ReferenceSection icon={ClipboardList} title={t("medicationsSection")} kicker={t("sourcePreservedHistory")}><MedicationList medications={medications} t={t} /></ReferenceSection>
       <ReferenceSection icon={ShieldAlert} title={t("attentionSection")} kicker={t("clinicalReview")}><div className="reference-alert-list"><ReviewRow icon={ShieldAlert} title={patient.riskFlags ? t("riskFlagsPresent") : t("noRiskFlags")} detail={patient.riskFlags || t("noRiskFlagsDetail")} priority={patient.riskFlags ? t("review") : t("info")} tone={patient.riskFlags ? "amber" : undefined} /><ReviewRow icon={CalendarClock} title={latestWound ? t("latestWoundAssessment") : t("noWoundAssessment")} detail={latestWound ? `${latestWound.woundLabel} · ${latestWound.assessedOn}` : t("noWoundAssessmentDetail")} priority={latestWound?.infectionIndicators ? t("review") : t("info")} tone={latestWound?.infectionIndicators ? "amber" : undefined} /></div></ReferenceSection>
       <ReferenceSection icon={Ruler} title={t("woundSection")} kicker={t("woundCare")}><WoundList wounds={wounds.slice(0, 4)} t={t} /></ReferenceSection>
+      <ReferenceSection icon={Image} title={t("woundPhotos")} kicker={t("imageHistory")}><WoundPhotoGallery photos={media} t={t} /></ReferenceSection>
     </div>}
     {tab === "Medications" && <ReferenceSection icon={FileText} title={t("medicationHistory")} kicker={t("clinicalReview")}><MedicationList medications={medications} t={t} /></ReferenceSection>}
     {tab === "Wounds" && <div className="reference-stack"><ReferenceSection icon={HeartPulse} title={t("woundProgress")} kicker={t("multipleWoundWorkspace")}><WoundList wounds={wounds} t={t} /></ReferenceSection><ReferenceSection icon={Activity} title={t("healingTrend")} kicker={t("longitudinalReview")}><HealingChart points={woundChart} t={t} language={language} /></ReferenceSection></div>}
+    {tab === "Photos" && <ReferenceSection icon={Image} title={t("woundPhotos")} kicker={t("imageHistory")}><WoundPhotoGallery photos={media} t={t} /></ReferenceSection>}
     {tab === "Timeline" && <ReferenceSection icon={Clock3} title={t("recordHistory")} kicker={t("timeline")}><div className="timeline">{audits.length ? audits.map((event) => <div className="timeline-row" key={event.id}><div className="timeline-date">{formatDate(event.createdAt, language)}</div><div className="timeline-marker" /><div><strong>{event.summary}</strong><p>{event.eventType}</p></div></div>) : <EmptyState title={t("noAuditEvents")} description={t("noAuditEvents")} />}</div></ReferenceSection>}
     {tab === "Audit trail" && <ReferenceSection icon={LockKeyhole} title={t("auditTrail")} kicker={t("accessAndChanges")}><div className="timeline">{audits.length ? audits.map((event) => <div className="timeline-row" key={event.id}><div className="timeline-date">{formatDate(event.createdAt, language)}</div><div className="timeline-marker" /><div><strong>{event.summary}</strong><p>{event.eventType}</p></div></div>) : <EmptyState title={t("noAuditEvents")} description={t("noAuditEvents")} />}</div></ReferenceSection>}
   </div>;
