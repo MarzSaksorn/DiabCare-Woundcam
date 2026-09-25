@@ -223,6 +223,7 @@ button { cursor: pointer; }
 .camera-help-popup p { margin: 0; }
 .camera-help-popup-close { display: inline-flex; flex: 0 0 auto; height: 28px; width: 28px; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: #f1f6f3; color: #5b866f; }
 .camera-help-popup-close:hover { background: #e5f0e9; }
+.camera-analysis-below { grid-column: 1 / -1; }
 @media (max-width: 520px) { .camera-help-popup { right: -8px; } }
 .camera-viewport {
   min-height: clamp(420px, 52vw, 570px);
