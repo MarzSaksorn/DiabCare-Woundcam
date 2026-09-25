@@ -225,6 +225,9 @@ button { cursor: pointer; }
 .camera-help-popup-close:hover { background: #e5f0e9; }
 .camera-analysis-below { grid-column: 1 / -1; }
 .camera-capture-card-wide { grid-column: 1 / -1; }
+.camera-process-card { min-width: 0; overflow: hidden; }
+.camera-process-step > div { min-width: 0; }
+.camera-process-step strong, .camera-process-step small { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
 @media (max-width: 520px) { .camera-help-popup { right: -8px; } }
 .camera-viewport {
   min-height: clamp(420px, 52vw, 570px);
