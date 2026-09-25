@@ -380,6 +380,7 @@ export type NewPatientWoundMedia = {
   fileSizeBytes: number;
   caption?: string | null;
   capturedOn?: string | null;
+  capturedAt: Date;
   recordedByUserId: number | null;
 };
 
@@ -438,7 +439,7 @@ export async function addPatientWoundMedia(input: NewPatientWoundMedia & { image
   const safeName = input.fileName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-160) || "wound-photo";
   const stored = await storagePut(`patient-wound-media/${input.patientId}/${safeName}`, input.imageBuffer, input.mimeType);
   const [media] = await db.insert(patientWoundMedia).values({ patientId: input.patientId, woundAssessmentId: input.woundAssessmentId ?? null, storageKey: stored.key, storageUrl: stored.url, fileName: input.fileName, mimeType: input.mimeType, fileSizeBytes: input.fileSizeBytes, caption: input.caption ?? null, capturedOn: input.capturedOn ?? null, recordedByUserId: input.recordedByUserId }).returning();
-  await recordPatientAudit(input.patientId, input.recordedByUserId, "wound_photo_uploaded", `Wound photo uploaded: ${input.fileName}`);
+  await recordPatientAudit(input.patientId, input.recordedByUserId, "wound_photo_uploaded", `Wound photo uploaded: ${input.fileName} at ${input.capturedAt.toISOString()}`);
   return media;
 }
 

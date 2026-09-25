@@ -251,6 +251,7 @@ export const patientWoundMedia = pgTable(
     fileSizeBytes: integer("file_size_bytes").notNull(),
     caption: varchar("caption", { length: 500 }),
     capturedOn: date("captured_on", { mode: "string" }),
+    capturedAt: timestamp("captured_at", { withTimezone: true, mode: "date" }),
     recordedByUserId: bigint("recorded_by_user_id", { mode: "number" }).references(() => users.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   },

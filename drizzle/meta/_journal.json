@@ -8,6 +8,13 @@
       "when": 1790235856930,
       "tag": "0000_special_sebastian_shaw",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790309910077,
+      "tag": "0001_acoustic_cerise",
+      "breakpoints": true
     }
   ]
 }
