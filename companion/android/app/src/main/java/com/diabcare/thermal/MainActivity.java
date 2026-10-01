@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -27,6 +28,7 @@ public final class MainActivity extends Activity implements Uti120UsbBridge.List
     private TextView statusText;
     private TextView frameText;
     private TextView rawRangeText;
+    private ThermalPreviewView previewView;
     private UsbDevice pendingDevice;
 
     private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
@@ -73,7 +75,23 @@ public final class MainActivity extends Activity implements Uti120UsbBridge.List
         eyebrow.setAllCaps(true);
         root.addView(eyebrow);
         root.addView(text("UNI-T UTi120M bridge", 28, 0xFF132238));
-        root.addView(text("Android USB host connection for calibrated thermal capture.", 15, 0xFF64746B));
+        root.addView(text("Android USB host connection for local thermal preview.", 15, 0xFF64746B));
+
+        LinearLayout previewCard = new LinearLayout(this);
+        previewCard.setOrientation(LinearLayout.VERTICAL);
+        previewCard.setPadding(dp(12), dp(12), dp(12), dp(12));
+        previewCard.setBackgroundColor(0xFF12231F);
+        LinearLayout.LayoutParams previewCardParams = new LinearLayout.LayoutParams(-1, -2);
+        previewCardParams.setMargins(0, dp(20), 0, dp(16));
+        root.addView(previewCard, previewCardParams);
+
+        TextView previewTitle = text("Live thermal preview", 17, 0xFFFFFFFF);
+        previewCard.addView(previewTitle);
+        previewCard.addView(text("Raw-count visualization · calibration not active", 12, 0xFFB7C9C0));
+        previewView = new ThermalPreviewView(this);
+        LinearLayout.LayoutParams previewParams = new LinearLayout.LayoutParams(-1, dp(270));
+        previewParams.setMargins(0, dp(10), 0, 0);
+        previewCard.addView(previewView, previewParams);
 
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
@@ -101,6 +119,7 @@ public final class MainActivity extends Activity implements Uti120UsbBridge.List
         disconnect.setText("Disconnect");
         disconnect.setOnClickListener(view -> {
             bridge.close();
+            previewView.clearFrame();
             connectionText.setText("Not connected");
             statusText.setText("Disconnected");
         });
@@ -109,7 +128,9 @@ public final class MainActivity extends Activity implements Uti120UsbBridge.List
         TextView note = text("Raw frames are shown for hardware validation only. Celsius conversion, shutter/NUC calibration, patient assignment, and DiabCare upload are intentionally not enabled in this first slice.", 13, 0xFF8A6654);
         note.setPadding(0, dp(20), 0, 0);
         root.addView(note);
-        return root;
+        ScrollView scrollView = new ScrollView(this);
+        scrollView.addView(root);
+        return scrollView;
     }
 
     private void findAndRequest() {
@@ -147,6 +168,7 @@ public final class MainActivity extends Activity implements Uti120UsbBridge.List
     @Override
     public void onFrame(Uti120Protocol.ThermalFrame frame) {
         runOnUiThread(() -> {
+            previewView.setFrame(frame);
             connectionText.setText("UTi120M streaming");
             frameText.setText(String.format(Locale.US, "Frame %d · %dx%d", frame.frameCounter, frame.width, frame.height));
             rawRangeText.setText(String.format(Locale.US, "Raw sensor range: %d–%d · header FPA %.2f°C", frame.rawMin, frame.rawMax, frame.fpaC));
@@ -164,6 +186,7 @@ public final class MainActivity extends Activity implements Uti120UsbBridge.List
     @Override
     protected void onDestroy() {
         bridge.shutdown();
+        if (previewView != null) previewView.clearFrame();
         unregisterReceiver(usbReceiver);
         super.onDestroy();
     }

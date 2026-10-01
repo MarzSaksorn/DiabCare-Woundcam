@@ -14,9 +14,10 @@ This native Android project implements the first hardware layer:
 - `0x81` frame request.
 - 25,600-byte frame collection.
 - Raw 120x90 Y16 frame parsing.
-- Basic connection and frame-status screen.
+- Local real-time preview rendered from each raw frame with a false-color raw-count palette.
+- Connection, frame, and raw-range status screen.
 
-It intentionally does **not** claim that raw sensor counts are Celsius. Shutter/NUC capture, factory calibration package parsing, temperature conversion, radiometric storage, patient assignment, and DiabCare upload come later.
+It intentionally does **not** claim that raw sensor counts are Celsius. The preview dynamically maps each frame's raw-count range to a false-color palette for visibility only. Shutter/NUC capture, factory calibration package parsing, temperature conversion, radiometric storage, patient assignment, and DiabCare upload come later.
 
 ## Build
 
@@ -34,4 +35,4 @@ The APK has not been tested with a physical UTi120M in this environment. Hardwar
 
 ## Safety boundary
 
-The status screen labels the output as raw sensor data. Do not use this build for clinical measurement. It is a transport validation slice only.
+The preview and status screen label the output as raw sensor data. Do not use this build for clinical measurement. It is a transport and local-preview validation slice only.
