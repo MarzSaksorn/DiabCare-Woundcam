@@ -32,6 +32,10 @@ type InferenceResult = {
 
 let sessionPromise: Promise<any> | null = null;
 
+export function getWoundModelReadiness() {
+  return { model: "diabetes-wound-detector", available: fs.existsSync(MODEL_PATH) } as const;
+}
+
 function getSession() {
   sessionPromise ??= ort.InferenceSession.create(MODEL_PATH, {
     executionProviders: ["cpu"],

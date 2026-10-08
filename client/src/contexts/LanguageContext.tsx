@@ -43,7 +43,7 @@ export function getMissingTranslationKeys(language: Language) {
 const LanguageContext = createContext<{ language: Language; setLanguage: (language: Language) => void; t: (key: TranslationKey) => string }>({ language: "en", setLanguage: () => undefined, t: (key) => translations.en[key as keyof typeof translations.en] ?? extraTranslations.en[key] ?? patientRecordTranslations.en[key] ?? referenceTranslations.en[key] ?? cameraTranslations.en[key] ?? key });
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(() => (localStorage.getItem("diabcare-language") as Language) || "en");
+  const [language, setLanguageState] = useState<Language>(() => (localStorage.getItem("diabcare-language") as Language) || "th");
   const setLanguage = (next: Language) => { setLanguageState(next); localStorage.setItem("diabcare-language", next); document.documentElement.lang = next === "th" ? "th" : "en"; };
   useEffect(() => { document.documentElement.lang = language === "th" ? "th" : "en"; }, [language]);
   const value = useMemo(() => ({ language, setLanguage, t: (key: TranslationKey) => translations[language][key as keyof typeof translations.en] ?? extraTranslations[language][key] ?? patientRecordTranslations[language][key] ?? referenceTranslations[language][key] ?? cameraTranslations[language][key] ?? key }), [language]);

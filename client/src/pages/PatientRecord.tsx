@@ -34,7 +34,7 @@ export default function PatientRecord() {
   }), [rows]);
 
   if (detail.isLoading) return <div className="record-page"><div className="record-skeleton"><div /><div /><div /><div /></div></div>;
-  if (detail.error || !patient) return <div className="record-page"><div className="record-error"><ShieldAlert className="h-6 w-6 text-[#c86b52]" /><div><h1>{t("recordUnavailable")}</h1><p>{t("signInRequired")}</p><Button onClick={() => setLocation("/patients")} variant="outline" className="mt-4 h-9 rounded-lg">{t("backToPatients")}</Button></div></div></div>;
+  if (detail.error || !patient) return <div className="record-page"><div className="record-error"><ShieldAlert className="h-6 w-6 text-[#E84D67]" /><div><h1>{t("recordUnavailable")}</h1><p>{t("signInRequired")}</p><Button onClick={() => setLocation("/patients")} variant="outline" className="mt-4 h-9 rounded-lg">{t("backToPatients")}</Button></div></div></div>;
 
   const sourceLabel = `${t("importedCohortRecord")} #${patient.sourceRowNumber - 1}`;
   const recordedFlags = [patient.type1, patient.type2, patient.gdm, patient.dmOnset].filter(Boolean).length;
@@ -47,7 +47,7 @@ export default function PatientRecord() {
       <div className="reference-action-bar"><ShieldAlert className="h-4 w-4" /> {t("referenceClinicalReviewBanner")}</div>
     </header>
 
-    <section className="record-safety"><div className="record-safety-icon"><Info className="h-4 w-4" /></div><div><p><strong>{t("importedBaseline")}</strong> {t("importedBaselineDetail")}</p><span>{t("reviewSource")}</span></div><Button onClick={() => toast.info(`Source: ${patient.sourceFilename}, row ${patient.sourceRowNumber}`)} variant="ghost" className="ml-auto hidden h-8 shrink-0 rounded-lg px-2 text-xs text-[#4f7463] sm:block">{t("viewProvenance")}</Button></section>
+    <section className="record-safety"><div className="record-safety-icon"><Info className="h-4 w-4" /></div><div><p><strong>{t("importedBaseline")}</strong> {t("importedBaselineDetail")}</p><span>{t("reviewSource")}</span></div><Button onClick={() => toast.info(`Source: ${patient.sourceFilename}, row ${patient.sourceRowNumber}`)} variant="ghost" className="ml-auto hidden h-8 shrink-0 rounded-lg px-2 text-xs text-[#0A4FBE] sm:block">{t("viewProvenance")}</Button></section>
 
     <nav className="record-tabs" aria-label={t("patientRecords")}>{tabs.map((item) => <button key={item} onClick={() => setTab(item)} className={tab === item ? "active" : ""}>{item === "Overview" ? t("overview") : item === "Observations" ? t("observations") : item === "Wounds" ? t("woundProgress") : item === "Timeline" ? t("timeline") : t("auditTrail")}{item === "Observations" && <span>{formatNumber(patient.observationCount, language)}</span>}</button>)}</nav>
 

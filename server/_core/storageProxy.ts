@@ -1,11 +1,25 @@
 import type { Express } from "express";
+import { getVisibleWoundMediaByStorageKey } from "../db";
 import { ENV } from "./env";
+import { createContext } from "./context";
 
 export function registerStorageProxy(app: Express) {
   app.get("/manus-storage/*", async (req, res) => {
     const key = (req.params as Record<string, string>)[0];
     if (!key) {
       res.status(400).send("Missing storage key");
+      return;
+    }
+
+    const context = await createContext({ req, res } as any);
+    if (!context.user) {
+      res.status(401).send("Authentication required");
+      return;
+    }
+
+    const media = await getVisibleWoundMediaByStorageKey(key);
+    if (!media) {
+      res.status(404).send("Media not found");
       return;
     }
 

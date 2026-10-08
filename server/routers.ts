@@ -2,10 +2,11 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { addPatientMedication, addPatientWoundAssessment, addPatientWoundMedia, archiveRegisteredPatient, createRegisteredPatient, deletePatientWoundMedia, exportRegisteredPatient, getDiabetesExampleBatches, getDiabetesExampleRecords, getDiabetesImportSummary, getDiabetesPatient, getDiabetesPatientObservations, getDiabetesPatients, getRegisteredPatientRecord, getRegisteredPatients, getWoundPhotoHistory, restoreRegisteredPatient, setPatientWoundMediaHidden, updateRegisteredPatient } from "./db";
+import { addPatientMedication, addPatientWoundAssessment, addPatientWoundMedia, archiveRegisteredPatient, createRegisteredPatient, deletePatientWoundMedia, exportRegisteredPatient, getClinicalDashboardSummary, getDiabetesExampleBatches, getDiabetesExampleRecords, getDiabetesImportSummary, getDiabetesPatient, getDiabetesPatientObservations, getDiabetesPatients, getDiabetesPatientsPage, getRegisteredPatientRecord, getRegisteredPatients, getRegisteredPatientsPage, getWoundPhotoHistory, restoreRegisteredPatient, setPatientWoundMediaHidden, updateRegisteredPatient } from "./db";
 import { z } from "zod";
 import { inferWoundImage } from "./woundInference";
 import { TRPCError } from "@trpc/server";
+import sharp from "sharp";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -21,14 +22,20 @@ export const appRouter = router({
     }),
   }),
 
+  dashboard: router({
+    summary: protectedProcedure.query(() => getClinicalDashboardSummary()),
+  }),
+
   diabetes: router({
     summary: protectedProcedure.query(() => getDiabetesImportSummary()),
     patients: protectedProcedure.input(z.object({ limit: z.number().int().min(1).max(100).default(100) })).query(({ input }) => getDiabetesPatients(input.limit)),
+    patientsPage: protectedProcedure.input(z.object({ query: z.string().trim().max(160).default(""), offset: z.number().int().min(0).max(100_000).default(0), limit: z.number().int().min(1).max(100).default(20) })).query(({ input }) => getDiabetesPatientsPage(input)),
     detail: protectedProcedure.input(z.object({ patientId: z.number().int().positive() })).query(({ input }) => getDiabetesPatient(input.patientId)),
     observations: protectedProcedure.input(z.object({ patientId: z.number().int().positive(), limit: z.number().int().min(1).max(100).default(24) })).query(({ input }) => getDiabetesPatientObservations(input.patientId, input.limit)),
     exampleBatches: protectedProcedure.input(z.object({ limit: z.number().int().min(1).max(20).default(20) })).query(({ input }) => getDiabetesExampleBatches(input.limit)),
     exampleRecords: protectedProcedure.input(z.object({ batchId: z.number().int().positive(), offset: z.number().int().min(0).max(100_000).default(0), limit: z.number().int().min(1).max(100).default(50) })).query(({ input }) => getDiabetesExampleRecords(input.batchId, input.offset, input.limit)),
     registeredPatients: protectedProcedure.input(z.object({ limit: z.number().int().min(1).max(100).default(100) })).query(({ input }) => getRegisteredPatients(input.limit)),
+    registeredPatientsPage: protectedProcedure.input(z.object({ query: z.string().trim().max(160).default(""), offset: z.number().int().min(0).max(100_000).default(0), limit: z.number().int().min(1).max(100).default(20) })).query(({ input }) => getRegisteredPatientsPage(input)),
     registeredPatientRecord: protectedProcedure.input(z.object({ patientId: z.number().int().positive() })).query(({ input }) => getRegisteredPatientRecord(input.patientId)),
     photoHistory: protectedProcedure.input(z.object({ patientId: z.number().int().positive().optional(), from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), offset: z.number().int().min(0).max(100_000).default(0), limit: z.number().int().min(1).max(100).default(30) })).query(({ input }) => getWoundPhotoHistory({ patientId: input.patientId, from: input.from ? new Date(`${input.from}T00:00:00`) : undefined, to: input.to ? new Date(`${input.to}T23:59:59.999`) : undefined, offset: input.offset, limit: input.limit })),
     registerPatient: protectedProcedure.input(z.object({
@@ -63,6 +70,15 @@ export const appRouter = router({
       const payload = input.imageData.includes(",") ? input.imageData.split(",", 2)[1] : input.imageData;
       const imageBuffer = Buffer.from(payload, "base64");
       if (!imageBuffer.length || imageBuffer.length > 12 * 1024 * 1024) throw new TRPCError({ code: "BAD_REQUEST", message: "Photo must be smaller than 12 MB" });
+      let actualMimeType: "image/jpeg" | "image/png" | "image/webp";
+      try {
+        const format = (await sharp(imageBuffer, { failOn: "error" }).metadata()).format;
+        if (format !== "jpeg" && format !== "png" && format !== "webp") throw new Error("unsupported image format");
+        actualMimeType = format === "jpeg" ? "image/jpeg" : format === "png" ? "image/png" : "image/webp";
+      } catch {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Photo bytes are not a valid JPEG, PNG, or WebP image" });
+      }
+      if (actualMimeType !== input.mimeType) throw new TRPCError({ code: "BAD_REQUEST", message: "Photo MIME type does not match its file bytes" });
       const capturedAt = new Date(input.capturedAt);
       if (Number.isNaN(capturedAt.getTime())) throw new TRPCError({ code: "BAD_REQUEST", message: "Photo date and time is invalid" });
       return addPatientWoundMedia({ patientId: input.patientId, woundAssessmentId: input.woundAssessmentId ?? null, fileName: input.fileName, mimeType: input.mimeType, fileSizeBytes: imageBuffer.length, capturedOn: capturedAt.toISOString().slice(0, 10), capturedAt, caption: input.caption ?? null, recordedByUserId: ctx.user && ctx.user.id > 0 ? ctx.user.id : null, imageBuffer });

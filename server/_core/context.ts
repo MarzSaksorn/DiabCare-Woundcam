@@ -9,9 +9,10 @@ export type TrpcContext = {
 };
 
 export function isLocalAuthBypassEnabled(env: NodeJS.ProcessEnv = process.env) {
-  // Local Vite/tsx development has no Manus session. Never enable this fallback
-  // for production unless the operator explicitly opts in (for an isolated demo).
-  return env.LOCAL_AUTH_BYPASS === "true" || (env.NODE_ENV !== "production" && env.LOCAL_AUTH_BYPASS !== "false");
+  // Local Vite/tsx development has no Manus session. Production must always
+  // use the configured identity provider, even if a stale env var is present.
+  if (env.NODE_ENV === "production") return false;
+  return env.LOCAL_AUTH_BYPASS !== "false";
 }
 
 export function createLocalDevelopmentUser(): User {
