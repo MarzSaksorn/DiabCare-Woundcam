@@ -769,3 +769,134 @@ button { cursor: pointer; }
 .replica-detail-loading-rows span { height: 78px; border-radius: 11px; background: linear-gradient(90deg, #f1f5f9, #f8fbff, #f1f5f9); background-size: 200% 100%; animation: report-shimmer 1.2s linear infinite; }
 @media (max-width: 800px) { .replica-detail-identity { align-items: flex-start; flex-wrap: wrap; } .replica-detail-actions { width: 100%; margin-left: 60px; } .replica-detail-actions > * { flex: 1; justify-content: center; } .replica-detail-info-grid, .replica-detail-observation-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .replica-detail-wounds, .replica-detail-two-column { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .replica-detail-page { padding: 14px 14px 34px; } .replica-detail-topbar > span { display: none; } .replica-detail-title-row h1 { font-size: 20px; } .replica-detail-identity { padding: 16px; } .replica-detail-actions { margin-left: 0; } .replica-detail-section { padding: 18px; } .replica-detail-section-heading h2 { font-size: 18px; } .replica-detail-info-grid, .replica-detail-note-grid, .replica-detail-observation-grid, .replica-detail-kpis { grid-template-columns: 1fr; } .replica-detail-chart svg { height: 150px; } }
+
+/* Direct replica camera workflow. */
+.replica-camera-page { width: 100%; max-width: 1100px; margin: 0 auto; padding: 2px 0 26px; color: #16345c; }
+.replica-camera-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin: 0 0 16px; }
+.replica-camera-back { display: inline-flex; align-items: center; gap: 4px; color: #0a4fbe; font-size: 11px; font-weight: 900; text-decoration: none; }
+.replica-camera-back svg { width: 15px; height: 15px; }
+.replica-camera-eyebrow { display: flex; align-items: center; gap: 7px; margin-top: 15px; color: #5e7ea6; font-size: 9px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.replica-camera-eyebrow > span { width: 6px; height: 6px; border-radius: 50%; background: #2fb9f6; box-shadow: 0 0 0 4px rgba(47,185,246,.12); }
+.replica-camera-header h1 { margin: 5px 0 0; color: #16345c; font-family: 'Sarabun', sans-serif; font-size: clamp(23px, 3vw, 31px); letter-spacing: -.04em; }
+.replica-camera-header p { max-width: 680px; margin: 5px 0 0; color: #64748b; font-size: 11px; line-height: 1.5; }
+.replica-camera-brand { align-self: flex-start; border-radius: 999px; background: #eff6ff; padding: 6px 9px; color: #0a4fbe; font-size: 9px; font-weight: 900; }
+.replica-camera-selector { overflow: hidden; padding: 0; }
+.replica-camera-notice { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #edf2f7; background: #fffaf0; padding: 12px 15px; color: #9a6b13; }
+.replica-camera-notice > svg { width: 17px; height: 17px; flex: 0 0 auto; }
+.replica-camera-notice > div { min-width: 0; flex: 1; }
+.replica-camera-notice strong { display: block; color: #7d5710; font-size: 11px; }
+.replica-camera-notice p { margin: 3px 0 0; color: #a27c38; font-size: 9px; line-height: 1.45; }
+.replica-camera-notice > span { border: 1px solid #f0d8a4; border-radius: 999px; padding: 4px 7px; font-size: 8px; font-weight: 900; letter-spacing: .08em; }
+.replica-camera-search { display: flex; height: 40px; align-items: center; gap: 8px; margin: 13px 14px 9px; border: 1px solid #d8dde7; border-radius: 10px; background: #fff; padding: 0 11px; }
+.replica-camera-search:focus-within { border-color: #1568e8; box-shadow: 0 0 0 3px rgba(21,104,232,.12); }
+.replica-camera-search svg { width: 15px; height: 15px; flex: 0 0 auto; color: #94a3b8; }
+.replica-camera-search input { min-width: 0; flex: 1; border: 0; outline: 0; color: #16345c; font-family: inherit; font-size: 11px; }
+.replica-camera-search input::placeholder { color: #a0b8d0; }
+.replica-camera-filter-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; margin: 0 14px 15px; border-radius: 9px; background: #f1f5f9; padding: 3px; }
+.replica-camera-filter-row button { min-height: 31px; border: 0; border-radius: 7px; background: transparent; color: #94a3b8; font-family: inherit; font-size: 9px; font-weight: 900; }
+.replica-camera-filter-row button.is-active { background: #0a4fbe; color: #fff; box-shadow: 0 3px 8px rgba(10,79,190,.18); }
+.replica-camera-patient-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 0 14px 8px; }
+.replica-camera-patient-heading > div > span { display: block; color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .13em; }
+.replica-camera-patient-heading strong { display: block; margin-top: 3px; color: #16345c; font-size: 13px; }
+.replica-camera-patient-heading small { color: #94a3b8; font-size: 9px; font-weight: 800; }
+.replica-camera-patient-list { display: grid; gap: 0; max-height: 470px; overflow: auto; border-top: 1px solid #f1f5f9; }
+.replica-camera-patient-choice { display: flex; width: 100%; min-width: 0; align-items: center; gap: 9px; border: 0; border-bottom: 1px solid #f1f5f9; border-left: 3px solid transparent; background: #fff; padding: 10px 14px 10px 11px; color: inherit; text-align: left; transition: background .16s ease, border-color .16s ease; }
+.replica-camera-patient-choice:hover, .replica-camera-patient-choice.is-selected { border-left-color: #0a4fbe; background: #f5faff; }
+.replica-camera-patient-avatar { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border-radius: 9px; background: #eff6ff; color: #0a4fbe; }
+.replica-camera-patient-avatar svg { width: 15px; height: 15px; }
+.replica-camera-patient-main { min-width: 0; flex: 1; }
+.replica-camera-patient-main strong { display: block; overflow: hidden; color: #16345c; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.replica-camera-patient-main small, .replica-camera-patient-main em { display: block; overflow: hidden; margin-top: 2px; color: #64748b; font-size: 9px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
+.replica-camera-patient-main em { color: #94a3b8; }
+.replica-camera-patient-check { display: grid; width: 20px; height: 20px; flex: 0 0 auto; place-items: center; }
+.replica-camera-patient-check > span { width: 12px; height: 12px; border: 1px solid #cbd5e1; border-radius: 50%; }
+.replica-camera-patient-check svg { width: 18px; height: 18px; color: #0a4fbe; }
+.replica-camera-confirm { display: flex; width: calc(100% - 28px); min-height: 40px; align-items: center; justify-content: center; gap: 7px; margin: 14px; border: 0; border-radius: 10px; background: linear-gradient(90deg, #0a57c8, #2fb9f6); color: #fff; font-family: inherit; font-size: 10px; font-weight: 900; box-shadow: 0 5px 14px rgba(10,79,190,.18); }
+.replica-camera-confirm:disabled { cursor: not-allowed; background: #e2e8f0; color: #94a3b8; box-shadow: none; }
+.replica-camera-confirm svg { width: 15px; height: 15px; }
+.replica-camera-picker-empty { display: flex; min-height: 180px; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #94a3b8; text-align: center; }
+.replica-camera-picker-empty.is-error svg { color: #e84d67; }
+.replica-camera-picker-empty svg { width: 25px; height: 25px; color: #93c5fd; }
+.replica-camera-picker-empty strong { margin-top: 8px; color: #16345c; font-size: 12px; }
+.replica-camera-picker-empty p { max-width: 300px; margin: 4px 0 0; font-size: 10px; line-height: 1.45; }
+.replica-camera-patient-loading { display: grid; gap: 8px; padding: 10px 14px 14px; }
+.replica-camera-patient-loading span { height: 52px; border-radius: 10px; background: linear-gradient(90deg, #f1f5f9, #f8fbff, #f1f5f9); background-size: 200% 100%; animation: replica-shimmer 1.2s linear infinite; }
+.replica-camera-selected { display: flex; min-width: 0; align-items: center; gap: 10px; margin-bottom: 13px; border: 1px solid #bfdbfe; border-radius: 13px; background: #eff6ff; padding: 11px 13px; }
+.replica-camera-selected-icon { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border-radius: 10px; background: #fff; color: #0a4fbe; }
+.replica-camera-selected-icon svg { width: 17px; height: 17px; }
+.replica-camera-selected > div:nth-child(2) { min-width: 0; flex: 1; }
+.replica-camera-selected > div:nth-child(2) > span { display: block; color: #5e7ea6; font-size: 8px; font-weight: 900; letter-spacing: .12em; }
+.replica-camera-selected strong { display: block; overflow: hidden; margin-top: 2px; color: #16345c; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.replica-camera-selected small { display: block; overflow: hidden; margin-top: 2px; color: #64748b; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.replica-camera-selected button { flex: 0 0 auto; border: 0; border-radius: 8px; background: #fff; padding: 7px 9px; color: #0a4fbe; font-family: inherit; font-size: 9px; font-weight: 900; }
+.replica-camera-workspace { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr); align-items: start; gap: 15px; }
+.replica-camera-capture, .replica-camera-analysis { padding: 18px; }
+.replica-camera-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
+.replica-camera-card-head > div > span { display: block; color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .14em; }
+.replica-camera-card-head h2 { margin: 4px 0 0; color: #16345c; font-family: 'Sarabun', sans-serif; font-size: 17px; letter-spacing: -.03em; }
+.replica-camera-help-wrap { position: relative; }
+.replica-camera-help { display: grid; width: 29px; height: 29px; place-items: center; border: 1px solid #d8dde7; border-radius: 8px; background: #f8fbff; color: #5e7ea6; }
+.replica-camera-help svg { width: 15px; height: 15px; }
+.replica-camera-help-popup { position: absolute; z-index: 20; top: 38px; right: 0; width: min(300px, calc(100vw - 35px)); border: 1px solid #dbeafe; border-radius: 12px; background: #fff; padding: 13px; color: #64748b; box-shadow: 0 14px 32px rgba(10,79,190,.15); }
+.replica-camera-help-popup strong { display: block; color: #16345c; font-size: 11px; }
+.replica-camera-help-popup p { margin: 5px 0 0; font-size: 10px; line-height: 1.5; }
+.replica-camera-help-popup button { position: absolute; top: 8px; right: 8px; display: grid; width: 23px; height: 23px; place-items: center; border: 0; border-radius: 6px; background: #f1f5f9; color: #64748b; }
+.replica-camera-help-popup button svg { width: 13px; height: 13px; }
+.replica-camera-viewport { position: relative; display: flex; min-height: 410px; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #dbeafe; border-radius: 15px; background: radial-gradient(circle at 50% 38%, #2b5972 0%, #12344a 52%, #082233 100%); }
+.replica-camera-viewport.has-preview { background: #082233; }
+.replica-camera-viewport img { width: 100%; height: 100%; min-height: 410px; object-fit: contain; }
+.replica-camera-viewport.is-live { background: #061824; }
+.replica-camera-live-video { display: block; width: 100%; height: 100%; min-height: 410px; object-fit: cover; }
+.replica-camera-frame { position: absolute; z-index: 2; inset: 13% 16%; border: 1px solid rgba(191,219,254,.42); border-radius: 22px; opacity: .9; }
+.replica-camera-frame span { position: absolute; width: 25px; height: 25px; border-color: #bfdbfe; }
+.replica-camera-frame span:nth-child(1) { top: -1px; left: -1px; border-top: 3px solid; border-left: 3px solid; border-radius: 6px 0 0; }
+.replica-camera-frame span:nth-child(2) { top: -1px; right: -1px; border-top: 3px solid; border-right: 3px solid; border-radius: 0 6px 0 0; }
+.replica-camera-frame span:nth-child(3) { bottom: -1px; left: -1px; border-bottom: 3px solid; border-left: 3px solid; border-radius: 0 0 0 6px; }
+.replica-camera-frame span:nth-child(4) { right: -1px; bottom: -1px; border-right: 3px solid; border-bottom: 3px solid; border-radius: 0 0 6px; }
+.replica-camera-empty { position: relative; z-index: 3; width: min(260px, 70%); color: #fff; text-align: center; }
+.replica-camera-lens { display: grid; width: 58px; height: 58px; place-items: center; margin: 0 auto 13px; border: 1px solid rgba(191,219,254,.34); border-radius: 19px; background: rgba(255,255,255,.12); color: #dbeafe; }
+.replica-camera-lens svg { width: 25px; height: 25px; }
+.replica-camera-empty strong { display: block; font-size: 13px; }
+.replica-camera-empty p { margin: 6px 0 0; color: rgba(255,255,255,.7); font-size: 10px; line-height: 1.5; }
+.replica-camera-status, .replica-camera-live-label { position: absolute; z-index: 4; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; background: rgba(4,15,21,.56); padding: 6px 9px; color: rgba(255,255,255,.8); font-size: 9px; font-weight: 800; backdrop-filter: blur(8px); }
+.replica-camera-status { right: 13px; bottom: 13px; }
+.replica-camera-status > span { width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; box-shadow: 0 0 0 3px rgba(110,231,183,.16); }
+.replica-camera-live-label { top: 13px; left: 13px; }
+.replica-camera-live-label svg { width: 13px; height: 13px; }
+.replica-camera-preview-overlay { position: absolute; z-index: 4; right: 13px; bottom: 13px; left: 13px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; background: rgba(5,19,27,.78); padding: 7px 8px 7px 10px; color: #fff; backdrop-filter: blur(10px); }
+.replica-camera-preview-overlay span { display: inline-flex; min-width: 0; align-items: center; gap: 6px; overflow: hidden; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.replica-camera-preview-overlay span svg { width: 13px; height: 13px; flex: 0 0 auto; }
+.replica-camera-preview-overlay button { display: grid; width: 24px; height: 24px; flex: 0 0 auto; place-items: center; border: 0; border-radius: 6px; background: rgba(255,255,255,.12); color: #fff; }
+.replica-camera-preview-overlay button svg { width: 13px; height: 13px; }
+.replica-camera-error { display: flex; align-items: flex-start; gap: 7px; margin-top: 9px; border: 1px solid #fecdd3; border-radius: 9px; background: #fff1f2; padding: 9px 10px; color: #be123c; font-size: 10px; line-height: 1.45; }
+.replica-camera-error svg { width: 14px; height: 14px; flex: 0 0 auto; }
+.replica-camera-actions { display: flex; gap: 8px; margin-top: 12px; }
+.replica-camera-actions > * { flex: 1; }
+.replica-camera-actions button { min-height: 39px; font-size: 10px; }
+.replica-camera-actions button svg { width: 14px; height: 14px; }
+.replica-camera-privacy { display: flex; align-items: center; gap: 6px; margin: 10px 1px 0; color: #94a3b8; font-size: 9px; line-height: 1.45; }
+.replica-camera-privacy svg { width: 14px; height: 14px; flex: 0 0 auto; color: #0a4fbe; }
+.replica-camera-state { border-radius: 999px; background: #f1f5f9; padding: 5px 7px; color: #94a3b8; font-size: 8px; font-weight: 900; }
+.replica-camera-state.is-ready { background: #ecfdf5; color: #15803d; }
+.replica-camera-review-placeholder { display: flex; min-height: 155px; flex-direction: column; align-items: center; justify-content: center; border: 1px dashed #bfdbfe; border-radius: 12px; background: #f8fbff; color: #93c5fd; text-align: center; padding: 15px; }
+.replica-camera-review-placeholder svg { width: 25px; height: 25px; }
+.replica-camera-review-placeholder strong { margin-top: 9px; color: #16345c; font-size: 12px; }
+.replica-camera-review-placeholder p { max-width: 240px; margin: 5px 0 0; color: #94a3b8; font-size: 10px; line-height: 1.45; }
+.replica-camera-inference { margin-top: 10px; border: 1px solid #bfdbfe; border-radius: 11px; background: #eff6ff; padding: 11px; }
+.replica-camera-inference > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.replica-camera-inference > div small { color: #5e7ea6; font-size: 8px; letter-spacing: 0; text-transform: none; }
+.replica-camera-inference > strong { display: block; margin-top: 7px; color: #16345c; font-family: 'Sarabun', sans-serif; font-size: 17px; text-transform: capitalize; }
+.replica-camera-inference > p { margin: 3px 0 0; color: #0a4fbe; font-size: 10px; font-weight: 800; }
+.replica-camera-inference > em { display: block; margin-top: 7px; color: #64748b; font-size: 9px; font-style: normal; line-height: 1.45; }
+.replica-camera-assignment { margin-top: 11px; border: 1px solid #dbeafe; border-radius: 12px; background: #fbfdff; padding: 12px; }
+.replica-camera-assignment-title { display: flex; align-items: center; gap: 7px; color: #0a4fbe; }
+.replica-camera-assignment-title svg { width: 15px; height: 15px; }
+.replica-camera-assignment-title strong { color: #16345c; font-size: 11px; }
+.replica-camera-assignment > p { margin: 4px 0 10px; color: #64748b; font-size: 9px; }
+.replica-camera-assignment label { display: grid; gap: 4px; margin-top: 9px; color: #64748b; font-size: 9px; font-weight: 900; }
+.replica-camera-assignment select, .replica-camera-assignment input { min-width: 0; height: 35px; border: 1px solid #d8dde7; border-radius: 8px; background: #fff; padding: 0 9px; color: #16345c; font-family: inherit; font-size: 10px; }
+.replica-camera-assignment .replica-primary-button { width: 100%; margin-top: 11px; }
+.replica-camera-assignment > small { display: block; margin-top: 7px; color: #94a3b8; font-size: 8px; line-height: 1.45; }
+.replica-camera-page .camera-history-card { margin-top: 15px; border-radius: 16px; padding: 17px; }
+@media (max-width: 840px) { .replica-camera-workspace { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .replica-camera-page { padding: 0 0 22px; } .replica-camera-header { align-items: flex-start; flex-direction: column; gap: 8px; } .replica-camera-brand { align-self: flex-start; } .replica-camera-notice { align-items: flex-start; } .replica-camera-notice > span { display: none; } .replica-camera-viewport, .replica-camera-viewport img, .replica-camera-live-video { min-height: 330px; } .replica-camera-capture, .replica-camera-analysis { padding: 14px; } .replica-camera-selected { align-items: flex-start; } .replica-camera-selected button { padding: 6px; } }

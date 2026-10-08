@@ -2,14 +2,15 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
-import { Camera, Check, ChevronLeft, CircleHelp, FileImage, ImagePlus, Info, Loader2, RefreshCcw, ShieldCheck, Sparkles, Upload, Video, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Activity, AlertTriangle, ArrowLeft, Camera, Check, CheckCircle2, ChevronLeft, CircleHelp, Database, FileImage, HeartPulse, ImagePlus, Info, Loader2, RefreshCcw, Search, ShieldCheck, Sparkles, Upload, UserRound, Users, Video, X } from "lucide-react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import DiagnosticPhotoHistory from "@/components/DiagnosticPhotoHistory";
 
 type CaptureState = "idle" | "preview" | "analyzing" | "ready";
 type CameraState = "closed" | "starting" | "live" | "error";
+type PatientContext = "all" | "type1" | "type2" | "gdm";
 type InferenceResult = { topSuggestion: { label: string; confidence: number; box: { x: number; y: number; width: number; height: number } } | null; detections: Array<{ label: string; confidence: number; box: { x: number; y: number; width: number; height: number } }>; disclaimer: string };
 type ImageLayout = { naturalWidth: number; naturalHeight: number; viewportWidth: number; viewportHeight: number };
 const MODEL_IMAGE_SIZE = 640;
@@ -21,7 +22,7 @@ function canRequestCamera() {
 }
 
 export default function DiagnosticCamera() {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -36,14 +37,20 @@ export default function DiagnosticCamera() {
   const [fileName, setFileName] = useState("");
   const [inferenceResult, setInferenceResult] = useState<InferenceResult | null>(null);
   const [imageLayout, setImageLayout] = useState<ImageLayout | null>(null);
+  const [patientSearch, setPatientSearch] = useState("");
+  const [patientContext, setPatientContext] = useState<PatientContext>("all");
+  const [selectedPatientId, setSelectedPatientId] = useState("");
   const [assignedPatientId, setAssignedPatientId] = useState("");
   const [woundAssessmentId, setWoundAssessmentId] = useState("");
   const [capturedAt, setCapturedAt] = useState("");
+  const [workflowStarted, setWorkflowStarted] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const inferMutation = trpc.wound.infer.useMutation();
-  const patientsQuery = trpc.diabetes.registeredPatients.useQuery({ limit: 100 });
-  const selectedPatientRecordQuery = trpc.diabetes.registeredPatientRecord.useQuery({ patientId: Number(assignedPatientId) }, { enabled: Boolean(assignedPatientId) });
+  const patientsQuery = trpc.diabetes.registeredPatientsPage.useQuery({ query: patientSearch, context: patientContext, offset: 0, limit: 50 }, { retry: false });
+  const selectedPatientRecordQuery = trpc.diabetes.registeredPatientRecord.useQuery({ patientId: Number(assignedPatientId) }, { enabled: Boolean(assignedPatientId), retry: false });
   const savePhotoMutation = trpc.diabetes.uploadWoundPhoto.useMutation({ onSuccess: () => toast.success(t("diagnosticPhotoSaved")), onError: (error) => toast.error(error.message) });
+  const patients = patientsQuery.data?.patients ?? [];
+  const selectedPatient = patients.find((patient) => patient.id === Number(selectedPatientId));
 
   function updateImageLayout() {
     const image = previewImageRef.current;
@@ -54,27 +61,14 @@ export default function DiagnosticCamera() {
   }
 
   useEffect(() => {
-    if (!previewUrl) {
-      setImageLayout(null);
-      return;
-    }
+    if (!previewUrl) { setImageLayout(null); return; }
     updateImageLayout();
     const observer = new ResizeObserver(updateImageLayout);
     if (viewportRef.current) observer.observe(viewportRef.current);
     return () => observer.disconnect();
   }, [previewUrl]);
 
-  function stopCamera() {
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    streamRef.current = null;
-    if (videoRef.current) videoRef.current.srcObject = null;
-    setCameraState("closed");
-  }
-
-  useEffect(() => () => {
-    stopCamera();
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-  }, [previewUrl]);
+  useEffect(() => () => stopCamera(), []);
 
   useEffect(() => {
     if (!helpOpen) return;
@@ -83,31 +77,24 @@ export default function DiagnosticCamera() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [helpOpen]);
 
-  async function startCamera() {
-    if (!canRequestCamera()) {
-      setCameraError(t("cameraSecureContext"));
-      setCameraState("error");
-      return;
-    }
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setCameraError(t("cameraUnavailable"));
-      setCameraState("error");
-      return;
-    }
+  function stopCamera() {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+    setCameraState("closed");
+  }
 
+  async function startCamera() {
+    if (!canRequestCamera()) { setCameraError(t("cameraSecureContext")); setCameraState("error"); return; }
+    if (!navigator.mediaDevices?.getUserMedia) { setCameraError(t("cameraUnavailable")); setCameraState("error"); return; }
     stopCamera();
     setCameraError("");
     setCameraState("starting");
     try {
       let stream: MediaStream;
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-        });
+        stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } } });
       } catch (error) {
-        // Some mobile browsers reject ideal facingMode/size constraints even
-        // though they can provide a camera. Retry with the minimal contract.
         if (!(error instanceof DOMException) || error.name !== "OverconstrainedError") throw error;
         stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
       }
@@ -132,7 +119,7 @@ export default function DiagnosticCamera() {
   function handleFile(file?: File) {
     if (!file || !file.type.startsWith("image/")) return;
     stopCamera();
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    clearPreviewUrl();
     setPreviewUrl(URL.createObjectURL(file));
     setFileName(file.name || t("uploadedWoundImage"));
     const reader = new FileReader();
@@ -141,6 +128,10 @@ export default function DiagnosticCamera() {
     setInferenceResult(null);
     setCapturedAt(localDateTimeValue());
     setState("preview");
+  }
+
+  function clearPreviewUrl() {
+    setPreviewUrl((current) => { if (current) URL.revokeObjectURL(current); return null; });
   }
 
   function blobToDataUrl(blob: Blob) {
@@ -155,24 +146,15 @@ export default function DiagnosticCamera() {
   function captureFrame() {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !video.videoWidth) {
-      setCameraError(t("captureError"));
-      return;
-    }
+    if (!video || !canvas || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !video.videoWidth) { setCameraError(t("captureError")); return; }
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const context = canvas.getContext("2d");
-    if (!context) {
-      setCameraError(t("captureError"));
-      return;
-    }
+    if (!context) { setCameraError(t("captureError")); return; }
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     canvas.toBlob((blob) => {
-      if (!blob) {
-        setCameraError(t("captureError"));
-        return;
-      }
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (!blob) { setCameraError(t("captureError")); return; }
+      clearPreviewUrl();
       void blobToDataUrl(blob).then((dataUrl) => {
         setPreviewUrl(URL.createObjectURL(blob));
         setImageDataUrl(dataUrl);
@@ -187,12 +169,10 @@ export default function DiagnosticCamera() {
 
   function resetCapture() {
     stopCamera();
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(null);
+    clearPreviewUrl();
     setImageDataUrl(null);
     setFileName("");
     setInferenceResult(null);
-    setAssignedPatientId("");
     setWoundAssessmentId("");
     setCapturedAt("");
     setCameraError("");
@@ -200,11 +180,15 @@ export default function DiagnosticCamera() {
     if (inputRef.current) inputRef.current.value = "";
   }
 
+  function changePatient() {
+    resetCapture();
+    setSelectedPatientId("");
+    setAssignedPatientId("");
+    setWorkflowStarted(false);
+  }
+
   async function beginReview() {
-    if (!imageDataUrl) {
-      setCameraError(t("captureError"));
-      return;
-    }
+    if (!imageDataUrl) { setCameraError(t("captureError")); return; }
     setState("analyzing");
     setCameraError("");
     try {
@@ -217,52 +201,41 @@ export default function DiagnosticCamera() {
     }
   }
 
+  function confirmPatient() {
+    if (!selectedPatientId) return;
+    setAssignedPatientId(selectedPatientId);
+    setWorkflowStarted(true);
+    setState("idle");
+  }
+
   function saveToPatient() {
     if (!imageDataUrl || !assignedPatientId) { toast.error(t("selectPatientForPhoto")); return; }
     if (!capturedAt) { toast.error(t("selectPhotoDateTime")); return; }
-    const patient = (patientsQuery.data ?? []).find((item) => item.id === Number(assignedPatientId));
-    if (!patient) { toast.error(t("patientUnavailable")); return; }
-    savePhotoMutation.mutate({ patientId: patient.id, woundAssessmentId: woundAssessmentId ? Number(woundAssessmentId) : null, fileName, mimeType: "image/jpeg", capturedAt: new Date(capturedAt).toISOString(), caption: inferenceResult?.topSuggestion ? `${t("decisionSupport")}: ${inferenceResult.topSuggestion.label.replaceAll("_", " ")}` : null, imageData: imageDataUrl });
+    if (!selectedPatientRecordQuery.data?.patient) { toast.error(t("patientUnavailable")); return; }
+    savePhotoMutation.mutate({ patientId: Number(assignedPatientId), woundAssessmentId: woundAssessmentId ? Number(woundAssessmentId) : null, fileName, mimeType: "image/jpeg", capturedAt: new Date(capturedAt).toISOString(), caption: inferenceResult?.topSuggestion ? `${t("decisionSupport")}: ${inferenceResult.topSuggestion.label.replaceAll("_", " ")}` : null, imageData: imageDataUrl });
   }
 
-  return <DashboardLayout><div className="camera-page">
-    <header className="camera-page-header"><div><Link href="/" className="camera-back"><ChevronLeft className="h-4 w-4" /> {t("overview")}</Link><div className="camera-eyebrow"><span /> {t("woundcam")} / {t("cameraWorkflow")}</div><h1>{t("cameraTitle")}</h1><p>{t("cameraSubtitle")}</p></div><div className="camera-header-badge"><ShieldCheck className="h-4 w-4" /> {t("localOnly")}</div></header>
-
-    <div className="camera-workspace">
-      <section className="camera-capture-card camera-capture-card-wide panel-card" aria-labelledby="capture-heading">
-        <div className="camera-card-header"><div><p className="camera-kicker">{t("stepOne")}</p><h2 id="capture-heading">{t("captureImage")}</h2></div><div className="camera-help-anchor"><button type="button" className="camera-help" aria-label={t("cameraHelp")} aria-expanded={helpOpen} aria-controls="camera-help-popup" onClick={() => setHelpOpen((open) => !open)}><CircleHelp className="h-4 w-4" /></button>{helpOpen && <div id="camera-help-popup" className="camera-help-popup" role="dialog" aria-labelledby="camera-help-title"><div className="camera-help-popup-heading"><div><span className="camera-kicker">{t("cameraHelp")}</span><strong id="camera-help-title">{t("cameraHelpTitle")}</strong></div><button type="button" className="camera-help-popup-close" aria-label={t("closeHelp")} onClick={() => setHelpOpen(false)}><X className="h-4 w-4" /></button></div><p>{t("cameraHelpText")}</p></div>}</div></div>
-        <div ref={viewportRef} className={`camera-viewport ${previewUrl ? "has-preview" : ""} ${cameraState === "live" ? "is-live" : ""}`}>
-          {previewUrl ? <><img ref={previewImageRef} src={previewUrl} alt={t("uploadedWoundImage")} onLoad={updateImageLayout} />{inferenceResult && imageLayout && <DetectionOverlay detections={inferenceResult.detections} layout={imageLayout} /> }<div className="camera-preview-overlay"><span><FileImage className="h-4 w-4" /> {fileName}</span><button type="button" onClick={resetCapture} aria-label={t("removeImage")}><X className="h-4 w-4" /></button></div></> : cameraState === "live" || cameraState === "starting" ? <><video ref={videoRef} className="camera-live-video" autoPlay muted playsInline aria-label={t("cameraLivePreview")} /><div className="camera-frame-guides"><span /><span /><span /><span /></div><div className="camera-live-label"><Video className="h-3.5 w-3.5" /> {cameraState === "starting" ? t("cameraStarting") : t("cameraLive")}</div></> : <><div className="camera-frame-guides"><span /><span /><span /><span /></div><div className="camera-empty"><div className="camera-lens"><Camera className="h-7 w-7" /></div><strong>{cameraState === "error" ? t("cameraPermission") : t("positionWound")}</strong><p>{cameraState === "error" ? cameraError : t("positionWoundDetail")}</p></div><div className="camera-status"><span className="camera-status-dot" /> {cameraState === "error" ? t("cameraPermission") : t("cameraReady")}</div></>}
-        </div>
-        {cameraError && cameraState !== "error" && <div className="camera-error" role="alert"><Info className="h-4 w-4" /><span>{cameraError}</span></div>}
-        <canvas ref={canvasRef} className="sr-only" aria-hidden="true" />
-        <div className="camera-capture-actions"><input ref={inputRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={(event) => handleFile(event.target.files?.[0])} />{previewUrl ? <><Button onClick={resetCapture} variant="outline" className="h-11 flex-1 rounded-xl border-slate-200"><RefreshCcw className="mr-2 h-4 w-4" /> {t("retake")}</Button><Button onClick={beginReview} disabled={state === "analyzing"} className="h-11 flex-1 rounded-xl bg-[#16345C] text-white hover:bg-[#223750]">{state === "analyzing" ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("preparing")}</> : <><Sparkles className="mr-2 h-4 w-4" /> {t("reviewImage")}</>}</Button></> : cameraState === "live" ? <><Button onClick={captureFrame} className="h-11 flex-1 rounded-xl bg-[#16345C] text-white hover:bg-[#223750]"><Camera className="mr-2 h-4 w-4" /> {t("capturePhoto")}</Button><Button onClick={stopCamera} variant="outline" className="h-11 rounded-xl border-slate-200 px-4"><X className="mr-2 h-4 w-4" /> {t("stopCamera")}</Button></> : <><Button onClick={startCamera} disabled={cameraState === "starting"} className="h-11 flex-1 rounded-xl bg-[#16345C] text-white hover:bg-[#223750]">{cameraState === "starting" ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("cameraStarting")}</> : <><Camera className="mr-2 h-4 w-4" /> {t("openCamera")}</>}</Button><Button onClick={() => inputRef.current?.click()} variant="outline" className="h-11 rounded-xl border-slate-200 px-4" aria-label={t("uploadImage")}><Upload className="h-4 w-4" /></Button></>}</div>
-        <div className="camera-trust-note"><ShieldCheck className="h-4 w-4" /><span>{t("imagePrivacy")}</span></div>
-      </section>
-
-        <section className="camera-analysis-card panel-card camera-analysis-below"><div className="camera-card-header"><div><p className="camera-kicker">{t("stepTwo")}</p><h2>{t("reviewBeforeAnalysis")}</h2></div><span className={`camera-state-pill ${state === "ready" ? "is-ready" : ""}`}>{state === "ready" ? t("ready") : t("waiting")}</span></div><div className="camera-review-placeholder">{state === "idle" ? <><ImagePlus className="h-6 w-6" /><strong>{t("noImageYet")}</strong><p>{t("noImageYetDetail")}</p></> : state === "analyzing" ? <><Loader2 className="h-6 w-6 animate-spin" /><strong>{t("preparingReview")}</strong><p>{t("preparingReviewDetail")}</p></> : <><Check className="h-6 w-6 text-[#4f8b68]" /><strong>{t("imageReady")}</strong><p>{t("imageReadyDetail")}</p></>}</div>{inferenceResult && <div className="camera-inference-result" role="status"><div className="camera-inference-heading"><span>{t("modelSuggestion")}</span><span>{inferenceResult.detections.length} {t("detectionsFound")}</span></div>{inferenceResult.topSuggestion ? <><strong>{inferenceResult.topSuggestion.label.replaceAll("_", " ")}</strong><p>{t("confidence")}: {Math.round(inferenceResult.topSuggestion.confidence * 100)}%</p><small>{inferenceResult.disclaimer}</small></> : <><strong>{t("noDetections")}</strong><p>{inferenceResult.disclaimer}</p></>}</div>}{previewUrl && <div className="mt-5 rounded-2xl border border-[#bfd8c8] bg-[#FAFDFE] p-4"><div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#16345c]"><Upload className="h-4 w-4 text-[#0A4FBE]" />{t("assignPhotoToPatient")}</div><label className="grid gap-1.5 text-sm font-semibold text-slate-600"><span>{t("patient")}</span><select value={assignedPatientId} onChange={(event) => { setAssignedPatientId(event.target.value); setWoundAssessmentId(""); }} className="field-control h-10 w-full bg-white" disabled={savePhotoMutation.isPending}><option value="">{patientsQuery.isLoading ? t("loadingPatients") : t("choosePatient")}</option>{(patientsQuery.data ?? []).map((patient) => <option key={patient.id} value={patient.id}>{patient.patientCode} · {patient.displayName || t("registeredPatient")} · {patient.registrationLocation}</option>)}</select></label>{assignedPatientId && <label className="mt-3 grid gap-1.5 text-sm font-semibold text-slate-600"><span>{t("woundAssessment")}</span><select value={woundAssessmentId} onChange={(event) => setWoundAssessmentId(event.target.value)} className="field-control h-10 w-full bg-white" disabled={savePhotoMutation.isPending || selectedPatientRecordQuery.isLoading}><option value="">{selectedPatientRecordQuery.isLoading ? t("loadingAssessments") : t("noSpecificAssessment")}</option>{(selectedPatientRecordQuery.data?.woundAssessments ?? []).map((assessment) => <option key={assessment.id} value={assessment.id}>{assessment.woundLabel} · {assessment.location} · {assessment.assessedOn}</option>)}</select></label>}{assignedPatientId && selectedPatientRecordQuery.data?.patient && <div className="mt-4 rounded-xl border border-[#d9e7de] bg-white p-3 text-sm text-[#16345c]"><p className="font-bold">{t("confirmPhotoAssignment")}</p><p className="mt-2">{selectedPatientRecordQuery.data.patient.patientCode} · {selectedPatientRecordQuery.data.patient.displayName || t("registeredPatient")}</p><p className="text-xs text-slate-500">{selectedPatientRecordQuery.data.patient.registrationLocation} · {t("photoDateTime")}: {capturedAt.replace("T", " ")}</p><p className="text-xs text-slate-500">{t("woundAssessment")}: {(selectedPatientRecordQuery.data.woundAssessments.find((item) => item.id === Number(woundAssessmentId))?.woundLabel) || t("noSpecificAssessment")}</p></div>}<label className="mt-3 grid gap-1.5 text-sm font-semibold text-slate-600"><span>{t("photoDateTime")}</span><input type="datetime-local" value={capturedAt} onChange={(event) => setCapturedAt(event.target.value)} className="field-control h-10 w-full bg-white" disabled={savePhotoMutation.isPending} /></label><Button onClick={saveToPatient} disabled={savePhotoMutation.isPending || !assignedPatientId || !capturedAt} className="mt-4 h-10 w-full rounded-xl bg-[#16345C] text-white">{savePhotoMutation.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t("savingPhoto")}</> : <><Upload className="mr-2 h-4 w-4" />{t("savePhotoToPatient")}</>}</Button><p className="mt-2 text-xs leading-5 text-slate-400">{t("photoAssignmentNote")}</p></div>}<div className="camera-disclaimer"><ShieldCheck className="h-4 w-4" /><p>{t("diagnosticDisclaimer")}</p></div></section>
-
-    </div>
-
-    <section className="camera-bottom-row"><div className="camera-process-card"><div className="camera-process-step is-active"><span>1</span><div><strong>{t("captureImage")}</strong><small>{t("captureStepDetail")}</small></div></div><div className="camera-process-line" /><div className={`camera-process-step ${state === "ready" ? "is-active" : ""}`}><span>2</span><div><strong>{t("reviewImage")}</strong><small>{t("reviewStepDetail")}</small></div></div><div className="camera-process-line" /><div className="camera-process-step"><span>3</span><div><strong>{t("clinicalDecision")}</strong><small>{t("clinicalDecisionDetail")}</small></div></div></div></section><DiagnosticPhotoHistory />
+  return <DashboardLayout><div className="replica-camera-page">
+    <header className="replica-camera-header"><div><Link href="/" className="replica-camera-back"><ChevronLeft aria-hidden="true" /> {t("overview")}</Link><span className="replica-camera-eyebrow"><span /> {language === "th" ? "โปรไฟล์ผู้ป่วย / ระเบียนแผล RGB" : "PATIENT PROFILE / RGB WOUND RECORD"}</span><h1>{language === "th" ? "บันทึกภาพแผล" : "Wound image capture"}</h1><p>{language === "th" ? "เลือกผู้ป่วยก่อนเริ่มบันทึกภาพ เพื่อเชื่อมผลวิเคราะห์กับระเบียนคลินิกที่ถูกต้อง" : "Select a patient before capturing an image so analysis stays linked to the correct clinical record."}</p></div><span className="replica-camera-brand">DiabCare Cam</span></header>
+    {!workflowStarted ? <PatientSelector language={language} t={t} patients={patients} loading={patientsQuery.isLoading} error={patientsQuery.error} search={patientSearch} context={patientContext} selectedId={selectedPatientId} onSearch={setPatientSearch} onContext={(next) => { setPatientContext(next); setSelectedPatientId(""); }} onSelect={setSelectedPatientId} onConfirm={confirmPatient} /> : <CaptureWorkspace language={language} t={t} selectedPatient={selectedPatient} selectedPatientRecord={selectedPatientRecordQuery.data ? { ...selectedPatientRecordQuery.data.patient, woundAssessments: selectedPatientRecordQuery.data.woundAssessments } : undefined} selectedPatientRecordLoading={selectedPatientRecordQuery.isLoading} state={state} cameraState={cameraState} cameraError={cameraError} previewUrl={previewUrl} fileName={fileName} inferenceResult={inferenceResult} imageLayout={imageLayout} helpOpen={helpOpen} capturedAt={capturedAt} woundAssessmentId={woundAssessmentId} inputRef={inputRef} previewImageRef={previewImageRef} videoRef={videoRef} canvasRef={canvasRef} viewportRef={viewportRef} onPreviewImageLoad={updateImageLayout} onHelp={() => setHelpOpen((open) => !open)} onCloseHelp={() => setHelpOpen(false)} onStartCamera={startCamera} onCapture={captureFrame} onStopCamera={stopCamera} onFile={handleFile} onReset={resetCapture} onReview={beginReview} onChangePatient={changePatient} onCapturedAt={setCapturedAt} onWoundAssessment={setWoundAssessmentId} onSave={saveToPatient} saving={savePhotoMutation.isPending} />}
+    <DiagnosticPhotoHistory />
   </div></DashboardLayout>;
 }
 
-function DetectionOverlay({ detections, layout }: { detections: InferenceResult["detections"]; layout: ImageLayout }) {
-  const modelScale = Math.min(MODEL_IMAGE_SIZE / layout.naturalWidth, MODEL_IMAGE_SIZE / layout.naturalHeight);
-  const modelOffsetX = (MODEL_IMAGE_SIZE - layout.naturalWidth * modelScale) / 2;
-  const modelOffsetY = (MODEL_IMAGE_SIZE - layout.naturalHeight * modelScale) / 2;
-  const displayScale = Math.min(layout.viewportWidth / layout.naturalWidth, layout.viewportHeight / layout.naturalHeight);
-  const displayOffsetX = (layout.viewportWidth - layout.naturalWidth * displayScale) / 2;
-  const displayOffsetY = (layout.viewportHeight - layout.naturalHeight * displayScale) / 2;
-
-  return <div className="camera-detection-layer" aria-label={`${detections.length} model detections`} role="img">
-    {detections.map((detection, index) => {
-      const x = displayOffsetX + ((detection.box.x - modelOffsetX) / modelScale) * displayScale;
-      const y = displayOffsetY + ((detection.box.y - modelOffsetY) / modelScale) * displayScale;
-      const width = (detection.box.width / modelScale) * displayScale;
-      const height = (detection.box.height / modelScale) * displayScale;
-      return <div key={`${detection.label}-${index}`} className="camera-detection-box" style={{ left: x, top: y, width, height }} aria-label={`${detection.label.replaceAll("_", " ")} ${Math.round(detection.confidence * 100)} percent`}><span>{detection.label.replaceAll("_", " ")} · {Math.round(detection.confidence * 100)}%</span></div>;
-    })}
-  </div>;
+type Patient = { id: number; patientCode: string; displayName: string | null; age: number | null; registrationLocation: string; identifyBy: string; type1: number; type2: number; gdm: number; sex: "FEMALE" | "MALE"; observationCount: number };
+function PatientSelector({ language, t, patients, loading, error, search, context, selectedId, onSearch, onContext, onSelect, onConfirm }: { language: "th" | "en"; t: (key: string) => string; patients: Patient[]; loading: boolean; error: unknown; search: string; context: PatientContext; selectedId: string; onSearch: (value: string) => void; onContext: (value: PatientContext) => void; onSelect: (value: string) => void; onConfirm: () => void }) {
+  const labels: Array<{ value: PatientContext; label: string }> = [{ value: "all", label: language === "th" ? "ทั้งหมด" : "All" }, { value: "type1", label: "Type 1" }, { value: "type2", label: "Type 2" }, { value: "gdm", label: "GDM" }];
+  const errorMessage = error && typeof error === "object" && "message" in error ? String(error.message) : language === "th" ? "ไม่สามารถเชื่อมต่อฐานข้อมูลได้" : "The connected database is unavailable";
+  return <section className="replica-camera-selector panel-card" aria-labelledby="camera-patient-selector-heading"><div className="replica-camera-notice"><ShieldCheck aria-hidden="true" /><div><strong>{language === "th" ? "กรุณาเลือกผู้ป่วยก่อนเริ่มบันทึกภาพ" : "Select a patient before starting image capture"}</strong><p>{language === "th" ? "ภาพถ่ายและผลจากโมเดลจะถูกเก็บไว้กับระเบียนผู้ป่วยที่เลือก" : "The captured image and model result will stay linked to the selected patient record."}</p></div><span>RGB</span></div><div className="replica-camera-search"><Search aria-hidden="true" /><input value={search} onChange={(event) => onSearch(event.target.value)} placeholder={language === "th" ? "ค้นหาชื่อ รหัสผู้ป่วย หรือพื้นที่..." : "Search name, patient code, or location..."} aria-label={language === "th" ? "ค้นหาผู้ป่วย" : "Search patients"} /></div><div className="replica-camera-filter-row" role="tablist" aria-label={language === "th" ? "ตัวกรองบริบทเบาหวาน" : "Diabetes context filter"}>{labels.map((item) => <button type="button" role="tab" aria-selected={context === item.value} key={item.value} className={context === item.value ? "is-active" : ""} onClick={() => onContext(item.value)}>{item.label}</button>)}</div><div className="replica-camera-patient-heading"><div><span>{language === "th" ? "ผู้ป่วยที่ตรงตามเงื่อนไข" : "MATCHING PATIENTS"}</span><strong>{language === "th" ? "เลือกผู้ป่วยเพื่อบันทึกภาพ" : "Choose a patient for image capture"}</strong></div><small>{language === "th" ? `พบ ${patients.length} รายการ` : `${patients.length} records found`}</small></div>{loading && <div className="replica-camera-patient-loading"><span /><span /><span /></div>}{!loading && Boolean(error) && <div className="replica-camera-picker-empty is-error"><AlertTriangle aria-hidden="true" /><strong>{language === "th" ? "โหลดรายชื่อผู้ป่วยไม่สำเร็จ" : "Patients could not be loaded"}</strong><p>{errorMessage}</p></div>}{!loading && !error && !patients.length && <div className="replica-camera-picker-empty"><Search aria-hidden="true" /><strong>{language === "th" ? "ไม่พบผู้ป่วย" : "No patients found"}</strong><p>{language === "th" ? "ลองเปลี่ยนคำค้นหาหรือตัวกรอง" : "Try a different search term or context filter."}</p></div>}{!loading && !error && patients.length > 0 && <div className="replica-camera-patient-list">{patients.map((patient) => <PatientChoice key={patient.id} patient={patient} selected={selectedId === String(patient.id)} language={language} onSelect={onSelect} />)}</div>}<button type="button" className="replica-camera-confirm" disabled={!selectedId || loading || Boolean(error)} onClick={onConfirm}><CheckCircle2 aria-hidden="true" /> {language === "th" ? "ยืนยันสิทธิ์ตรวจแผลผู้ป่วยรายนี้" : "Confirm this patient for wound capture"}</button></section>;
 }
+function PatientChoice({ patient, selected, language, onSelect }: { patient: Patient; selected: boolean; language: "th" | "en"; onSelect: (id: string) => void }) { return <button type="button" className={`replica-camera-patient-choice ${selected ? "is-selected" : ""}`} onClick={() => onSelect(String(patient.id))}><span className="replica-camera-patient-avatar"><UserRound aria-hidden="true" /></span><span className="replica-camera-patient-main"><strong>{patient.displayName || patient.patientCode}</strong><small>{patient.patientCode} · {patient.age === null ? (language === "th" ? "อายุไม่ระบุ" : "Age not recorded") : `${patient.age} ${language === "th" ? "ปี" : "years"}`} · {diabetesContext(patient, language)}</small><em>{patient.registrationLocation} · {patient.observationCount} {language === "th" ? "การสังเกต" : "observations"}</em></span><span className="replica-camera-patient-check">{selected ? <CheckCircle2 aria-hidden="true" /> : <span />}</span></button>; }
+
+function CaptureWorkspace({ language, t, selectedPatient, selectedPatientRecord, selectedPatientRecordLoading, state, cameraState, cameraError, previewUrl, fileName, inferenceResult, imageLayout, helpOpen, capturedAt, woundAssessmentId, inputRef, previewImageRef, videoRef, canvasRef, viewportRef, onPreviewImageLoad, onHelp, onCloseHelp, onStartCamera, onCapture, onStopCamera, onFile, onReset, onReview, onChangePatient, onCapturedAt, onWoundAssessment, onSave, saving }: { language: "th" | "en"; t: (key: string) => string; selectedPatient?: Patient; selectedPatientRecord?: { patientCode: string; displayName: string | null; registrationLocation: string; woundAssessments?: Array<{ id: number; woundLabel: string; location: string; assessedOn: string }> }; selectedPatientRecordLoading: boolean; state: CaptureState; cameraState: CameraState; cameraError: string; previewUrl: string | null; fileName: string; inferenceResult: InferenceResult | null; imageLayout: ImageLayout | null; helpOpen: boolean; capturedAt: string; woundAssessmentId: string; inputRef: RefObject<HTMLInputElement | null>; previewImageRef: RefObject<HTMLImageElement | null>; videoRef: RefObject<HTMLVideoElement | null>; canvasRef: RefObject<HTMLCanvasElement | null>; viewportRef: RefObject<HTMLDivElement | null>; onPreviewImageLoad: () => void; onHelp: () => void; onCloseHelp: () => void; onStartCamera: () => void; onCapture: () => void; onStopCamera: () => void; onFile: (file?: File) => void; onReset: () => void; onReview: () => void; onChangePatient: () => void; onCapturedAt: (value: string) => void; onWoundAssessment: (value: string) => void; onSave: () => void; saving: boolean }) {
+  return <><section className="replica-camera-selected"><div className="replica-camera-selected-icon"><UserRound aria-hidden="true" /></div><div><span>{language === "th" ? "ผู้ป่วยที่เลือก" : "SELECTED PATIENT"}</span><strong>{selectedPatientRecord?.displayName || selectedPatient?.displayName || selectedPatientRecord?.patientCode || selectedPatient?.patientCode}</strong><small>{selectedPatientRecord?.patientCode || selectedPatient?.patientCode} · {selectedPatientRecord?.registrationLocation || selectedPatient?.registrationLocation}</small></div><button type="button" onClick={onChangePatient}>{language === "th" ? "เปลี่ยนผู้ป่วย" : "Change patient"}</button></section><div className="replica-camera-workspace"><section className="replica-camera-capture panel-card" aria-labelledby="replica-camera-capture-heading"><div className="replica-camera-card-head"><div><span>{language === "th" ? "ขั้นตอนที่ 1" : "STEP 1"}</span><h2 id="replica-camera-capture-heading">{language === "th" ? "ถ่ายภาพแผล" : "Capture wound image"}</h2></div><div className="replica-camera-help-wrap"><button type="button" className="replica-camera-help" aria-label={t("cameraHelp")} aria-expanded={helpOpen} onClick={onHelp}><CircleHelp aria-hidden="true" /></button>{helpOpen && <div className="replica-camera-help-popup" role="dialog"><strong>{t("cameraHelpTitle")}</strong><p>{t("cameraHelpText")}</p><button type="button" onClick={onCloseHelp} aria-label={t("closeHelp")}><X aria-hidden="true" /></button></div>}</div></div><div ref={viewportRef} className={`replica-camera-viewport ${previewUrl ? "has-preview" : ""} ${cameraState === "live" ? "is-live" : ""}`}>{previewUrl ? <><img ref={previewImageRef} src={previewUrl} alt={t("uploadedWoundImage")} onLoad={onPreviewImageLoad} />{inferenceResult && imageLayout && <DetectionOverlay detections={inferenceResult.detections} layout={imageLayout} />}<div className="replica-camera-preview-overlay"><span><FileImage aria-hidden="true" /> {fileName}</span><button type="button" onClick={onReset} aria-label={t("removeImage")}><X aria-hidden="true" /></button></div></> : cameraState === "live" || cameraState === "starting" ? <><video ref={videoRef} className="replica-camera-live-video" autoPlay muted playsInline aria-label={t("cameraLivePreview")} /><div className="replica-camera-frame"><span /><span /><span /><span /></div><div className="replica-camera-live-label"><Video aria-hidden="true" /> {cameraState === "starting" ? t("cameraStarting") : t("cameraLive")}</div></> : <><div className="replica-camera-frame"><span /><span /><span /><span /></div><div className="replica-camera-empty"><div className="replica-camera-lens"><Camera aria-hidden="true" /></div><strong>{cameraState === "error" ? t("cameraPermission") : t("positionWound")}</strong><p>{cameraState === "error" ? cameraError : t("positionWoundDetail")}</p></div><div className="replica-camera-status"><span /> {cameraState === "error" ? t("cameraPermission") : t("cameraReady")}</div></>}</div>{cameraError && cameraState !== "error" && <div className="replica-camera-error" role="alert"><Info aria-hidden="true" /><span>{cameraError}</span></div>}<canvas ref={canvasRef} className="sr-only" aria-hidden="true" /><div className="replica-camera-actions"><input ref={inputRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={(event) => onFile(event.target.files?.[0])} />{previewUrl ? <><Button onClick={onReset} variant="outline" className="replica-secondary-button"><RefreshCcw aria-hidden="true" /> {t("retake")}</Button><Button onClick={onReview} disabled={state === "analyzing"} className="replica-primary-button">{state === "analyzing" ? <><Loader2 className="animate-spin" aria-hidden="true" /> {t("preparing")}</> : <><Sparkles aria-hidden="true" /> {t("reviewImage")}</>}</Button></> : cameraState === "live" ? <><Button onClick={onCapture} className="replica-primary-button"><Camera aria-hidden="true" /> {t("capturePhoto")}</Button><Button onClick={onStopCamera} variant="outline" className="replica-secondary-button"><X aria-hidden="true" /> {t("stopCamera")}</Button></> : <><Button onClick={onStartCamera} disabled={cameraState === "starting"} className="replica-primary-button">{cameraState === "starting" ? <><Loader2 className="animate-spin" aria-hidden="true" /> {t("cameraStarting")}</> : <><Camera aria-hidden="true" /> {t("openCamera")}</>}</Button><Button onClick={() => inputRef.current?.click()} variant="outline" className="replica-secondary-button" aria-label={t("uploadImage")}><Upload aria-hidden="true" /> {t("uploadImage")}</Button></>}</div><p className="replica-camera-privacy"><ShieldCheck aria-hidden="true" /> {t("imagePrivacy")}</p></section><section className="replica-camera-analysis panel-card"><div className="replica-camera-card-head"><div><span>{language === "th" ? "ขั้นตอนที่ 2" : "STEP 2"}</span><h2>{language === "th" ? "ตรวจสอบก่อนวิเคราะห์" : "Review before analysis"}</h2></div><span className={`replica-camera-state ${state === "ready" ? "is-ready" : ""}`}>{state === "ready" ? t("ready") : t("waiting")}</span></div><div className="replica-camera-review-placeholder">{state === "idle" ? <><ImagePlus aria-hidden="true" /><strong>{t("noImageYet")}</strong><p>{t("noImageYetDetail")}</p></> : state === "analyzing" ? <><Loader2 className="animate-spin" aria-hidden="true" /><strong>{t("preparingReview")}</strong><p>{t("preparingReviewDetail")}</p></> : <><Check aria-hidden="true" /><strong>{t("imageReady")}</strong><p>{t("imageReadyDetail")}</p></>}</div>{inferenceResult && <div className="replica-camera-inference" role="status"><div><span>{t("modelSuggestion")}</span><small>{inferenceResult.detections.length} {t("detectionsFound")}</small></div>{inferenceResult.topSuggestion ? <><strong>{inferenceResult.topSuggestion.label.replaceAll("_", " ")}</strong><p>{t("confidence")}: {Math.round(inferenceResult.topSuggestion.confidence * 100)}%</p><em>{inferenceResult.disclaimer}</em></> : <><strong>{t("noDetections")}</strong><em>{inferenceResult.disclaimer}</em></>}</div>}{previewUrl && <PhotoAssignment language={language} t={t} patient={selectedPatientRecord} loading={selectedPatientRecordLoading} woundAssessmentId={woundAssessmentId} capturedAt={capturedAt} onWoundAssessment={onWoundAssessment} onCapturedAt={onCapturedAt} onSave={onSave} saving={saving} />}</section></div></>;
+}
+
+function PhotoAssignment({ language, t, patient, loading, woundAssessmentId, capturedAt, onWoundAssessment, onCapturedAt, onSave, saving }: { language: "th" | "en"; t: (key: string) => string; patient?: { patientCode: string; displayName: string | null; registrationLocation: string; woundAssessments?: Array<{ id: number; woundLabel: string; location: string; assessedOn: string }> }; loading: boolean; woundAssessmentId: string; capturedAt: string; onWoundAssessment: (value: string) => void; onCapturedAt: (value: string) => void; onSave: () => void; saving: boolean }) { const assessments = patient?.woundAssessments ?? []; return <div className="replica-camera-assignment"><div className="replica-camera-assignment-title"><Database aria-hidden="true" /><strong>{language === "th" ? "บันทึกเข้าระเบียนผู้ป่วย" : "Save to patient record"}</strong></div><p>{patient?.patientCode} · {patient?.displayName || (language === "th" ? "ผู้ป่วยที่เลือก" : "Selected patient")}</p><label><span>{t("woundAssessment")}</span><select value={woundAssessmentId} onChange={(event) => onWoundAssessment(event.target.value)} disabled={saving || loading}><option value="">{loading ? t("loadingAssessments") : t("noSpecificAssessment")}</option>{assessments.map((assessment) => <option key={assessment.id} value={assessment.id}>{assessment.woundLabel} · {assessment.location} · {assessment.assessedOn}</option>)}</select></label><label><span>{t("photoDateTime")}</span><input type="datetime-local" value={capturedAt} onChange={(event) => onCapturedAt(event.target.value)} disabled={saving} /></label><Button onClick={onSave} disabled={saving || !capturedAt} className="replica-primary-button">{saving ? <><Loader2 className="animate-spin" aria-hidden="true" /> {t("savingPhoto")}</> : <><Upload aria-hidden="true" /> {t("savePhotoToPatient")}</>}</Button><small>{t("photoAssignmentNote")}</small></div>; }
+
+function DetectionOverlay({ detections, layout }: { detections: InferenceResult["detections"]; layout: ImageLayout }) { const modelScale = Math.min(MODEL_IMAGE_SIZE / layout.naturalWidth, MODEL_IMAGE_SIZE / layout.naturalHeight); const modelOffsetX = (MODEL_IMAGE_SIZE - layout.naturalWidth * modelScale) / 2; const modelOffsetY = (MODEL_IMAGE_SIZE - layout.naturalHeight * modelScale) / 2; const displayScale = Math.min(layout.viewportWidth / layout.naturalWidth, layout.viewportHeight / layout.naturalHeight); const displayOffsetX = (layout.viewportWidth - layout.naturalWidth * displayScale) / 2; const displayOffsetY = (layout.viewportHeight - layout.naturalHeight * displayScale) / 2; return <div className="camera-detection-layer" aria-label={`${detections.length} model detections`} role="img">{detections.map((detection, index) => { const x = displayOffsetX + ((detection.box.x - modelOffsetX) / modelScale) * displayScale; const y = displayOffsetY + ((detection.box.y - modelOffsetY) / modelScale) * displayScale; const width = (detection.box.width / modelScale) * displayScale; const height = (detection.box.height / modelScale) * displayScale; return <div key={`${detection.label}-${index}`} className="camera-detection-box" style={{ left: x, top: y, width, height }} aria-label={`${detection.label.replaceAll("_", " ")} ${Math.round(detection.confidence * 100)} percent`}><span>{detection.label.replaceAll("_", " ")} · {Math.round(detection.confidence * 100)}%</span></div>; })}</div>; }
+
+function diabetesContext(patient: { type1: number; type2: number; gdm: number }, language: "th" | "en") { if (patient.type1) return "Type 1"; if (patient.type2) return "Type 2"; if (patient.gdm) return "GDM"; return language === "th" ? "ไม่ได้บันทึก" : "Not recorded"; }
