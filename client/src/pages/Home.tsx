@@ -51,7 +51,9 @@ function StatusBadge({ status }: { status: string }) {
   return <span className={`status-badge status-${tone}`}><span className="status-dot" />{status}</span>;
 }
 
-export default function Home() {
+type HomeProps = { demoMode?: boolean; params?: unknown };
+
+export default function Home({ demoMode = false }: HomeProps) {
   const { user } = useAuth();
   const { language, t } = useLanguage();
   const dashboardMetrics = [
@@ -74,7 +76,7 @@ export default function Home() {
   }, [query]);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout demoMode={demoMode}>
       <div className="mx-auto w-full max-w-[1500px] space-y-7 px-1 py-1 sm:px-3 lg:px-6 lg:py-4">
         <header className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
           <div>

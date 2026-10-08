@@ -12,8 +12,8 @@ import { Button } from "./ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { isNavItemActive } from "@shared/navigation";
 
-const menuItems = [
-  { icon: LayoutDashboard, label: "overview", path: "/" },
+const buildMenuItems = (demoMode: boolean) => [
+  { icon: LayoutDashboard, label: "overview", path: demoMode ? "/workspace" : "/" },
   { icon: Users, label: "patients", path: "/patients" },
   { icon: Activity, label: "assessments", path: "/assessments" },
   { icon: FileText, label: "reports", path: "/reports" },
@@ -50,6 +50,7 @@ function DashboardLayoutContent({ children, setSidebarWidth, demoMode }: Dashboa
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const menuItems = buildMenuItems(demoMode);
   const activeMenuItem = menuItems.find(item => isNavItemActive(item.path, location));
   const isMobile = useIsMobile();
   const displayUser = user ?? { name: "Dr. Morgan Lee", email: "demo@riverside.health" };
