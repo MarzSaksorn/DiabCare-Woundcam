@@ -182,14 +182,24 @@ export async function getDiabetesPatients(limit = 100) {
   return patients.map((patient) => ({ ...patient, observationCount: countByPatient.get(patient.id) ?? 0 }));
 }
 
-export async function getDiabetesPatientsPage(input: { query?: string; offset: number; limit: number }) {
+type DiabetesContextFilter = "all" | "type1" | "type2" | "gdm";
+
+function diabetesContextWhere(table: typeof diabetesPatients | typeof registeredPatients, context: DiabetesContextFilter) {
+  if (context === "type1") return eq(table.type1, 1);
+  if (context === "type2") return eq(table.type2, 1);
+  if (context === "gdm") return eq(table.gdm, 1);
+  return undefined;
+}
+
+export async function getDiabetesPatientsPage(input: { query?: string; context?: DiabetesContextFilter; offset: number; limit: number }) {
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable");
 
   const query = input.query?.trim();
-  const where = query
-    ? or(ilike(diabetesPatients.age, `%${query}%`), ilike(diabetesPatients.identifyBy, `%${query}%`), ilike(diabetesPatients.sex, `%${query}%`))
-    : undefined;
+  const where = and(
+    diabetesContextWhere(diabetesPatients, input.context ?? "all"),
+    query ? or(ilike(diabetesPatients.age, `%${query}%`), ilike(diabetesPatients.identifyBy, `%${query}%`), ilike(diabetesPatients.sex, `%${query}%`)) : undefined,
+  );
   const [patients, totalRows] = await Promise.all([
     db.select().from(diabetesPatients).where(where).orderBy(asc(diabetesPatients.sourceRowNumber), asc(diabetesPatients.id)).limit(input.limit).offset(input.offset),
     db.select({ count: sql<number>`count(*)` }).from(diabetesPatients).where(where),
@@ -365,13 +375,14 @@ export async function getRegisteredPatients(limit = 100) {
   return patients.map((patient) => ({ ...patient, observationCount: patient.importedPatientId ? countByPatient.get(patient.importedPatientId) ?? 0 : 0 }));
 }
 
-export async function getRegisteredPatientsPage(input: { query?: string; offset: number; limit: number }) {
+export async function getRegisteredPatientsPage(input: { query?: string; context?: DiabetesContextFilter; offset: number; limit: number }) {
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable");
 
   const query = input.query?.trim();
   const where = and(
     isNull(registeredPatients.archivedAt),
+    diabetesContextWhere(registeredPatients, input.context ?? "all"),
     query
       ? or(
           ilike(registeredPatients.patientCode, `%${query}%`),
