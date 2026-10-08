@@ -578,3 +578,35 @@ button { cursor: pointer; }
 .settings-disclaimer p { margin: 0; font-size: 10px; line-height: 1.55; }
 @media (max-width: 680px) { .report-selector-controls, .settings-status-grid { grid-template-columns: 1fr; } .report-profile-grid, .settings-count-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } .report-document-toolbar, .report-document-header, .settings-preference-row { align-items: flex-start; flex-direction: column; } .report-ref { text-align: left; } .settings-signout-button { margin-left: 0; } .report-evidence-row > span { display: none; } }
 @media print { .app-header, .bottom-nav, .no-print { display: none !important; } .mobile-content { padding: 0 !important; } .replica-page { max-width: none; padding: 0; } .report-document { border: 0; box-shadow: none; } .report-document-header { margin-top: 0; } }
+
+/* Direct replica dashboard homepage composition. */
+.replica-home-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+.replica-home-side { display: grid; gap: 16px; }
+.homepage-review-panel { overflow: hidden; }
+.homepage-current-record { display: flex; align-items: center; gap: 11px; margin: 15px 18px 0; border: 1px solid #edf2f7; border-radius: 13px; background: #fbfdff; padding: 12px; transition: border-color .16s ease, background .16s ease; }
+.homepage-current-record:hover { border-color: #93c5fd; background: #f8fbff; }
+.homepage-current-icon { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; border-radius: 11px; background: #eff6ff; color: #0a4fbe; }
+.homepage-current-icon svg { width: 18px; height: 18px; }
+.homepage-current-record > div { min-width: 0; flex: 1; }
+.homepage-record-kicker { display: block; color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .12em; }
+.homepage-current-record strong { display: block; overflow: hidden; margin-top: 3px; color: #16345c; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.homepage-current-record p { overflow: hidden; margin: 3px 0 0; color: #94a3b8; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.homepage-record-date { display: inline-flex; align-items: center; gap: 5px; color: #5e7ea6; font-size: 9px; font-weight: 800; white-space: nowrap; }
+.homepage-record-date svg { width: 13px; height: 13px; }
+.homepage-trend-block { margin: 16px 18px 18px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+.homepage-trend-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.homepage-trend-heading h3 { margin: 4px 0 0; color: #16345c; font-size: 14px; }
+.homepage-trend-tabs { display: inline-flex; gap: 3px; border-radius: 9px; background: #f8fbff; padding: 3px; }
+.homepage-trend-tabs button { border: 0; border-radius: 7px; background: transparent; padding: 5px 8px; color: #94a3b8; font-family: inherit; font-size: 9px; font-weight: 800; }
+.homepage-trend-tabs button.is-active { background: #eff6ff; color: #0a4fbe; }
+.homepage-trend-empty { display: flex; min-height: 130px; flex-direction: column; align-items: center; justify-content: center; margin-top: 11px; border: 1px dashed #dbeafe; border-radius: 13px; background: linear-gradient(180deg, #fbfdff, #f8fbff); padding: 14px; text-align: center; }
+.homepage-trend-empty svg { width: 24px; height: 24px; color: #93c5fd; }
+.homepage-trend-empty strong { margin-top: 7px; color: #16345c; font-size: 11px; }
+.homepage-trend-empty p { max-width: 360px; margin: 4px 0 0; color: #94a3b8; font-size: 10px; line-height: 1.45; }
+.homepage-schedule-empty { display: flex; min-height: 178px; flex-direction: column; align-items: center; justify-content: center; padding: 20px 18px; text-align: center; }
+.homepage-schedule-empty svg { width: 26px; height: 26px; color: #93c5fd; }
+.homepage-schedule-empty strong { margin-top: 9px; color: #16345c; font-size: 11px; }
+.homepage-schedule-empty p { margin: 4px 0 0; color: #94a3b8; font-size: 10px; line-height: 1.45; }
+.homepage-capture-panel .replica-empty-state { min-height: 150px; }
+@media (max-width: 980px) { .replica-home-grid { grid-template-columns: 1fr; } .replica-home-side { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .replica-home-side { grid-template-columns: 1fr; } .homepage-current-record { align-items: flex-start; } .homepage-record-date { display: none; } .homepage-trend-heading { flex-direction: column; } }
