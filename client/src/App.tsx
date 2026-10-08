@@ -6,8 +6,6 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Home from "./pages/Home";
-import LocalLogin from "./pages/LocalLogin";
-import LocalWorkspace from "./pages/LocalWorkspace";
 import PatientRecord from "./pages/PatientRecord";
 import Patients from "./pages/Patients";
 import DiagnosticCamera from "./pages/DiagnosticCamera";
@@ -23,8 +21,7 @@ function Router() {
       <Route path="/patients/registered/:id" component={RegisteredPatientRecord} />
       <Route path={"/patients/:id"} component={PatientRecord} />
       <Route path="/camera" component={DiagnosticCamera} />
-      <Route path="/workspace" component={LocalWorkspace} />
-      <Route path={"/"} component={LocalLogin} />
+      <Route path={"/"} component={Home} />
       <Route path="/patients" component={Patients} />
       <Route path="/assessments" component={DiagnosticCamera} />
       <Route path="/reports" component={Home} />

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>DiabCare Dashboard</title>
+    <script>
+      (function() {
+        try {
+          var originalFetch = window.fetch;
+          var currentFetch = originalFetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() {
+              return currentFetch;
+            },
+            set: function(value) {
+              currentFetch = value;
+            },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {
+          console.warn("Could not polyfill window.fetch setter: ", e);
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-CjqjVV4H.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BuEJWz0O.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
