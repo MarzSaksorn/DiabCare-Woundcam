@@ -66,6 +66,8 @@ The development server starts the Express/tRPC backend and Vite frontend togethe
 
 When `NODE_ENV=development`, the app uses a clearly labeled synthetic **Local Clinician** identity by default, so a local checkout does not redirect to Manus OAuth. This bypass is development-only; set `LOCAL_AUTH_BYPASS=false` to test the unauthenticated flow. Production keeps Manus authentication enabled unless `LOCAL_AUTH_BYPASS=true` is explicitly set.
 
+For the training preview, set `DISABLE_LOGIN_PAGE=true` to keep the development identity active even when `LOCAL_AUTH_BYPASS=false`. The flag is development-only and production startup rejects it. Do not use this mode on a shared or untrusted network with clinical data.
+
 ## Docker Compose
 
 `Dockerfile` builds the Vite frontend and Express/tRPC backend together. The runtime image includes the checked-in ONNX wound detector under `dist/models`, so the browser UI, API, and local YOLO inference run as one service. The database is intentionally not bundled: configure the server-only `SUPABASE_DATABASE_URL` for the approved Supabase PostgreSQL connection rather than creating a second copy of clinical data in a local container.
