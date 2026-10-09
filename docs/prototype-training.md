@@ -63,6 +63,61 @@ V  = Venous wound
 
 Body-map metadata is not silently folded into the image-only baseline. A later multimodal model can consume it as a separate input after the metadata schema is finalized.
 
+## Roboflow detector fine-tuning
+
+The Roboflow upload is a valid Ultralytics detector checkpoint with the same
+five class order used by the website:
+
+```text
+0 callus_corn
+1 dfu_ulcer
+2 infected_wound
+3 necrotic_wound
+4 normal_foot
+```
+
+The uploaded file is a `best.pt` checkpoint. It contains model weights but no
+optimizer state, so it can be fine-tuned from those weights. It is **not** a
+full epoch-and-optimizer resume checkpoint. Use a later Ultralytics `last.pt`
+with `--resume` only when that file contains the original training state.
+
+The Roboflow export must also include a private YOLO dataset with `data.yaml`
+and matching `images/` and `labels/` directories. The command validates class
+order, image/label pairs, class IDs, and normalized bounding boxes before it
+starts training.
+
+Validate the dataset without training first:
+
+```bash
+python scripts/train_detector.py \
+  --weights /private-data/roboflow-detector-source/best.pt \
+  --data /private-data/roboflow-wound-dataset/data.yaml \
+  --output /private-data/roboflow-detector-artifacts \
+  --allow-source-split \
+  --dry-run
+```
+
+After the dry run passes, fine-tune the checkpoint:
+
+```bash
+python scripts/train_detector.py \
+  --weights /private-data/roboflow-detector-source/best.pt \
+  --data /private-data/roboflow-wound-dataset/data.yaml \
+  --output /private-data/roboflow-detector-artifacts \
+  --name woundcam-detector-finetune-01 \
+  --allow-source-split \
+  --epochs 20 \
+  --imgsz 640 \
+  --batch 8 \
+  --device cpu
+```
+
+The command writes the Ultralytics run directory and a `training-manifest.json`
+containing checkpoint and dataset hashes, split counts, class order, and the
+research-only warning. Do not copy the resulting checkpoint into
+`server/models` until it has independent evaluation and explicit integration
+review.
+
 ## Output contract
 
 Each run writes:
