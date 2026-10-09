@@ -64,7 +64,7 @@ pnpm dev
 
 The development server starts the Express/tRPC backend and Vite frontend together. The application requires authentication before protected patient and assessment workflows can be opened.
 
-When `NODE_ENV=development`, the app uses a clearly labeled synthetic **Local Clinician** identity by default, so a local checkout does not redirect to Manus OAuth. This bypass is development-only; set `LOCAL_AUTH_BYPASS=false` to test the unauthenticated flow. Production keeps Manus authentication enabled unless `LOCAL_AUTH_BYPASS=true` is explicitly set.
+When `NODE_ENV=development`, the app uses a clearly labeled synthetic **Local Clinician** identity by default, so a local checkout does not redirect to Manus OAuth. This bypass is development-only; set `LOCAL_AUTH_BYPASS=false` to test the unauthenticated flow. Production always keeps Manus authentication enabled and rejects bypass flags.
 
 For the training preview, set `DISABLE_LOGIN_PAGE=true` to keep the development identity active even when `LOCAL_AUTH_BYPASS=false`. The flag is development-only and production startup rejects it. Do not use this mode on a shared or untrusted network with clinical data.
 
