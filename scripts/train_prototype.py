@@ -220,6 +220,27 @@ def split_train_validation(items: list, seed: int, validation_fraction: float = 
     return shuffled[validation_count:], shuffled[:validation_count]
 
 
+def restore_checkpoint(
+    model: nn.Module,
+    optimizer: torch.optim.Optimizer,
+    resume_path: Path | None,
+    device: torch.device,
+) -> tuple[int, float, list[dict]]:
+    """Restore a prototype checkpoint, tolerating older model-only checkpoints."""
+    if resume_path is None:
+        return 1, float("inf"), []
+    if not resume_path.exists():
+        raise PrototypeError(f"resume checkpoint does not exist: {resume_path}")
+    checkpoint = torch.load(resume_path, map_location=device, weights_only=True)
+    model.load_state_dict(checkpoint["model_state_dict"])
+    if checkpoint.get("optimizer_state_dict"):
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    next_epoch = int(checkpoint.get("epoch", 0)) + 1
+    best_validation_loss = float(checkpoint.get("best_validation_loss", float("inf")))
+    history = list(checkpoint.get("history", []))
+    return next_epoch, best_validation_loss, history
+
+
 def wound_pairs(root: Path, split: str) -> list[tuple[Path, Path]]:
     image_root = root / split / "images"
     label_root = root / split / "labels"
@@ -346,9 +367,9 @@ def train_segmentation(args: argparse.Namespace) -> dict:
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
     output_dir = Path(args.output_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    best = float("inf")
-    history = []
-    for epoch in range(1, args.epochs + 1):
+    resume_path = Path(args.resume).resolve() if args.resume else None
+    start_epoch, best, history = restore_checkpoint(model, optimizer, resume_path, device)
+    for epoch in range(start_epoch, start_epoch + args.epochs):
         model.train()
         losses = []
         for images, masks in train_loader:
@@ -362,9 +383,21 @@ def train_segmentation(args: argparse.Namespace) -> dict:
         row = {"epoch": epoch, "train_loss": float(np.mean(losses)), "validation": validation}
         history.append(row)
         print(json.dumps(row), flush=True)
-        if validation["loss"] < best:
+        is_best = validation["loss"] < best
+        if is_best:
             best = validation["loss"]
-            torch.save({"model_state_dict": model.state_dict(), "classes": classes, "class_names": class_names}, output_dir / "best.pt")
+        checkpoint = {
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "classes": classes,
+            "class_names": class_names,
+            "epoch": epoch,
+            "best_validation_loss": best,
+            "history": history,
+        }
+        torch.save(checkpoint, output_dir / "last.pt")
+        if is_best:
+            torch.save(checkpoint, output_dir / "best.pt")
     checkpoint = torch.load(output_dir / "best.pt", map_location=device, weights_only=True)
     model.load_state_dict(checkpoint["model_state_dict"])
     test = evaluate_segmentation(model, test_loader, device, multiclass, classes)
@@ -376,6 +409,7 @@ def train_segmentation(args: argparse.Namespace) -> dict:
         "classes": class_names,
         "history": history,
         "test_metrics": test,
+        "resumed_from": str(resume_path) if resume_path else None,
         "prototype_warning": "Uses source-provided splits and is not patient-leakage-safe; not for clinical decisions.",
     }
     (output_dir / "metrics.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
@@ -431,9 +465,9 @@ def train_classification(args: argparse.Namespace) -> dict:
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
     output_dir = Path(args.output_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    best = float("inf")
-    history = []
-    for epoch in range(1, args.epochs + 1):
+    resume_path = Path(args.resume).resolve() if args.resume else None
+    start_epoch, best, history = restore_checkpoint(model, optimizer, resume_path, device)
+    for epoch in range(start_epoch, start_epoch + args.epochs):
         model.train()
         losses = []
         for images, labels in train_loader:
@@ -447,9 +481,20 @@ def train_classification(args: argparse.Namespace) -> dict:
         row = {"epoch": epoch, "train_loss": float(np.mean(losses)), "validation": validation}
         history.append(row)
         print(json.dumps(row), flush=True)
-        if validation["loss"] < best:
+        is_best = validation["loss"] < best
+        if is_best:
             best = validation["loss"]
-            torch.save({"model_state_dict": model.state_dict(), "class_names": class_names}, output_dir / "best.pt")
+        checkpoint = {
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "class_names": class_names,
+            "epoch": epoch,
+            "best_validation_loss": best,
+            "history": history,
+        }
+        torch.save(checkpoint, output_dir / "last.pt")
+        if is_best:
+            torch.save(checkpoint, output_dir / "best.pt")
     checkpoint = torch.load(output_dir / "best.pt", map_location=device, weights_only=True)
     model.load_state_dict(checkpoint["model_state_dict"])
     test = evaluate_classification(model, test_loader, device, len(class_names))
@@ -461,6 +506,7 @@ def train_classification(args: argparse.Namespace) -> dict:
         "classes": class_names,
         "history": history,
         "test_metrics": test,
+        "resumed_from": str(resume_path) if resume_path else None,
         "prototype_warning": "Uses source-provided splits and is not patient-leakage-safe; labels are source-native and not a medical diagnosis.",
     }
     (output_dir / "metrics.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
@@ -483,6 +529,7 @@ def build_parser() -> argparse.ArgumentParser:
         sub.add_argument("--seed", type=int, default=42)
         sub.add_argument("--device", default="auto")
         sub.add_argument("--max-train", type=int, default=0)
+        sub.add_argument("--resume", type=Path, default=None, help="resume from a prior best.pt or last.pt checkpoint")
     sub = subparsers.add_parser("classification")
     sub.set_defaults(task="classification", handler=train_classification)
     sub.add_argument("--source-root", required=True, type=Path)
@@ -495,6 +542,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_argument("--seed", type=int, default=42)
     sub.add_argument("--device", default="auto")
     sub.add_argument("--max-train", type=int, default=0)
+    sub.add_argument("--resume", type=Path, default=None, help="resume from a prior best.pt or last.pt checkpoint")
     return parser
 
 

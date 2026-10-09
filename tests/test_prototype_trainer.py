@@ -1,11 +1,12 @@
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from train_prototype import SmallClassifier, SmallUNet, segmentation_loss  # noqa: E402
+from train_prototype import SmallClassifier, SmallUNet, restore_checkpoint, segmentation_loss  # noqa: E402
 
 
 class PrototypeTrainerTests(unittest.TestCase):
@@ -33,6 +34,26 @@ class PrototypeTrainerTests(unittest.TestCase):
         model = SmallClassifier(6)
         logits = model(torch.randn(2, 3, 64, 64))
         self.assertEqual(tuple(logits.shape), (2, 6))
+
+    def test_checkpoint_resume_restores_epoch_and_optimizer(self) -> None:
+        model = SmallClassifier(6)
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+        with tempfile.TemporaryDirectory() as directory:
+            checkpoint = Path(directory) / "last.pt"
+            torch.save(
+                {
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "epoch": 4,
+                    "best_validation_loss": 0.75,
+                    "history": [{"epoch": 4}],
+                },
+                checkpoint,
+            )
+            next_epoch, best, history = restore_checkpoint(model, optimizer, checkpoint, torch.device("cpu"))
+        self.assertEqual(next_epoch, 5)
+        self.assertEqual(best, 0.75)
+        self.assertEqual(history, [{"epoch": 4}])
 
 
 if __name__ == "__main__":

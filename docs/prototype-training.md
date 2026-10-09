@@ -59,4 +59,19 @@ Each run writes:
 - `best.pt`: PyTorch checkpoint
 - `metrics.json`: config, source split counts, history, test metrics, and prototype warning
 
+## Continuing training
+
+Pass `--resume` with `last.pt` to continue from the latest completed epoch. The
+trainer restores the model, optimizer, best validation loss, and history. Older
+model-only checkpoints are also accepted; those resume with a fresh optimizer.
+
+```bash
+python scripts/train_prototype.py classification \
+  --source-root /private-data/diabcare-staging/azh-multimodal \
+  --output-dir /private-data/diabcare-artifacts/azh-classification-prototype \
+  --allow-source-split \
+  --epochs 5 \
+  --resume /private-data/diabcare-artifacts/azh-classification-prototype/last.pt
+```
+
 The output is for development and basic decision support only. It is not a diagnosis, treatment recommendation, triage decision, or substitute for a clinician. Do not use it for patient care until patient-grouped evaluation, external validation, calibration, bias analysis, and clinical review are complete.
