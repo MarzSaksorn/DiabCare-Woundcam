@@ -72,9 +72,43 @@ Each run writes:
 
 ## Continuing training
 
-Pass `--resume` with `last.pt` to continue from the latest completed epoch. The
-trainer restores the model, optimizer, best validation loss, and history. Older
-model-only checkpoints are also accepted; those resume with a fresh optimizer.
+The repository includes a convenience wrapper that selects the current private
+dataset root, prefers `last.pt`, restores the optimizer and history, and writes a
+timestamped continuation log. Run it from the repository root:
+
+```bash
+scripts/continue_prototype_training.sh classification --epochs 5
+scripts/continue_prototype_training.sh tissue-segmentation --epochs 5
+scripts/continue_prototype_training.sh wound-segmentation --epochs 5
+```
+
+Each `--epochs` value means **additional epochs**, not a final total. The
+wrapper defaults to the private staging and artifact paths used in this
+workspace. On another machine, set `DIABCARE_STAGING_ROOT` and
+`DIABCARE_ARTIFACT_ROOT`, or override the paths directly:
+
+```bash
+DIABCARE_STAGING_ROOT=/private-data/diabcare-staging \
+DIABCARE_ARTIFACT_ROOT=/private-data/diabcare-artifacts \
+scripts/continue_prototype_training.sh classification --epochs 10
+```
+
+Useful overrides include:
+
+```bash
+scripts/continue_prototype_training.sh classification \
+  --epochs 5 \
+  --device cpu \
+  --output-dir /private-data/diabcare-artifacts/azh-classification-prototype \
+  --resume /private-data/diabcare-artifacts/azh-classification-prototype/last.pt
+```
+
+The wrapper requires an existing `last.pt` or `best.pt`. It fails closed when
+the dataset or checkpoint path is missing. It always passes
+`--allow-source-split` because these uploaded archives do not contain reliable
+patient or wound grouping IDs.
+
+The equivalent direct command is:
 
 ```bash
 python scripts/train_prototype.py classification \
@@ -84,5 +118,11 @@ python scripts/train_prototype.py classification \
   --epochs 5 \
   --resume /private-data/diabcare-artifacts/azh-classification-prototype/last.pt
 ```
+
+The trainer restores the model, optimizer, best validation loss, and history.
+Older model-only checkpoints are also accepted; those resume with a fresh
+optimizer. Each run updates `last.pt`, updates `best.pt` only when validation
+loss improves, rewrites `metrics.json`, and stores the console output in a
+timestamped `.log` file when launched through the wrapper.
 
 The output is for development and basic decision support only. It is not a diagnosis, treatment recommendation, triage decision, or substitute for a clinician. Do not use it for patient care until patient-grouped evaluation, external validation, calibration, bias analysis, and clinical review are complete.
