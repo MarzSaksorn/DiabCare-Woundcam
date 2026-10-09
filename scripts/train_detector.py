@@ -62,9 +62,20 @@ def load_data_yaml(path: Path) -> dict[str, Any]:
 
 def resolve_split_path(value: str | Path, data_yaml: Path, root: Path | None) -> Path:
     path = Path(value)
-    if not path.is_absolute():
-        path = (root if root is not None else data_yaml.parent) / path
-    return path.resolve()
+    if path.is_absolute():
+        return path.resolve()
+    bases = [root] if root is not None else []
+    bases.append(data_yaml.parent)
+    candidates = [(base / path).resolve() for base in bases]
+    # Roboflow exports sometimes keep data.yaml beside train/valid/test but
+    # retain ../ prefixes from the source project layout.
+    if path.parts and path.parts[0] == "..":
+        stripped = Path(*path.parts[1:])
+        candidates.extend((base / stripped).resolve() for base in bases)
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
 
 
 def image_files(directory: Path) -> list[Path]:
@@ -91,7 +102,9 @@ def audit_split(split: str, image_directory: Path) -> dict[str, int | str]:
         raise DetectorDataError(f"{split} image directory is empty: {image_directory}")
     missing_labels: list[str] = []
     invalid_rows: list[str] = []
-    box_count = 0
+    object_count = 0
+    bbox_count = 0
+    polygon_count = 0
     for image in images:
         label = labels / f"{image.stem}.txt"
         if not label.exists():
@@ -102,26 +115,52 @@ def audit_split(split: str, image_directory: Path) -> dict[str, int | str]:
             if not line:
                 continue
             fields = line.split()
-            if len(fields) != 5:
+            if len(fields) == 5:
+                row_kind = "bbox"
+            elif len(fields) >= 7 and len(fields) % 2 == 1:
+                row_kind = "polygon"
+            else:
                 invalid_rows.append(f"{label}:{line_number}")
                 continue
             try:
-                class_id, x_center, y_center, width, height = map(float, fields)
+                values = list(map(float, fields))
             except ValueError:
                 invalid_rows.append(f"{label}:{line_number}")
                 continue
+            class_id = values[0]
             if class_id != int(class_id) or not 0 <= int(class_id) < len(EXPECTED_NAMES):
                 invalid_rows.append(f"{label}:{line_number}")
                 continue
-            if not all(0 <= value <= 1 for value in (x_center, y_center, width, height)) or width <= 0 or height <= 0:
+            coordinates = values[1:]
+            if not all(0 <= value <= 1 for value in coordinates):
                 invalid_rows.append(f"{label}:{line_number}")
                 continue
-            box_count += 1
+            if row_kind == "bbox":
+                _, _, width, height = coordinates
+                if width <= 0 or height <= 0:
+                    invalid_rows.append(f"{label}:{line_number}")
+                    continue
+                bbox_count += 1
+            else:
+                x_values = coordinates[0::2]
+                y_values = coordinates[1::2]
+                if len(x_values) < 3 or max(x_values) <= min(x_values) or max(y_values) <= min(y_values):
+                    invalid_rows.append(f"{label}:{line_number}")
+                    continue
+                polygon_count += 1
+            object_count += 1
     if missing_labels:
         raise DetectorDataError(f"{split}: {len(missing_labels)} images have no label file; examples: {missing_labels[:5]}")
     if invalid_rows:
         raise DetectorDataError(f"{split}: {len(invalid_rows)} invalid YOLO label rows; examples: {invalid_rows[:5]}")
-    return {"images": len(images), "boxes": box_count, "image_dir": str(image_directory), "label_dir": str(labels)}
+    return {
+        "images": len(images),
+        "objects": object_count,
+        "bbox_rows": bbox_count,
+        "polygon_rows": polygon_count,
+        "image_dir": str(image_directory),
+        "label_dir": str(labels),
+    }
 
 
 def audit_dataset(data_yaml_path: Path, data: dict[str, Any], root: Path | None) -> dict[str, Any]:
@@ -198,7 +237,7 @@ def main() -> int:
         data=str(data_yaml),
         project=str(output),
         name=args.name,
-        exist_ok=False,
+        exist_ok=args.resume,
         epochs=args.epochs,
         imgsz=args.imgsz,
         batch=args.batch,

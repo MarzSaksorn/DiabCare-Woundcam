@@ -82,33 +82,103 @@ full epoch-and-optimizer resume checkpoint. Use a later Ultralytics `last.pt`
 with `--resume` only when that file contains the original training state.
 
 The Roboflow export must also include a private YOLO dataset with `data.yaml`
-and matching `images/` and `labels/` directories. The command validates class
-order, image/label pairs, class IDs, and normalized bounding boxes before it
-starts training.
+and matching `images/` and `labels/` directories. Roboflow may export either
+five-field bounding-box rows or polygon rows. The detector trainer accepts both
+but the safest local workflow first converts polygons into a separate detector
+copy. It preserves the original export and writes only tight normalized boxes
+to the derived copy.
 
-Validate the dataset without training first:
+### Local Linux setup
+
+From the repository root, create a dedicated environment. For CPU training,
+install Torch and TorchVision from the same CPU index before the remaining
+requirements. Mixing a CPU Torch build with a CUDA TorchVision wheel causes an
+`operator torchvision::nms does not exist` error during validation.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
+python -m pip install -r requirements-training.txt
+```
+
+For GPU training, install a matching Torch/TorchVision pair from the official
+PyTorch selector instead, then install `requirements-training.txt`.
+
+Extract the Roboflow ZIP privately. Do not commit this directory:
+
+```bash
+mkdir -p "$HOME/datasets/DiabCareWoundCam-v1"
+unzip -q /path/to/DiabCareWoundCam.v1i.yolov8.zip \
+  -d "$HOME/datasets/DiabCareWoundCam-v1"
+```
+
+Convert Roboflow polygon annotations to detector boxes:
+
+```bash
+python scripts/prepare_detector_boxes.py \
+  --source-root "$HOME/datasets/DiabCareWoundCam-v1" \
+  --data "$HOME/datasets/DiabCareWoundCam-v1/data.yaml" \
+  --output-root "$HOME/datasets/DiabCareWoundCam-v1-bbox"
+```
+
+Copy the uploaded checkpoint to a private model directory:
+
+```bash
+mkdir -p "$HOME/models/diabcare"
+cp /path/to/best.pt "$HOME/models/diabcare/roboflow-best.pt"
+chmod 600 "$HOME/models/diabcare/roboflow-best.pt"
+```
+
+Validate the derived dataset without training first:
 
 ```bash
 python scripts/train_detector.py \
-  --weights /private-data/roboflow-detector-source/best.pt \
-  --data /private-data/roboflow-wound-dataset/data.yaml \
-  --output /private-data/roboflow-detector-artifacts \
+  --weights "$HOME/models/diabcare/roboflow-best.pt" \
+  --data "$HOME/datasets/DiabCareWoundCam-v1-bbox/data.yaml" \
+  --output "$HOME/models/diabcare/runs" \
   --allow-source-split \
   --dry-run
 ```
 
-After the dry run passes, fine-tune the checkpoint:
+After the dry run passes, fine-tune the checkpoint. On a CPU, keep
+`--workers 0`. On a GPU, use `--device 0` and adjust `--batch` to fit memory:
 
 ```bash
 python scripts/train_detector.py \
-  --weights /private-data/roboflow-detector-source/best.pt \
-  --data /private-data/roboflow-wound-dataset/data.yaml \
-  --output /private-data/roboflow-detector-artifacts \
+  --weights "$HOME/models/diabcare/roboflow-best.pt" \
+  --data "$HOME/datasets/DiabCareWoundCam-v1-bbox/data.yaml" \
+  --output "$HOME/models/diabcare/runs" \
   --name woundcam-detector-finetune-01 \
   --allow-source-split \
   --epochs 20 \
   --imgsz 640 \
   --batch 8 \
+  --workers 0 \
+  --device cpu
+```
+
+For a long local run, start the command inside `tmux` so closing the terminal
+doesn’t stop training:
+
+```bash
+tmux new -s woundcam-detector
+# run the command above, then press Ctrl-b followed by d to detach
+tmux attach -t woundcam-detector
+```
+
+To continue a completed run, use its full Ultralytics `last.pt`, keep the same
+run name, and add `--resume`:
+
+```bash
+python scripts/train_detector.py \
+  --weights "$HOME/models/diabcare/runs/woundcam-detector-finetune-01/weights/last.pt" \
+  --data "$HOME/datasets/DiabCareWoundCam-v1-bbox/data.yaml" \
+  --output "$HOME/models/diabcare/runs" \
+  --name woundcam-detector-finetune-01 \
+  --allow-source-split \
+  --resume \
   --device cpu
 ```
 
