@@ -6,7 +6,7 @@ import unittest
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from train_prototype import SmallClassifier, SmallUNet, restore_checkpoint, segmentation_loss  # noqa: E402
+from train_prototype import AZH_CLASS_LABELS, SmallClassifier, SmallUNet, restore_checkpoint, segmentation_loss  # noqa: E402
 
 
 class PrototypeTrainerTests(unittest.TestCase):
@@ -34,6 +34,14 @@ class PrototypeTrainerTests(unittest.TestCase):
         model = SmallClassifier(6)
         logits = model(torch.randn(2, 3, 64, 64))
         self.assertEqual(tuple(logits.shape), (2, 6))
+
+    def test_azh_label_mapping(self) -> None:
+        self.assertEqual(AZH_CLASS_LABELS["BG"], "Background")
+        self.assertEqual(AZH_CLASS_LABELS["N"], "Normal skin")
+        self.assertEqual(AZH_CLASS_LABELS["D"], "Diabetic wound")
+        self.assertEqual(AZH_CLASS_LABELS["P"], "Pressure wound")
+        self.assertEqual(AZH_CLASS_LABELS["S"], "Surgical wound")
+        self.assertEqual(AZH_CLASS_LABELS["V"], "Venous wound")
 
     def test_checkpoint_resume_restores_epoch_and_optimizer(self) -> None:
         model = SmallClassifier(6)

@@ -24,6 +24,14 @@ from torch.utils.data import DataLoader, Dataset
 
 
 IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp", ".webp")
+AZH_CLASS_LABELS = {
+    "BG": "Background",
+    "N": "Normal skin",
+    "D": "Diabetic wound",
+    "P": "Pressure wound",
+    "S": "Surgical wound",
+    "V": "Venous wound",
+}
 
 
 @dataclass(frozen=True)
@@ -448,6 +456,7 @@ def train_classification(args: argparse.Namespace) -> dict:
     seed_everything(args.seed)
     source_root = Path(args.source_root).resolve()
     class_names = ["BG", "D", "N", "P", "S", "V"]
+    class_label_map = {name: AZH_CLASS_LABELS[name] for name in class_names}
     train_records = azh_classification_records(source_root, "Train", class_names)
     test_records = azh_classification_records(source_root, "Test", class_names)
     train_records, validation_records = split_train_validation(train_records, args.seed)
@@ -488,6 +497,7 @@ def train_classification(args: argparse.Namespace) -> dict:
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "class_names": class_names,
+            "class_label_map": class_label_map,
             "epoch": epoch,
             "best_validation_loss": best,
             "history": history,
@@ -504,6 +514,7 @@ def train_classification(args: argparse.Namespace) -> dict:
         "validation_records": len(validation_records),
         "test_records": len(test_records),
         "classes": class_names,
+        "class_label_map": class_label_map,
         "history": history,
         "test_metrics": test,
         "resumed_from": str(resume_path) if resume_path else None,

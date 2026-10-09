@@ -50,7 +50,18 @@ python scripts/train_prototype.py classification \
   --batch-size 32
 ```
 
-The classifier preserves the source-native folder labels `BG`, `D`, `N`, `P`, `S`, and `V`. Body-map metadata is not silently folded into the image-only baseline. A later multimodal model can consume it as a separate input after the metadata schema is finalized.
+The classifier preserves the source-native folder labels `BG`, `D`, `N`, `P`, `S`, and `V`, and stores this display mapping in `metrics.json` and the checkpoint:
+
+```text
+BG = Background
+N  = Normal skin
+D  = Diabetic wound
+P  = Pressure wound
+S  = Surgical wound
+V  = Venous wound
+```
+
+Body-map metadata is not silently folded into the image-only baseline. A later multimodal model can consume it as a separate input after the metadata schema is finalized.
 
 ## Output contract
 
