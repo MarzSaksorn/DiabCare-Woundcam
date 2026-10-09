@@ -889,15 +889,25 @@ button { cursor: pointer; }
 .replica-camera-inference > p { margin: 3px 0 0; color: #0a4fbe; font-size: 10px; font-weight: 800; }
 .replica-camera-inference > em { display: block; margin-top: 7px; color: #64748b; font-size: 9px; font-style: normal; line-height: 1.45; }
 .replica-camera-regions { display: grid; gap: 8px; margin-top: 10px; }
-.replica-camera-regions-heading { display: grid; gap: 3px; }
-.replica-camera-regions-heading strong { color: #16345c; font-size: 11px; }
-.replica-camera-regions-heading small { color: #64748b; font-size: 9px; line-height: 1.4; }
-.replica-camera-region-card { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; border: 1px solid #dbeafe; border-radius: 11px; background: #fbfdff; padding: 10px; }
-.replica-camera-region-card > div { display: grid; align-content: start; gap: 3px; min-width: 0; }
-.replica-camera-region-card span { color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
-.replica-camera-region-card strong { overflow-wrap: anywhere; color: #16345c; font-size: 11px; }
-.replica-camera-region-card small { color: #64748b; font-size: 9px; line-height: 1.35; }
-.replica-camera-region-card em { grid-column: 1 / -1; border-top: 1px solid #e5edf7; padding-top: 7px; color: #64748b; font-size: 8px; font-style: normal; line-height: 1.4; }
+.replica-camera-regions-heading { display: flex; align-items: end; justify-content: space-between; gap: 10px; }
+.replica-camera-regions-heading > div { display: grid; gap: 3px; }
+.replica-camera-regions-heading span { color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .08em; }
+.replica-camera-regions-heading strong { color: #16345c; font-size: 12px; }
+.replica-camera-regions-heading small { color: #64748b; font-size: 9px; line-height: 1.4; text-align: right; }
+.replica-camera-region-card { display: grid; gap: 10px; border: 1px solid #dbeafe; border-radius: 11px; background: #fbfdff; padding: 10px; }
+.replica-camera-region-header { display: flex; align-items: start; justify-content: space-between; gap: 8px; border-bottom: 1px solid #e5edf7; padding-bottom: 8px; }
+.replica-camera-region-header > div { display: grid; gap: 3px; min-width: 0; }
+.replica-camera-region-header span, .replica-camera-region-model span { color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.replica-camera-region-header strong, .replica-camera-region-model strong { overflow-wrap: anywhere; color: #16345c; font-size: 11px; }
+.replica-camera-region-header small, .replica-camera-region-model small { color: #64748b; font-size: 9px; line-height: 1.35; }
+.replica-camera-region-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.replica-camera-region-model { display: grid; align-content: start; gap: 3px; min-width: 0; }
+.replica-camera-probabilities { display: grid; gap: 5px; border-top: 1px solid #e5edf7; padding-top: 9px; }
+.replica-camera-probability { display: grid; grid-template-columns: 25px 1fr 32px; align-items: center; gap: 6px; color: #64748b; font-size: 8px; font-weight: 800; }
+.replica-camera-probability > strong { color: #16345c; font-size: 8px; text-align: right; }
+.replica-camera-probability-track { height: 6px; overflow: hidden; border-radius: 999px; background: #e7eef7; }
+.replica-camera-probability-track > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #0a4fbe, #4f8fe8); }
+.replica-camera-region-card em { border-top: 1px solid #e5edf7; padding-top: 7px; color: #64748b; font-size: 8px; font-style: normal; line-height: 1.4; }
 .replica-camera-assignment { margin-top: 11px; border: 1px solid #dbeafe; border-radius: 12px; background: #fbfdff; padding: 12px; }
 .replica-camera-assignment-title { display: flex; align-items: center; gap: 7px; color: #0a4fbe; }
 .replica-camera-assignment-title svg { width: 15px; height: 15px; }
@@ -909,4 +919,4 @@ button { cursor: pointer; }
 .replica-camera-assignment > small { display: block; margin-top: 7px; color: #94a3b8; font-size: 8px; line-height: 1.45; }
 .replica-camera-page .camera-history-card { margin-top: 15px; border-radius: 16px; padding: 17px; }
 @media (max-width: 840px) { .replica-camera-workspace { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .replica-camera-page { padding: 0 0 22px; } .replica-camera-header { align-items: flex-start; flex-direction: column; gap: 8px; } .replica-camera-brand { align-self: flex-start; } .replica-camera-notice { align-items: flex-start; } .replica-camera-notice > span { display: none; } .replica-camera-viewport, .replica-camera-viewport img, .replica-camera-live-video { min-height: 330px; } .replica-camera-capture, .replica-camera-analysis { padding: 14px; } .replica-camera-selected { align-items: flex-start; } .replica-camera-selected button { padding: 6px; } }
+@media (max-width: 560px) { .replica-camera-page { padding: 0 0 22px; } .replica-camera-header { align-items: flex-start; flex-direction: column; gap: 8px; } .replica-camera-brand { align-self: flex-start; } .replica-camera-notice { align-items: flex-start; } .replica-camera-notice > span { display: none; } .replica-camera-viewport, .replica-camera-viewport img, .replica-camera-live-video { min-height: 330px; } .replica-camera-capture, .replica-camera-analysis { padding: 14px; } .replica-camera-selected { align-items: flex-start; } .replica-camera-selected button { padding: 6px; } .replica-camera-regions-heading { align-items: start; flex-direction: column; } .replica-camera-regions-heading small { text-align: left; } .replica-camera-region-summary { grid-template-columns: 1fr; } }
