@@ -1,0 +1,10 @@
+# Install in a dedicated training environment, not the web runtime.
+Pillow>=10.4,<13
+PyYAML>=6.0,<7
+numpy>=1.26,<3
+scikit-learn>=1.5,<2
+imagehash>=4.3,<5
+# Install a CUDA-matched torch build separately when GPU training is available.
+torch>=2.4,<3
+torchvision>=0.19,<1
+ultralytics>=8.3,<9

@@ -1,0 +1,41 @@
+# Source-native registry. Raw roots are local or approved object-storage paths.
+# Replace only after the owner-approved archives are staged.
+
+sources:
+  DFUC2020:
+    version: "2020"
+    task: detection
+    annotations: bounding_boxes
+    patient_key_required: true
+    access: owner_request_noncommercial
+  DFUC2021:
+    version: "2021"
+    task: classification
+    annotations: image_level_four_class
+    patient_key_required: true
+    access: owner_agreement
+  Zivot:
+    version: "current_owner_release"
+    task: detection
+    modalities: [rgb, depth, thermal]
+    annotations: bounding_boxes_and_case_metadata
+    patient_key_required: true
+    access: selected_institution_request
+  DFUTissue:
+    version: "UWM_AZH_original"
+    task: segmentation
+    annotations: pixel_masks
+    patient_key_required: true
+    access: owner_terms_required
+  AZH:
+    version: "730_image_release"
+    task: classification
+    annotations: wound_type_and_body_map_location
+    patient_key_required: true
+    access: owner_terms_required
+  DFU-fewshot-146:
+    version: "146_original_images"
+    task: classification
+    annotations: three_class_severity
+    patient_key_required: true
+    access: author_request
