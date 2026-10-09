@@ -14,6 +14,7 @@ describe("wound inference", () => {
     expect(result.task).toBe("detect");
     expect(result.disclaimer).toContain("clinician review");
     expect(Array.isArray(result.detections)).toBe(true);
+    expect(result.regions).toHaveLength(result.detections.length);
     expect(result.detections.every((item) => ["callus_corn", "dfu_ulcer", "infected_wound", "necrotic_wound", "normal_foot"].includes(item.label))).toBe(true);
     expect(result.detections.every((item) => item.confidence >= 0.25 && item.confidence <= 1)).toBe(true);
     expect(result.detections.every((item) => item.box.x >= 0 && item.box.y >= 0 && item.box.width >= 0 && item.box.height >= 0)).toBe(true);

@@ -1,0 +1,57 @@
+{
+  "model": "azh-classifier",
+  "task": "classification",
+  "format": "onnx",
+  "opset": 17,
+  "input": {
+    "name": "images",
+    "shape": [
+      "batch",
+      3,
+      128,
+      128
+    ],
+    "color_order": "RGB",
+    "normalization": "pixel / 255"
+  },
+  "output": {
+    "name": "logits",
+    "shape": [
+      "batch",
+      6
+    ]
+  },
+  "classes": [
+    "BG",
+    "D",
+    "N",
+    "P",
+    "S",
+    "V"
+  ],
+  "class_label_map": {
+    "BG": "Background",
+    "D": "Diabetic wound",
+    "N": "Normal skin",
+    "P": "Pressure wound",
+    "S": "Surgical wound",
+    "V": "Venous wound"
+  },
+  "checkpoint_epoch": 13,
+  "checkpoint_sha256": "65758192033d977b9dd592ac957796d787f1b461f3afe5734978ab30c33bd923",
+  "onnx_sha256": "b848889c359dfaf42b94524dccdff97dfff04f9ddeaf2cd4ae29b0778e42d39b",
+  "exported_at": "2026-10-09T02:57:22.076262+00:00",
+  "source_dataset": "AZH",
+  "source_split_mode": "native_source_split_not_patient_safe",
+  "patient_group_id_available": false,
+  "clinical_use": false,
+  "disclaimer": "Research prototype. Source split is not patient-leakage-safe and output is not a medical diagnosis.",
+  "parity_validation": {
+    "passed": true,
+    "fixtures": 12,
+    "max_abs_logit_difference": 1.7881393432617188e-05,
+    "mean_abs_logit_difference": 2.0744691937579773e-06,
+    "tolerance": 0.0001,
+    "validator": "scripts/validate_azh_classifier_onnx.py"
+  }
+}

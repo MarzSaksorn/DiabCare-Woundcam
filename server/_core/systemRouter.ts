@@ -3,7 +3,7 @@ import { notifyOwner } from "./notification";
 import { adminProcedure, publicProcedure, router } from "./trpc";
 import { getDb } from "../db";
 import { ENV } from "./env";
-import { getWoundModelReadiness } from "../woundInference";
+import { getCombinedModelReadiness } from "../woundInference";
 import { sql } from "drizzle-orm";
 
 export const systemRouter = router({
@@ -25,8 +25,8 @@ export const systemRouter = router({
         }
       }
       const storage = Boolean(ENV.forgeApiUrl && ENV.forgeApiKey);
-      const model = getWoundModelReadiness();
-      return { ok: database && storage && model.available, dependencies: { database, storage, model } } as const;
+      const models = getCombinedModelReadiness();
+      return { ok: database && storage && models.detector.available, dependencies: { database, storage, model: models.detector, classifier: models.classifier } } as const;
     }),
 
   notifyOwner: adminProcedure

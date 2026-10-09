@@ -888,6 +888,16 @@ button { cursor: pointer; }
 .replica-camera-inference > strong { display: block; margin-top: 7px; color: #16345c; font-family: 'Sarabun', sans-serif; font-size: 17px; text-transform: capitalize; }
 .replica-camera-inference > p { margin: 3px 0 0; color: #0a4fbe; font-size: 10px; font-weight: 800; }
 .replica-camera-inference > em { display: block; margin-top: 7px; color: #64748b; font-size: 9px; font-style: normal; line-height: 1.45; }
+.replica-camera-regions { display: grid; gap: 8px; margin-top: 10px; }
+.replica-camera-regions-heading { display: grid; gap: 3px; }
+.replica-camera-regions-heading strong { color: #16345c; font-size: 11px; }
+.replica-camera-regions-heading small { color: #64748b; font-size: 9px; line-height: 1.4; }
+.replica-camera-region-card { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; border: 1px solid #dbeafe; border-radius: 11px; background: #fbfdff; padding: 10px; }
+.replica-camera-region-card > div { display: grid; align-content: start; gap: 3px; min-width: 0; }
+.replica-camera-region-card span { color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.replica-camera-region-card strong { overflow-wrap: anywhere; color: #16345c; font-size: 11px; }
+.replica-camera-region-card small { color: #64748b; font-size: 9px; line-height: 1.35; }
+.replica-camera-region-card em { grid-column: 1 / -1; border-top: 1px solid #e5edf7; padding-top: 7px; color: #64748b; font-size: 8px; font-style: normal; line-height: 1.4; }
 .replica-camera-assignment { margin-top: 11px; border: 1px solid #dbeafe; border-radius: 12px; background: #fbfdff; padding: 12px; }
 .replica-camera-assignment-title { display: flex; align-items: center; gap: 7px; color: #0a4fbe; }
 .replica-camera-assignment-title svg { width: 15px; height: 15px; }

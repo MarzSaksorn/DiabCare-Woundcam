@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import fs from "node:fs";
 import * as ort from "onnxruntime-node";
 import sharp from "sharp";
+import { classifyWoundCrop, getAzhClassifierReadiness, isAzhClassifierEnabled, type AzhClassification } from "./woundClassification";
 
 const MODEL_FILENAME = "diabetes-wound-detector.onnx";
 const MODULE_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
@@ -22,18 +23,35 @@ type Detection = {
   box: { x: number; y: number; width: number; height: number };
 };
 
-type InferenceResult = {
+type ClassificationFailure = {
+  status: "unavailable" | "error";
+  model: "azh-classifier";
+  reason: string;
+};
+
+export type RegionAnalysis = {
+  detection: Detection;
+  classification: AzhClassification | ClassificationFailure;
+  reviewRequired: true;
+};
+
+export type InferenceResult = {
   model: "diabetes-wound-detector";
   task: "detect";
   disclaimer: "Model suggestion only; clinician review required.";
   detections: Detection[];
   topSuggestion: Detection | null;
+  regions: RegionAnalysis[];
 };
 
 let sessionPromise: Promise<any> | null = null;
 
 export function getWoundModelReadiness() {
   return { model: "diabetes-wound-detector", available: fs.existsSync(MODEL_PATH) } as const;
+}
+
+export function getCombinedModelReadiness() {
+  return { detector: getWoundModelReadiness(), classifier: getAzhClassifierReadiness() } as const;
 }
 
 function getSession() {
@@ -116,6 +134,36 @@ function decodeDetections(tensor: { dims: readonly number[]; data: ArrayLike<num
   return detections;
 }
 
+function failure(status: ClassificationFailure["status"], reason: string): ClassificationFailure {
+  return { status, model: "azh-classifier", reason };
+}
+
+async function classifyDetection(
+  decoded: { data: Buffer; info: { width: number; height: number; channels: number } },
+  detection: Detection,
+): Promise<RegionAnalysis> {
+  if (!isAzhClassifierEnabled()) {
+    return { detection, classification: failure("unavailable", "AZH classifier is disabled."), reviewRequired: true };
+  }
+  if (!getAzhClassifierReadiness().available) {
+    return { detection, classification: failure("unavailable", "AZH classifier artifact is unavailable."), reviewRequired: true };
+  }
+  try {
+    const left = Math.max(0, Math.min(decoded.info.width - 1, Math.floor(detection.box.x)));
+    const top = Math.max(0, Math.min(decoded.info.height - 1, Math.floor(detection.box.y)));
+    const right = Math.max(left + 1, Math.min(decoded.info.width, Math.ceil(detection.box.x + detection.box.width)));
+    const bottom = Math.max(top + 1, Math.min(decoded.info.height, Math.ceil(detection.box.y + detection.box.height)));
+    const crop = await sharp(decoded.data, { raw: { width: decoded.info.width, height: decoded.info.height, channels: 3 } })
+      .extract({ left, top, width: right - left, height: bottom - top })
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const classification = await classifyWoundCrop(crop.data, crop.info.width, crop.info.height);
+    return { detection, classification, reviewRequired: true };
+  } catch {
+    return { detection, classification: failure("error", "AZH classifier could not analyze this region."), reviewRequired: true };
+  }
+}
+
 export async function inferWoundImage(image: Buffer, confidence = DEFAULT_CONFIDENCE): Promise<InferenceResult> {
   const decoded = await sharp(image).rotate().resize({ width: IMAGE_SIZE, height: IMAGE_SIZE, fit: "contain", background: { r: 114, g: 114, b: 114 } }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const pixels = new Float32Array(1 * 3 * IMAGE_SIZE * IMAGE_SIZE);
@@ -130,5 +178,6 @@ export async function inferWoundImage(image: Buffer, confidence = DEFAULT_CONFID
   const output = await session.run({ images: new ort.Tensor("float32", pixels, [1, 3, IMAGE_SIZE, IMAGE_SIZE]) });
   const tensor = output.output0;
   const kept = suppressOverlappingDetections(decodeDetections(tensor, confidence));
-  return { model: "diabetes-wound-detector", task: "detect", disclaimer: "Model suggestion only; clinician review required.", detections: kept, topSuggestion: kept[0] ?? null };
+  const regions = await Promise.all(kept.map((detection) => classifyDetection(decoded, detection)));
+  return { model: "diabetes-wound-detector", task: "detect", disclaimer: "Model suggestion only; clinician review required.", detections: kept, topSuggestion: kept[0] ?? null, regions };
 }
