@@ -888,12 +888,20 @@ button { cursor: pointer; }
 .replica-camera-inference > strong { display: block; margin-top: 7px; color: #16345c; font-family: 'Sarabun', sans-serif; font-size: 17px; text-transform: capitalize; }
 .replica-camera-inference > p { margin: 3px 0 0; color: #0a4fbe; font-size: 10px; font-weight: 800; }
 .replica-camera-inference > em { display: block; margin-top: 7px; color: #64748b; font-size: 9px; font-style: normal; line-height: 1.45; }
+.replica-camera-inconclusive { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 9px; margin-top: 10px; border: 1px solid #f0d8a4; border-radius: 11px; background: #fffaf0; padding: 11px; color: #9a6b13; }
+.replica-camera-inconclusive > svg { grid-row: span 3; width: 17px; height: 17px; margin-top: 1px; }
+.replica-camera-inconclusive h3 { margin: 0; color: #7d5710; font-size: 12px; }
+.replica-camera-inconclusive p, .replica-camera-inconclusive small { margin: 0; color: #8a6b29; font-size: 9px; line-height: 1.45; }
 .replica-camera-regions { display: grid; gap: 8px; margin-top: 10px; }
 .replica-camera-regions-heading { display: flex; align-items: end; justify-content: space-between; gap: 10px; }
 .replica-camera-regions-heading > div { display: grid; gap: 3px; }
 .replica-camera-regions-heading span { color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .08em; }
-.replica-camera-regions-heading strong { color: #16345c; font-size: 12px; }
+.replica-camera-regions-heading h3 { margin: 0; color: #16345c; font-size: 12px; }
 .replica-camera-regions-heading small { color: #64748b; font-size: 9px; line-height: 1.4; text-align: right; }
+.replica-camera-taxonomy-note { display: flex; align-items: flex-start; gap: 8px; border: 1px solid #dbeafe; border-radius: 10px; background: #f8fbff; padding: 9px 10px; color: #0a4fbe; }
+.replica-camera-taxonomy-note > svg { width: 15px; height: 15px; flex: 0 0 auto; margin-top: 1px; }
+.replica-camera-taxonomy-note strong { display: block; color: #16345c; font-size: 10px; }
+.replica-camera-taxonomy-note p { margin: 3px 0 0; color: #64748b; font-size: 9px; line-height: 1.45; }
 .replica-camera-region-card { display: grid; gap: 10px; border: 1px solid #dbeafe; border-radius: 11px; background: #fbfdff; padding: 10px; }
 .replica-camera-region-header { display: flex; align-items: start; justify-content: space-between; gap: 8px; border-bottom: 1px solid #e5edf7; padding-bottom: 8px; }
 .replica-camera-region-header > div { display: grid; gap: 3px; min-width: 0; }
@@ -908,6 +916,11 @@ button { cursor: pointer; }
 .replica-camera-probability > strong { color: #16345c; font-size: 8px; text-align: right; }
 .replica-camera-probability-track { height: 6px; overflow: hidden; border-radius: 999px; background: #e7eef7; }
 .replica-camera-probability-track > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #0a4fbe, #4f8fe8); }
+.replica-camera-review-status { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 7px; border-radius: 8px; background: #ecfdf5; padding: 7px 8px; color: #15803d; }
+.replica-camera-review-status.is-error { background: #fff7ed; color: #9a3412; }
+.replica-camera-review-status svg { width: 14px; height: 14px; flex: 0 0 auto; }
+.replica-camera-review-status strong { font-size: 9px; }
+.replica-camera-review-status span { color: #64748b; font-size: 8px; }
 .replica-camera-region-card em { border-top: 1px solid #e5edf7; padding-top: 7px; color: #64748b; font-size: 8px; font-style: normal; line-height: 1.4; }
 .replica-camera-assignment { margin-top: 11px; border: 1px solid #dbeafe; border-radius: 12px; background: #fbfdff; padding: 12px; }
 .replica-camera-assignment-title { display: flex; align-items: center; gap: 7px; color: #0a4fbe; }

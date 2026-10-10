@@ -18,15 +18,15 @@ DiabCare Woundcam is a bilingual clinical companion web application for hospital
 
 ## Architecture
 
-| Layer | Implementation |
-| --- | --- |
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS v4, Wouter, Radix UI, Lucide Icons |
-| API | Express, tRPC 11, Zod validation |
-| Persistence | Supabase PostgreSQL accessed through Drizzle ORM |
-| Inference | Ultralytics YOLO export, ONNX Runtime Node, Sharp preprocessing |
-| Authentication | Manus OAuth/session integration |
-| Storage | S3-compatible object storage helpers; store references, not image bytes, in database rows |
-| Localization | Shared English/Thai `LanguageProvider` |
+| Layer          | Implementation                                                                            |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| Frontend       | React 19, TypeScript, Vite, Tailwind CSS v4, Wouter, Radix UI, Lucide Icons               |
+| API            | Express, tRPC 11, Zod validation                                                          |
+| Persistence    | Supabase PostgreSQL accessed through Drizzle ORM                                          |
+| Inference      | Ultralytics YOLO export, ONNX Runtime Node, Sharp preprocessing                           |
+| Authentication | Manus OAuth/session integration                                                           |
+| Storage        | S3-compatible object storage helpers; store references, not image bytes, in database rows |
+| Localization   | Shared English/Thai `LanguageProvider`                                                    |
 
 The application uses local/server-side inference. Patient images are not sent to an external AI API by the wound-detection flow.
 
@@ -122,7 +122,12 @@ The inference pipeline:
 3. Applies EXIF rotation and 640×640 letterbox preprocessing with Sharp.
 4. Runs CPU ONNX inference locally.
 5. Decodes model output, filters by confidence, and applies class-aware overlap suppression.
-6. Returns detections and a required clinician-review disclaimer to the frontend.
+6. Crops only the qualifying detector regions and runs the independent AZH classifier on each crop.
+7. Returns the detector result, one classifier result or explicit failure state per region, model hashes, and a required clinician-review disclaimer to the frontend.
+
+The response keeps `task: "detect"` for compatibility and adds `pipeline: "detector+azh-classifier"`, `schemaVersion: 1`, and separate detector/classifier metadata. Detector labels and AZH labels are different taxonomies; the application never rewrites one into the other. If no detector region qualifies, the classifier does not run on the full image and the UI reports an inconclusive result.
+
+The runtime loads only the versioned ONNX artifacts under `server/models/`. Adjacent metadata records the tensor contract, class order, export/training provenance, clinical-use boundary, and SHA-256 artifact hash. PyTorch checkpoints, raw datasets, and candidate training outputs stay outside Git.
 
 Model confidence is not clinical certainty. Thresholds, calibration, per-class performance, and failure modes must be reviewed with representative validation data.
 
