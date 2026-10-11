@@ -1,0 +1,234 @@
+{
+  "root": "/home/mark/Project/DiabCare-Woundcam/server/models/Training/diabcare-wound-segmentation-kit/wound-segmentation-kit/data/wound-segmentation-patches",
+  "task": "binary_wound_area_segmentation",
+  "splits": {
+    "train": {
+      "images": 831,
+      "masks": 831,
+      "missing_masks": [],
+      "orphan_masks": [],
+      "empty_masks": 52,
+      "mask_positive_pixel_fraction": 0.027190858574928166,
+      "non_binary_masks": {},
+      "image_shapes_sample": {
+        "0020126b06a719c36fed196c2c71f2f0_0.png": [
+          224,
+          224
+        ],
+        "002985bcbd572241a950bf39b4188d70_0.png": [
+          224,
+          224
+        ],
+        "00437234527092743faeb39bc59bd7ee_0.png": [
+          224,
+          224
+        ],
+        "00be2ad4736f6657b767683186615f3f_0.png": [
+          224,
+          224
+        ],
+        "00bf40d77104c2b4d6d55e431ca009b9_0.png": [
+          224,
+          224
+        ],
+        "00d87e85e220404257d75a9c6d574e0b_0.png": [
+          224,
+          224
+        ],
+        "01289b5d0d3f47b0de56c003ec81614a_0.png": [
+          224,
+          224
+        ],
+        "01289b5d0d3f47b0de56c003ec81614a_1.png": [
+          224,
+          224
+        ],
+        "026d4acc83cb338c02ade317e0816f61_0.png": [
+          224,
+          224
+        ],
+        "0272003ec882522e7bec012aac93cc26_0.png": [
+          224,
+          224
+        ]
+      }
+    },
+    "test": {
+      "images": 278,
+      "masks": 278,
+      "missing_masks": [],
+      "orphan_masks": [],
+      "empty_masks": 17,
+      "mask_positive_pixel_fraction": 0.02787949009414917,
+      "non_binary_masks": {},
+      "image_shapes_sample": {
+        "b23232898bafcf304b2138af86be40b9_0.png": [
+          224,
+          224
+        ],
+        "b586407933e66b112820f28448783627_0.png": [
+          224,
+          224
+        ],
+        "b61269467f2dc93f3cc31f933fa7013a_0.png": [
+          224,
+          224
+        ],
+        "b712446cdd649dcb735673f7322daa69_0.png": [
+          224,
+          224
+        ],
+        "b99276bf857375e23da3a9f5388cd6ce_0.png": [
+          224,
+          224
+        ],
+        "ba00cb9444f74badd3afada2bd3d6642_0.png": [
+          224,
+          224
+        ],
+        "ba4755da013537410deae3f8386d08ba_0.png": [
+          224,
+          224
+        ],
+        "ba4755da013537410deae3f8386d08ba_1.png": [
+          224,
+          224
+        ],
+        "baba5451a41a555f6ea4355b4c53db59_0.png": [
+          224,
+          224
+        ],
+        "baba5451a41a555f6ea4355b4c53db59_1.png": [
+          224,
+          224
+        ]
+      }
+    }
+  },
+  "exact_duplicate_image_groups": [
+    [
+      "train/images/1576e366442683aac204404e081eb938_1.png",
+      "train/images/22476241644edd0ccb41dc9d27c26d3b_1.png"
+    ],
+    [
+      "train/images/1576e366442683aac204404e081eb938_2.png",
+      "train/images/22476241644edd0ccb41dc9d27c26d3b_2.png"
+    ],
+    [
+      "train/images/1576e366442683aac204404e081eb938_3.png",
+      "train/images/22476241644edd0ccb41dc9d27c26d3b_3.png"
+    ],
+    [
+      "train/images/1636f83a5221bc82ca5083fbe9dcaee5_0.png",
+      "train/images/4c04a102ed471b05e3d0be9ae55db91a_0.png"
+    ],
+    [
+      "train/images/17ac7a71251dd0572d75d074db6e1964_0.png",
+      "test/images/f866514f4d9da8c409ec5a5b7c60b912_0.png"
+    ],
+    [
+      "train/images/1ad70e82589acbd9638b6e465366a7fe_0.png",
+      "train/images/58b1025b124be051254cf0071fae910f_0.png",
+      "test/images/d89317533d1ca29abe05734f949b0934_0.png"
+    ],
+    [
+      "train/images/1c27d8289cbfa6a1a0da01d7ec757a46_0.png",
+      "train/images/3ed2bf6e2ef1d94d42c949a841a561d3_0.png"
+    ],
+    [
+      "train/images/1d557cd47276255d999c71bc49ccf493_0.png",
+      "test/images/c8cf2da63be1a27497baa852387fe31f_0.png"
+    ],
+    [
+      "train/images/1d557cd47276255d999c71bc49ccf493_1.png",
+      "test/images/c8cf2da63be1a27497baa852387fe31f_1.png"
+    ],
+    [
+      "train/images/1d557cd47276255d999c71bc49ccf493_2.png",
+      "test/images/c8cf2da63be1a27497baa852387fe31f_2.png"
+    ],
+    [
+      "train/images/2c13c4147e8715cf645381ed4e06e55e_0.png",
+      "test/images/c265c21a78fbc8365180265e1332d004_0.png"
+    ],
+    [
+      "train/images/2ddef25c454171474b25f986aec589be_0.png",
+      "train/images/92451abdfb6109ed435b9431d025d4e3_0.png"
+    ],
+    [
+      "train/images/302d6a35b8498b1e57120c3dc277b097_0.png",
+      "train/images/9eb946a13df2fec02decd7a9a8c24664_0.png"
+    ],
+    [
+      "train/images/393ca23ea4bd9b810100a85518c720c9_0.png",
+      "test/images/fb9adc0e6d8c4fdebd66255342088626_0.png"
+    ],
+    [
+      "train/images/440078c6936219a7a496ebc67228d5d5_0.png",
+      "train/images/4cb7afba9a7708f2dd1fe874de7cc56d_0.png"
+    ],
+    [
+      "train/images/440078c6936219a7a496ebc67228d5d5_1.png",
+      "train/images/4cb7afba9a7708f2dd1fe874de7cc56d_1.png"
+    ],
+    [
+      "train/images/484aa6be0ea024aadc8f154b7c637a6f_0.png",
+      "train/images/5f1aa951a7c2daf54acd85dcd6fe5c06_0.png"
+    ],
+    [
+      "train/images/52ef1e670e4b103c7fd06e24ba0a07ec_0.png",
+      "train/images/97afdc101911ffc33d0fc166cacbaf1b_0.png"
+    ],
+    [
+      "train/images/53b50f36a529702794331e1014345ae1_0.png",
+      "test/images/b99276bf857375e23da3a9f5388cd6ce_0.png"
+    ],
+    [
+      "train/images/5c73b842f2fe0c289cb2a6d4326ba406_0.png",
+      "test/images/d950fc3ee06a1970c0361244bc6d039a_0.png"
+    ],
+    [
+      "train/images/5c73b842f2fe0c289cb2a6d4326ba406_1.png",
+      "test/images/d950fc3ee06a1970c0361244bc6d039a_1.png"
+    ],
+    [
+      "train/images/61dfd31019c941d34b7661056af0a125_0.png",
+      "test/images/c95105b1727344ae36f8dca2a1ba4543_0.png"
+    ],
+    [
+      "train/images/61dfd31019c941d34b7661056af0a125_1.png",
+      "test/images/c95105b1727344ae36f8dca2a1ba4543_1.png"
+    ],
+    [
+      "train/images/61dfd31019c941d34b7661056af0a125_2.png",
+      "test/images/c95105b1727344ae36f8dca2a1ba4543_2.png"
+    ],
+    [
+      "train/images/61dfd31019c941d34b7661056af0a125_3.png",
+      "test/images/c95105b1727344ae36f8dca2a1ba4543_3.png"
+    ],
+    [
+      "train/images/6fed027b91cec55f75de19f29b9a972f_0.png",
+      "train/images/b9fff21bebb15ba7d8c3f54063e37799_0.png"
+    ],
+    [
+      "train/images/71111745329c7b6029c48edf964dbed5_0.png",
+      "test/images/f5c1ec5e8557e6e79bcdec53ea11567b_0.png"
+    ],
+    [
+      "train/images/816b2c8cbdaa48026c25f79587082816_0.png",
+      "train/images/870640cd12cfdfe8366e97db14227891_0.png"
+    ],
+    [
+      "train/images/ab023a8ca6aa2bee24280d3ac25c0082_0.png",
+      "test/images/fe5ddb7a17c9668b1ff27b281efe6c29_0.png"
+    ],
+    [
+      "train/images/b72c7981ed24cbb21bf1d6044d3ae39c_0.png",
+      "test/images/d76818df608939dece3a817709df7f83_0.png"
+    ]
+  ],
+  "patient_group_id_available": false,
+  "source_split_warning": "The source archive has no reliable patient or wound grouping IDs; source splits are not patient-leakage-safe.",
+  "valid_for_smoke_training": true
+}

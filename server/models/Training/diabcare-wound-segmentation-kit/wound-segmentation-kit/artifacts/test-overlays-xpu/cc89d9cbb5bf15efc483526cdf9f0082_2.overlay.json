@@ -1,0 +1,15 @@
+{
+  "task": "binary_wound_area_segmentation",
+  "checkpoint": "/home/mark/Project/DiabCare-Woundcam/server/models/Training/diabcare-wound-segmentation-kit/wound-segmentation-kit/artifacts/wound-segmentation-xpu/best.pt",
+  "image": "/home/mark/Project/DiabCare-Woundcam/server/models/Training/diabcare-wound-segmentation-kit/wound-segmentation-kit/data/wound-segmentation-patches/test/images/cc89d9cbb5bf15efc483526cdf9f0082_2.png",
+  "overlay": "/home/mark/Project/DiabCare-Woundcam/server/models/Training/diabcare-wound-segmentation-kit/wound-segmentation-kit/artifacts/test-overlays-xpu/cc89d9cbb5bf15efc483526cdf9f0082_2.overlay.png",
+  "mask": "/home/mark/Project/DiabCare-Woundcam/server/models/Training/diabcare-wound-segmentation-kit/wound-segmentation-kit/artifacts/test-overlays-xpu/cc89d9cbb5bf15efc483526cdf9f0082_2.overlay.mask.png",
+  "input_size": 128,
+  "threshold": 0.5,
+  "original_size": [
+    224,
+    224
+  ],
+  "predicted_wound_pixel_fraction": 0.001953125,
+  "warning": "Pixel fraction is not a physical area measurement and this output is not a diagnosis."
+}

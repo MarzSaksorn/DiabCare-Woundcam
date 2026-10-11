@@ -1,0 +1,70 @@
+{
+  "config": {
+    "task": "wound-segmentation",
+    "source_root": "/home/ubuntu/private-diabcare-staging/extracted/nested/wound-segmentation/patches",
+    "output_dir": "/home/ubuntu/private-diabcare-artifacts/prototype-20261009-continued/wound-segmentation",
+    "image_size": 128,
+    "epochs": 5,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "seed": 42,
+    "device": "cpu",
+    "source_split_mode": "native_source_split_not_patient_safe",
+    "patient_group_id_available": false
+  },
+  "train_records": 748,
+  "validation_records": 83,
+  "test_records": 278,
+  "classes": [
+    "background",
+    "wound"
+  ],
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.39761961679509344,
+      "validation": {
+        "loss": 0.4349742531776428,
+        "dice": 0.6546624275771055
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.3480670899152756,
+      "validation": {
+        "loss": 0.4093216373161836,
+        "dice": 0.6772048364986073
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.33178591236789173,
+      "validation": {
+        "loss": 0.4388060894879428,
+        "dice": 0.6587591117078607
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.32660153761823124,
+      "validation": {
+        "loss": 0.3924155303023078,
+        "dice": 0.6763622787865725
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.3096742113219931,
+      "validation": {
+        "loss": 0.4180011356418783,
+        "dice": 0.6784315515648235
+      }
+    }
+  ],
+  "test_metrics": {
+    "loss": 0.3084200518471854,
+    "dice": 0.7486326856272562
+  },
+  "resumed_from": "/home/ubuntu/private-diabcare-artifacts/prototype-20261009/wound-segmentation/best.pt",
+  "prototype_warning": "Uses source-provided splits and is not patient-leakage-safe; not for clinical decisions."
+}
