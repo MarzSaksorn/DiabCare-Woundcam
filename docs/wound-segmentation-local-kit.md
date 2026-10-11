@@ -18,7 +18,8 @@ wound-segmentation-kit/
 │   ├── run_wound_segmentation.sh
 │   ├── validate_wound_dataset.py
 │   ├── inspect_wound_masks.py
-│   └── predict_wound_segmentation.py
+│   ├── predict_wound_segmentation.py
+│   └── predict_wound_segmentation_batch.py
 ├── data/wound-segmentation-patches/
 │   ├── train/images/
 │   ├── train/labels/
@@ -199,7 +200,29 @@ python scripts/predict_wound_segmentation.py \
   --threshold 0.65
 ```
 
-## 6. Read the metrics
+## 6. Generate overlays for a directory
+
+Use the batch predictor instead of calling the single-image script in a shell
+loop. It loads the checkpoint once and sends multiple images through the model
+at a time:
+
+```bash
+python scripts/predict_wound_segmentation_batch.py \
+  --checkpoint artifacts/wound-segmentation/best.pt \
+  --input-dir data/wound-segmentation-patches/test/images \
+  --output-dir artifacts/test-overlays \
+  --device xpu \
+  --batch-size 4
+```
+
+For CPU, use `--device cpu`. Start with `--batch-size 2` or `4` on an
+integrated Intel Arc GPU, then increase it only if memory remains available.
+The script creates `.overlay.png`, `.overlay.mask.png`, and `.overlay.json`
+for every input image while keeping subdirectories intact.
+
+The checkpoint is loaded once per command, not once per image.
+
+## 7. Read the metrics
 
 ```bash
 cat artifacts/wound-segmentation/metrics.json
