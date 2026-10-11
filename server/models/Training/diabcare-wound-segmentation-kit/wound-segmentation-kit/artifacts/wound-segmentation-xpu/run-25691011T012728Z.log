@@ -1,0 +1,17 @@
+{"epoch": 1, "train_loss": 1.333458791387842, "validation": {"loss": 1.1700576110319658, "dice": 0.5733423476869409}}
+{"epoch": 2, "train_loss": 1.0369845907738868, "validation": {"loss": 0.9315503293817694, "dice": 0.5764790339903398}}
+{"epoch": 3, "train_loss": 0.8227054831829477, "validation": {"loss": 0.7284254648468711, "dice": 0.6208149790763855}}
+{"epoch": 4, "train_loss": 0.6219540526892277, "validation": {"loss": 0.6496639034964822, "dice": 0.5447919829325243}}
+{"epoch": 5, "train_loss": 0.486105074590825, "validation": {"loss": 0.46637972647493536, "dice": 0.6741046390750192}}
+{"epoch": 6, "train_loss": 0.40709957765771987, "validation": {"loss": 0.4689703204415061, "dice": 0.6535891592502594}}
+{"epoch": 7, "train_loss": 0.36543530590356665, "validation": {"loss": 0.47045753218910913, "dice": 0.6387719132683494}}
+{"epoch": 8, "train_loss": 0.3445580942516631, "validation": {"loss": 0.3728612187233838, "dice": 0.7127035422758623}}
+{"epoch": 9, "train_loss": 0.3345282421784198, "validation": {"loss": 0.3887055773626674, "dice": 0.7036386078054254}}
+{"epoch": 10, "train_loss": 0.3164292719769985, "validation": {"loss": 0.41291985186663543, "dice": 0.6697051145813682}}
+{
+  "output_dir": "/home/mark/Project/DiabCare-Woundcam/server/models/Training/diabcare-wound-segmentation-kit/wound-segmentation-kit/artifacts/wound-segmentation-xpu",
+  "test_metrics": {
+    "loss": 0.31997721195220946,
+    "dice": 0.7597126773425511
+  }
+}
