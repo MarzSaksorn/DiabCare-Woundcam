@@ -26,7 +26,16 @@ export const systemRouter = router({
       }
       const storage = Boolean(ENV.forgeApiUrl && ENV.forgeApiKey);
       const models = getCombinedModelReadiness();
-      return { ok: database && storage && models.detector.available, dependencies: { database, storage, model: models.detector, classifier: models.classifier } } as const;
+      return {
+        ok: database && storage && models.detector.available,
+        dependencies: {
+          database,
+          storage,
+          model: models.detector,
+          classifier: models.classifier,
+          segmentation: models.segmentation,
+        },
+      } as const;
     }),
 
   notifyOwner: adminProcedure

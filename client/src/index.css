@@ -934,3 +934,36 @@ button { cursor: pointer; }
 .replica-camera-page .camera-history-card { margin-top: 15px; border-radius: 16px; padding: 17px; }
 @media (max-width: 840px) { .replica-camera-workspace { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .replica-camera-page { padding: 0 0 22px; } .replica-camera-header { align-items: flex-start; flex-direction: column; gap: 8px; } .replica-camera-brand { align-self: flex-start; } .replica-camera-notice { align-items: flex-start; } .replica-camera-notice > span { display: none; } .replica-camera-viewport, .replica-camera-viewport img, .replica-camera-live-video { min-height: 330px; } .replica-camera-capture, .replica-camera-analysis { padding: 14px; } .replica-camera-selected { align-items: flex-start; } .replica-camera-selected button { padding: 6px; } .replica-camera-regions-heading { align-items: start; flex-direction: column; } .replica-camera-regions-heading small { text-align: left; } .replica-camera-region-summary { grid-template-columns: 1fr; } }
+
+/* Three-model wound analysis overlays and controls */
+.camera-detection-layer { z-index: 3; }
+.camera-segmentation-mask { position: absolute; z-index: 1; overflow: hidden; border-radius: 5px; pointer-events: none; }
+.camera-segmentation-mask img { display: block; width: 100%; height: 100%; image-rendering: pixelated; object-fit: fill; }
+.camera-detection-box { z-index: 2; }
+.replica-camera-overlay-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; margin-top: 10px; border: 1px solid #dbeafe; border-radius: 11px; background: #f8fbff; padding: 10px 11px; color: #16345c; }
+.replica-camera-overlay-controls legend { grid-column: 1 / -1; padding: 0 4px; color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.replica-camera-overlay-controls label { display: flex; min-height: 30px; align-items: center; gap: 6px; color: #506576; font-size: 9px; font-weight: 800; }
+.replica-camera-overlay-controls label input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: #0a4fbe; }
+.replica-camera-overlay-controls label svg { width: 14px; height: 14px; flex: 0 0 auto; color: #0a4fbe; }
+.replica-camera-overlay-controls label:focus-within { outline: 2px solid #60a5fa; outline-offset: 3px; border-radius: 5px; }
+.replica-camera-overlay-controls label.is-disabled { color: #94a3b8; }
+.replica-camera-opacity { grid-column: 1 / -1; display: grid !important; grid-template-columns: auto minmax(0, 1fr) 34px; gap: 8px !important; }
+.replica-camera-opacity input[type="range"] { width: 100%; accent-color: #e54954; }
+.replica-camera-opacity strong { color: #16345c; font-size: 9px; text-align: right; }
+.replica-camera-overlay-legend { display: flex; grid-column: 1 / -1; flex-wrap: wrap; gap: 7px 12px; border-top: 1px solid #e5edf7; padding-top: 8px; color: #64748b; font-size: 8px; }
+.replica-camera-overlay-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.replica-camera-overlay-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+.replica-camera-overlay-legend i.is-box { border: 2px solid #ffcf66; background: rgba(255,207,102,.18); }
+.replica-camera-overlay-legend i.is-mask { background: rgba(229,73,84,.75); }
+.replica-camera-overlay-legend i.is-card { border: 1px solid #bfdbfe; background: #eff6ff; }
+.replica-camera-overlay-hint { grid-column: 1 / -1; color: #94a3b8; font-size: 8px; line-height: 1.4; }
+.replica-camera-segmentation-result { display: grid; gap: 3px; border: 1px solid #dbeafe; border-radius: 9px; background: #f8fbff; padding: 8px 9px; }
+.replica-camera-segmentation-result > span { color: #0a4fbe; font-size: 8px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.replica-camera-segmentation-result > strong { color: #16345c; font-size: 11px; }
+.replica-camera-segmentation-result > small { color: #64748b; font-size: 9px; line-height: 1.4; }
+.replica-camera-segmentation-result > em { border-top: 1px solid #dbeafe; padding-top: 5px; color: #9a6b13; font-size: 9px; font-style: normal; line-height: 1.35; }
+.replica-camera-segmentation-result.is-unavailable { border-color: #e2e8f0; background: #f8fafc; }
+.replica-camera-segmentation-result.is-unavailable > span, .replica-camera-segmentation-result.is-unavailable > strong { color: #64748b; }
+.replica-camera-segmentation-result.is-error { border-color: #fecdd3; background: #fff7f7; }
+.replica-camera-segmentation-result.is-error > span, .replica-camera-segmentation-result.is-error > strong { color: #be123c; }
+@media (max-width: 560px) { .replica-camera-overlay-controls { grid-template-columns: 1fr; } .replica-camera-opacity, .replica-camera-overlay-legend, .replica-camera-overlay-hint, .replica-camera-overlay-controls legend { grid-column: 1; } }

@@ -11,9 +11,11 @@ DiabCare Woundcam is a bilingual clinical companion web application for hospital
 - Imported, de-identified diabetes patient cohort with patient search, filters, observations, and record drill-down.
 - Clinical record workspace for source-preserved demographics, vitals, laboratory observations, medication context, review flags, timelines, and wound-progress placeholders.
 - Real browser camera capture using `MediaDevices.getUserMedia`, with image-upload fallback and local preview.
-- Server-side wound-image inference using the locally packaged ONNX model and `onnxruntime-node`.
+- Server-side wound-image inference using locally packaged ONNX models and `onnxruntime-node`.
 - Five model classes: `callus_corn`, `dfu_ulcer`, `infected_wound`, `necrotic_wound`, and `normal_foot`.
-- Detection bounding boxes mapped onto the captured preview, with confidence scores and a clinician-review disclaimer.
+- Per-region AZH classification across `BG`, `D`, `N`, `P`, `S`, and `V`, kept separate from detector labels.
+- Wound-area segmentation on each qualifying detector crop, with a bounded 128×128 mask overlay and predicted pixel coverage.
+- Detection bounding boxes and mask overlays mapped onto the captured preview, with confidence scores, visibility controls, and a clinician-review disclaimer.
 - Type-safe tRPC procedures, Drizzle ORM schema, Supabase PostgreSQL persistence, and S3-compatible storage helpers.
 
 ## Architecture
@@ -23,7 +25,7 @@ DiabCare Woundcam is a bilingual clinical companion web application for hospital
 | Frontend       | React 19, TypeScript, Vite, Tailwind CSS v4, Wouter, Radix UI, Lucide Icons               |
 | API            | Express, tRPC 11, Zod validation                                                          |
 | Persistence    | Supabase PostgreSQL accessed through Drizzle ORM                                          |
-| Inference      | Ultralytics YOLO export, ONNX Runtime Node, Sharp preprocessing                           |
+| Inference      | Ultralytics and SmallUNet ONNX exports, ONNX Runtime Node, Sharp preprocessing            |
 | Authentication | Manus OAuth/session integration                                                           |
 | Storage        | S3-compatible object storage helpers; store references, not image bytes, in database rows |
 | Localization   | Shared English/Thai `LanguageProvider`                                                    |
@@ -42,7 +44,11 @@ server/
   db.ts                      Database helpers
   routers.ts                 tRPC router contracts
   woundInference.ts          ONNX preprocessing and output decoding
+  woundSegmentation.ts       Optional crop segmentation and mask encoding
   models/                    Versioned ONNX model and label manifest
+scripts/
+  export_wound_segmentation.py       PyTorch-to-ONNX exporter
+  validate_wound_segmentation_onnx.py Deterministic PyTorch/ONNX parity validator
 drizzle/                     Database schema and migrations
 shared/                      Shared constants and types
 ```
@@ -70,7 +76,7 @@ For the training preview, set `DISABLE_LOGIN_PAGE=true` to keep the development 
 
 ## Docker Compose
 
-`Dockerfile` builds the Vite frontend and Express/tRPC backend together. The runtime image includes the checked-in ONNX wound detector under `dist/models`, so the browser UI, API, and local YOLO inference run as one service. The database is intentionally not bundled: configure the server-only `SUPABASE_DATABASE_URL` for the approved Supabase PostgreSQL connection rather than creating a second copy of clinical data in a local container.
+`Dockerfile` builds the Vite frontend and Express/tRPC backend together. The runtime image allowlists the checked-in detector, classifier, and segmentation ONNX artifacts under `dist/models`; it does not copy the tracked training kit into the runtime image. The database is intentionally not bundled: configure the server-only `SUPABASE_DATABASE_URL` for the approved Supabase PostgreSQL connection rather than creating a second copy of clinical data in a local container.
 
 Copy `env.example` to the ignored local `.env` file, then replace the Supabase and secret placeholders before starting the stack:
 
@@ -122,12 +128,12 @@ The inference pipeline:
 3. Applies EXIF rotation and 640×640 letterbox preprocessing with Sharp.
 4. Runs CPU ONNX inference locally.
 5. Decodes model output, filters by confidence, and applies class-aware overlap suppression.
-6. Crops only the qualifying detector regions and runs the independent AZH classifier on each crop.
-7. Returns the detector result, one classifier result or explicit failure state per region, model hashes, and a required clinician-review disclaimer to the frontend.
+6. Crops only the qualifying detector regions and runs the independent AZH classifier and optional wound-area segmenter on each crop.
+7. Returns separate detector, AZH, and segmentation results or explicit failure states per region, model hashes, and a required clinician-review disclaimer to the frontend.
 
-The response keeps `task: "detect"` for compatibility and adds `pipeline: "detector+azh-classifier"`, `schemaVersion: 1`, and separate detector/classifier metadata. Detector labels and AZH labels are different taxonomies; the application never rewrites one into the other. If no detector region qualifies, the classifier does not run on the full image and the UI reports an inconclusive result.
+The response keeps `task: "detect"` for compatibility and uses `pipeline: "detector+azh-classifier+wound-segmentation"`, `schemaVersion: 2`, and separate detector/classifier/segmentation metadata. Detector labels, AZH labels, and predicted mask coverage are different model outputs; the application never rewrites them into one diagnosis. If no detector region qualifies, neither downstream model runs on the full image and the UI reports an inconclusive result.
 
-The runtime loads only the versioned ONNX artifacts under `server/models/`. Adjacent metadata records the tensor contract, class order, export/training provenance, clinical-use boundary, and SHA-256 artifact hash. PyTorch checkpoints, raw datasets, and candidate training outputs stay outside Git.
+The runtime loads only the versioned ONNX artifacts under `server/models/`. Adjacent metadata records the tensor contract, class order, export/training provenance, clinical-use boundary, and SHA-256 artifact hash. The segmentation artifact was exported from the tracked research `best.pt` checkpoint with opset 17 and passed 12 deterministic PyTorch/ONNX fixtures; the recorded max absolute logit difference is `2.77e-5` against a `1e-4` tolerance. The runtime never loads the PyTorch checkpoint or raw training data. `WOUND_SEGMENTATION_ENABLED=false` remains the default, so detector and AZH results continue to work when segmentation is disabled or unavailable.
 
 Model confidence is not clinical certainty. Thresholds, calibration, per-class performance, and failure modes must be reviewed with representative validation data.
 

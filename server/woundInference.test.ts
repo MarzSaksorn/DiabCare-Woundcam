@@ -51,8 +51,8 @@ describe("wound inference", () => {
 
     expect(result.model).toBe("diabetes-wound-detector");
     expect(result.task).toBe("detect");
-    expect(result.pipeline).toBe("detector+azh-classifier");
-    expect(result.schemaVersion).toBe(1);
+    expect(result.pipeline).toBe("detector+azh-classifier+wound-segmentation");
+    expect(result.schemaVersion).toBe(2);
     expect(result.disclaimer).toContain("clinician review");
     expect(result.detector).toMatchObject({
       model: "diabetes-wound-detector",
@@ -73,6 +73,14 @@ describe("wound inference", () => {
       classes: ["BG", "D", "N", "P", "S", "V"],
       artifactSha256:
         "b848889c359dfaf42b94524dccdff97dfff04f9ddeaf2cd4ae29b0778e42d39b",
+    });
+    expect(result.segmentation).toMatchObject({
+      model: "wound-segmentation",
+      version: "wound-segmentation-xpu-best",
+      classes: ["background", "wound"],
+      threshold: 0.5,
+      artifactSha256:
+        "269ed002a5bc5fa20c2d11dfb85b5b00f9c768e0e40a5ca28022477c4ff8f48e",
     });
     expect(Array.isArray(result.detections)).toBe(true);
     expect(result.regions).toHaveLength(result.detections.length);
@@ -120,8 +128,14 @@ describe("wound inference", () => {
     });
 
     const rawYolo = new Float32Array([320, 320, 80, 80, 0.1, 0.8, 0, 0, 0]);
-    expect(decodeWoundDetections({ dims: [1, 9, 1], data: rawYolo }, 0.25)).toMatchObject([
-      { label: "dfu_ulcer", confidence: 0.8, box: { x: 280, y: 280, width: 80, height: 80 } },
+    expect(
+      decodeWoundDetections({ dims: [1, 9, 1], data: rawYolo }, 0.25)
+    ).toMatchObject([
+      {
+        label: "dfu_ulcer",
+        confidence: 0.8,
+        box: { x: 280, y: 280, width: 80, height: 80 },
+      },
     ]);
   });
 
@@ -150,8 +164,76 @@ describe("wound inference", () => {
         region => region.classification.status === "ok" && region.reviewRequired
       )
     ).toBe(true);
+    expect(
+      regions.every(region => region.segmentation.status === "unavailable")
+    ).toBe(true);
     expect(calls).toHaveLength(2);
-    expect(calls.every((area) => area === 12000)).toBe(true);
+    expect(calls.every(area => area === 12000)).toBe(true);
+  });
+
+  it("keeps AZH and segmentation results associated with the same crop", async () => {
+    const detections = [detection("dfu_ulcer", 1, 10)];
+    const classifierCalls: number[] = [];
+    const segmentationCalls: number[] = [];
+    const regions = await analyzeDetectedRegions(decodedImage, detections, {
+      enabled: true,
+      available: true,
+      classify: async (_raw, width, height) => {
+        classifierCalls.push(width * height);
+        return classification;
+      },
+      segmentationEnabled: true,
+      segmentationAvailable: true,
+      segment: async (_raw, width, height) => {
+        segmentationCalls.push(width * height);
+        return {
+          status: "ok",
+          model: "wound-segmentation",
+          threshold: 0.5,
+          mask: {
+            width: 128,
+            height: 128,
+            encoding: "png-base64",
+            data: "AA==",
+          },
+          woundPixelFraction: 0.125,
+        };
+      },
+    });
+    expect(regions).toHaveLength(1);
+    expect(regions[0].classification).toMatchObject({
+      status: "ok",
+      code: "D",
+    });
+    expect(regions[0].segmentation).toMatchObject({
+      status: "ok",
+      woundPixelFraction: 0.125,
+    });
+    expect(classifierCalls).toEqual([12000]);
+    expect(segmentationCalls).toEqual([12000]);
+  });
+
+  it("preserves detector and AZH output when segmentation inference fails", async () => {
+    const detections = [detection("dfu_ulcer", 1, 10)];
+    const regions = await analyzeDetectedRegions(decodedImage, detections, {
+      enabled: true,
+      available: true,
+      classify: async () => classification,
+      segmentationEnabled: true,
+      segmentationAvailable: true,
+      segment: async () => {
+        throw new Error("simulated segmentation failure");
+      },
+    });
+    expect(regions[0].detection).toEqual(detections[0]);
+    expect(regions[0].classification).toMatchObject({
+      status: "ok",
+      code: "D",
+    });
+    expect(regions[0].segmentation).toMatchObject({
+      status: "error",
+      model: "wound-segmentation",
+    });
   });
 
   it("preserves detector output when classifier inference fails", async () => {

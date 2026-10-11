@@ -11,6 +11,13 @@ import {
   isAzhClassifierEnabled,
   type AzhClassification,
 } from "./woundClassification";
+import {
+  getWoundSegmentationContract,
+  getWoundSegmentationReadiness,
+  isWoundSegmentationEnabled,
+  segmentWoundCrop,
+  type SegmentationResult,
+} from "./woundSegmentation";
 
 const MODEL_FILENAME = "diabetes-wound-detector.onnx";
 const METADATA_FILENAME = "diabetes-wound-detector.labels.json";
@@ -38,6 +45,7 @@ const DETECTOR_CLASS_NAMES = [
 const DEFAULT_CONFIDENCE = 0.25;
 const IOU_THRESHOLD = 0.45;
 const MAX_REGIONS_PER_REQUEST = 20;
+const MAX_DOWNSTREAM_CONCURRENCY = 4;
 const REVIEW_DISCLAIMER =
   "Model suggestion only; clinician review required." as const;
 
@@ -74,6 +82,7 @@ type ClassificationFailure = {
 export type RegionAnalysis = {
   detection: Detection;
   classification: AzhClassification | ClassificationFailure;
+  segmentation: SegmentationResult;
   reviewRequired: true;
 };
 
@@ -87,11 +96,12 @@ export type DetectorContract = {
 export type InferenceResult = {
   model: "diabetes-wound-detector";
   task: "detect";
-  pipeline: "detector+azh-classifier";
-  schemaVersion: 1;
+  pipeline: "detector+azh-classifier+wound-segmentation";
+  schemaVersion: 2;
   disclaimer: typeof REVIEW_DISCLAIMER;
   detector: DetectorContract;
   classifier: ReturnType<typeof getAzhClassifierContract>;
+  segmentation: ReturnType<typeof getWoundSegmentationContract>;
   detections: Detection[];
   topSuggestion: Detection | null;
   regions: RegionAnalysis[];
@@ -102,11 +112,16 @@ export type DecodedRgbImage = {
   info: { width: number; height: number; channels: number };
 };
 
-type ClassifierRuntime = {
+type DownstreamRuntime = {
   enabled: boolean;
   available: boolean;
   classify: typeof classifyWoundCrop;
+  segmentationEnabled: boolean;
+  segmentationAvailable: boolean;
+  segment: typeof segmentWoundCrop;
 };
+
+type Crop = { data: Buffer; width: number; height: number };
 
 let sessionPromise: Promise<any> | null = null;
 let validatedMetadata: DetectorMetadata | null = null;
@@ -119,7 +134,6 @@ function readAndValidateDetectorMetadata(): DetectorMetadata {
   if (validatedMetadata) return validatedMetadata;
   if (!fs.existsSync(METADATA_PATH))
     throw new Error("Wound detector metadata is unavailable");
-
   const metadata = JSON.parse(
     fs.readFileSync(METADATA_PATH, "utf8")
   ) as DetectorMetadata;
@@ -140,7 +154,12 @@ function readAndValidateDetectorMetadata(): DetectorMetadata {
       "Wound detector metadata class order does not match the server contract"
     );
   }
-  const expectedInputShape = JSON.stringify(["batch", 3, IMAGE_SIZE, IMAGE_SIZE]);
+  const expectedInputShape = JSON.stringify([
+    "batch",
+    3,
+    IMAGE_SIZE,
+    IMAGE_SIZE,
+  ]);
   const expectedOutputShape = JSON.stringify([1, 300, 6]);
   if (
     metadata.input?.name !== "images" ||
@@ -151,7 +170,11 @@ function readAndValidateDetectorMetadata(): DetectorMetadata {
     throw new Error(
       "Wound detector metadata tensor contract does not match the server contract"
     );
-  if (typeof metadata.onnx_sha256 === "string" && fs.existsSync(MODEL_PATH) && sha256File(MODEL_PATH) !== metadata.onnx_sha256) {
+  if (
+    typeof metadata.onnx_sha256 === "string" &&
+    fs.existsSync(MODEL_PATH) &&
+    sha256File(MODEL_PATH) !== metadata.onnx_sha256
+  ) {
     throw new Error("Wound detector artifact hash does not match metadata");
   }
   validatedMetadata = metadata;
@@ -171,6 +194,7 @@ export function getCombinedModelReadiness() {
   return {
     detector: getWoundModelReadiness(),
     classifier: getAzhClassifierReadiness(),
+    segmentation: getWoundSegmentationReadiness(),
   } as const;
 }
 
@@ -217,9 +241,8 @@ function suppressOverlappingDetections(detections: Detection[]) {
           existing.classId === candidate.classId &&
           iou(existing.box, candidate.box) > IOU_THRESHOLD
       )
-    ) {
+    )
       kept.push(candidate);
-    }
   }
   return kept.slice(0, MAX_REGIONS_PER_REQUEST);
 }
@@ -271,8 +294,6 @@ export function decodeWoundDetections(
   const data = tensor.data;
   if (dimensions.length !== 3 || dimensions[0] !== 1)
     throw new Error("Unexpected wound detector output shape");
-
-  // The reviewed export uses embedded NMS and emits [1, 300, 6]: xyxy, confidence, class id.
   if (dimensions[1] === 300 && dimensions[2] === 6) {
     const detections: Detection[] = [];
     for (let row = 0; row < dimensions[1]; row += 1) {
@@ -290,8 +311,6 @@ export function decodeWoundDetections(
     }
     return detections;
   }
-
-  // Keep the tested raw YOLO layouts [1, 9, 8400] and [1, 8400, 9] as a compatibility fallback.
   const channels =
     dimensions[1] === 4 + DETECTOR_CLASS_NAMES.length
       ? dimensions[1]
@@ -337,109 +356,181 @@ export function decodeWoundDetections(
   return detections;
 }
 
-function failure(
+function classificationFailure(
   status: ClassificationFailure["status"],
   reason: string
 ): ClassificationFailure {
   return { status, model: "azh-classifier", reason };
 }
 
-async function classifyDetection(
+function segmentationUnavailable(reason: string): SegmentationResult {
+  return { status: "unavailable", model: "wound-segmentation", reason };
+}
+
+function segmentationError(reason: string): SegmentationResult {
+  return { status: "error", model: "wound-segmentation", reason };
+}
+
+async function cropDetectedRegion(
+  decoded: DecodedRgbImage,
+  detection: Detection
+): Promise<Crop> {
+  if (
+    decoded.info.channels !== 3 ||
+    decoded.info.width < 1 ||
+    decoded.info.height < 1
+  )
+    throw new Error("decoded image is not RGB");
+  const left = Math.max(
+    0,
+    Math.min(decoded.info.width - 1, Math.floor(detection.box.x))
+  );
+  const top = Math.max(
+    0,
+    Math.min(decoded.info.height - 1, Math.floor(detection.box.y))
+  );
+  const right = Math.max(
+    left + 1,
+    Math.min(
+      decoded.info.width,
+      Math.ceil(detection.box.x + detection.box.width)
+    )
+  );
+  const bottom = Math.max(
+    top + 1,
+    Math.min(
+      decoded.info.height,
+      Math.ceil(detection.box.y + detection.box.height)
+    )
+  );
+  if (right <= left || bottom <= top)
+    throw new Error("detector crop has no area");
+  const crop = await sharp(decoded.data, {
+    raw: {
+      width: decoded.info.width,
+      height: decoded.info.height,
+      channels: 3,
+    },
+  })
+    .extract({ left, top, width: right - left, height: bottom - top })
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  return { data: crop.data, width: crop.info.width, height: crop.info.height };
+}
+
+async function analyzeRegion(
   decoded: DecodedRgbImage,
   detection: Detection,
-  runtime: ClassifierRuntime
+  runtime: DownstreamRuntime
 ): Promise<RegionAnalysis> {
-  if (!runtime.enabled) {
-    return {
-      detection,
-      classification: failure("unavailable", "AZH classifier is disabled."),
-      reviewRequired: true,
-    };
+  const classifierReady = runtime.enabled && runtime.available;
+  const segmentationReady =
+    runtime.segmentationEnabled && runtime.segmentationAvailable;
+  let crop: Crop | null = null;
+  let cropError = false;
+  if (classifierReady || segmentationReady) {
+    try {
+      crop = await cropDetectedRegion(decoded, detection);
+    } catch {
+      cropError = true;
+    }
   }
-  if (!runtime.available) {
-    return {
-      detection,
-      classification: failure(
-        "unavailable",
-        "AZH classifier artifact is unavailable."
-      ),
-      reviewRequired: true,
-    };
-  }
-  try {
-    if (
-      decoded.info.channels !== 3 ||
-      decoded.info.width < 1 ||
-      decoded.info.height < 1
-    )
-      throw new Error("decoded image is not RGB");
-    const left = Math.max(
-      0,
-      Math.min(decoded.info.width - 1, Math.floor(detection.box.x))
-    );
-    const top = Math.max(
-      0,
-      Math.min(decoded.info.height - 1, Math.floor(detection.box.y))
-    );
-    const right = Math.max(
-      left + 1,
-      Math.min(
-        decoded.info.width,
-        Math.ceil(detection.box.x + detection.box.width)
+
+  const classificationPromise = !runtime.enabled
+    ? Promise.resolve<AzhClassification | ClassificationFailure>(
+        classificationFailure("unavailable", "AZH classifier is disabled.")
       )
-    );
-    const bottom = Math.max(
-      top + 1,
-      Math.min(
-        decoded.info.height,
-        Math.ceil(detection.box.y + detection.box.height)
+    : !runtime.available
+      ? Promise.resolve<AzhClassification | ClassificationFailure>(
+          classificationFailure(
+            "unavailable",
+            "AZH classifier artifact is unavailable."
+          )
+        )
+      : cropError || !crop
+        ? Promise.resolve<AzhClassification | ClassificationFailure>(
+            classificationFailure(
+              "error",
+              "AZH classifier could not analyze this region."
+            )
+          )
+        : runtime
+            .classify(crop.data, crop.width, crop.height)
+            .catch(() =>
+              classificationFailure(
+                "error",
+                "AZH classifier could not analyze this region."
+              )
+            );
+
+  const segmentationPromise = !runtime.segmentationEnabled
+    ? Promise.resolve<SegmentationResult>(
+        segmentationUnavailable("Wound segmentation is disabled.")
       )
-    );
-    if (right <= left || bottom <= top)
-      throw new Error("detector crop has no area");
-    const crop = await sharp(decoded.data, {
-      raw: {
-        width: decoded.info.width,
-        height: decoded.info.height,
-        channels: 3,
-      },
-    })
-      .extract({ left, top, width: right - left, height: bottom - top })
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-    const classification = await runtime.classify(
-      crop.data,
-      crop.info.width,
-      crop.info.height
-    );
-    return { detection, classification, reviewRequired: true };
-  } catch {
-    return {
-      detection,
-      classification: failure(
-        "error",
-        "AZH classifier could not analyze this region."
-      ),
-      reviewRequired: true,
-    };
+    : !runtime.segmentationAvailable
+      ? Promise.resolve<SegmentationResult>(
+          segmentationUnavailable("Wound segmentation artifact is unavailable.")
+        )
+      : cropError || !crop
+        ? Promise.resolve<SegmentationResult>(
+            segmentationError(
+              "Wound segmentation could not analyze this region."
+            )
+          )
+        : runtime
+            .segment(crop.data, crop.width, crop.height)
+            .catch(() =>
+              segmentationError(
+                "Wound segmentation could not analyze this region."
+              )
+            );
+
+  const [classification, segmentation] = await Promise.all([
+    classificationPromise,
+    segmentationPromise,
+  ]);
+  return { detection, classification, segmentation, reviewRequired: true };
+}
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  mapper: (item: T, index: number) => Promise<R>
+) {
+  const results = new Array<R>(items.length);
+  let nextIndex = 0;
+  async function worker() {
+    while (nextIndex < items.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await mapper(items[index], index);
+    }
   }
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, () => worker())
+  );
+  return results;
 }
 
 export async function analyzeDetectedRegions(
   decoded: DecodedRgbImage,
   detections: Detection[],
-  runtime?: Partial<ClassifierRuntime>
+  runtime?: Partial<DownstreamRuntime>
 ): Promise<RegionAnalysis[]> {
   if (detections.length === 0) return [];
-  const effectiveRuntime: ClassifierRuntime = {
+  const effectiveRuntime: DownstreamRuntime = {
     enabled: runtime?.enabled ?? isAzhClassifierEnabled(),
     available: runtime?.available ?? getAzhClassifierReadiness().available,
     classify: runtime?.classify ?? classifyWoundCrop,
+    segmentationEnabled:
+      runtime?.segmentationEnabled ?? isWoundSegmentationEnabled(),
+    segmentationAvailable:
+      runtime?.segmentationAvailable ??
+      getWoundSegmentationReadiness().available,
+    segment: runtime?.segment ?? segmentWoundCrop,
   };
-  return Promise.all(
-    detections.map(detection =>
-      classifyDetection(decoded, detection, effectiveRuntime)
-    )
+  return mapWithConcurrency(detections, MAX_DOWNSTREAM_CONCURRENCY, detection =>
+    analyzeRegion(decoded, detection, effectiveRuntime)
   );
 }
 
@@ -465,7 +556,6 @@ export async function inferWoundImage(
     pixels[planeSize + index] = decoded.data[index * 3 + 1] / 255;
     pixels[planeSize * 2 + index] = decoded.data[index * 3 + 2] / 255;
   }
-
   const session = await getSession();
   const output = await session.run({
     images: new ort.Tensor("float32", pixels, [1, 3, IMAGE_SIZE, IMAGE_SIZE]),
@@ -480,11 +570,12 @@ export async function inferWoundImage(
   return {
     model: "diabetes-wound-detector",
     task: "detect",
-    pipeline: "detector+azh-classifier",
-    schemaVersion: 1,
+    pipeline: "detector+azh-classifier+wound-segmentation",
+    schemaVersion: 2,
     disclaimer: REVIEW_DISCLAIMER,
     detector: getDetectorContract(),
     classifier: getAzhClassifierContract(),
+    segmentation: getWoundSegmentationContract(),
     detections: kept,
     topSuggestion: kept[0] ?? null,
     regions,

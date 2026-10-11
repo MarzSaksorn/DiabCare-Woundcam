@@ -2,6 +2,7 @@
 .gitignore
 node_modules
 dist
+server/models/Training
 .env
 .env.*
 !.env.example

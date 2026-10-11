@@ -4,7 +4,7 @@
 
 **Base:** latest remote `feat/combined-model-results`
 
-**Status:** Planning only. This document does not deploy or promote a model.
+**Status:** Implemented in the working tree. The feature remains disabled by default; this document does not deploy or promote a model.
 
 ## 1. Goal
 
@@ -39,18 +39,20 @@ The existing server pipeline is:
 image -> detector -> detected regions -> AZH classifier per region
 ```
 
-The new wound-area model currently exists as PyTorch checkpoints in the training
-artifacts:
+The wound-area model exists as PyTorch checkpoints in the training artifacts and
+as a parity-validated ONNX runtime artifact:
 
 ```text
 server/models/Training/diabcare-wound-segmentation-kit/
   wound-segmentation-kit/artifacts/wound-segmentation-xpu/best.pt
   wound-segmentation-kit/artifacts/wound-segmentation-xpu/last.pt
+server/models/wound-segmentation.onnx
+server/models/wound-segmentation.labels.json
 ```
 
-Those `.pt` files are training artifacts, not the website runtime format. The
-website uses Node ONNX Runtime, so `best.pt` must be exported and parity-tested
-as ONNX before integration.
+The `.pt` files remain training artifacts, not the website runtime format. The
+website uses Node ONNX Runtime; `best.pt` was exported and parity-tested as ONNX
+before the runtime artifact was added.
 
 Use `best.pt` for inference. Keep `last.pt` for resuming training only.
 
