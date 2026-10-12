@@ -80,7 +80,9 @@ export function useAuth(options?: UseAuthOptions) {
     if (redirectPath) {
       window.location.href = redirectPath;
     } else {
-      startLogin();
+      void startLogin().catch(error => {
+        console.error("[Auth] Couldn't start sign-in:", error);
+      });
     }
   }, [
     redirectOnUnauthenticated,

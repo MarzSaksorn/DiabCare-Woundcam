@@ -16,19 +16,19 @@ DiabCare Woundcam is a bilingual clinical companion web application for hospital
 - Per-region AZH classification across `BG`, `D`, `N`, `P`, `S`, and `V`, kept separate from detector labels.
 - Wound-area segmentation on each qualifying detector crop, with a bounded 128×128 mask overlay and predicted pixel coverage.
 - Detection bounding boxes and mask overlays mapped onto the captured preview, with confidence scores, visibility controls, and a clinician-review disclaimer.
- - Type-safe tRPC procedures, Drizzle ORM schema, Supabase PostgreSQL persistence, and Cloudflare R2 storage for wound images.
+- Type-safe tRPC procedures, Drizzle ORM schema, Supabase PostgreSQL persistence, and Cloudflare R2 storage for wound images.
 
 ## Architecture
 
-| Layer          | Implementation                                                                            |
-| -------------- | ----------------------------------------------------------------------------------------- |
-| Frontend       | React 19, TypeScript, Vite, Tailwind CSS v4, Wouter, Radix UI, Lucide Icons               |
-| API            | Express, tRPC 11, Zod validation                                                          |
-| Persistence    | Supabase PostgreSQL accessed through Drizzle ORM                                          |
-| Inference      | Ultralytics and SmallUNet ONNX exports, ONNX Runtime Node, Sharp preprocessing            |
-| Authentication | Manus OAuth/session integration                                                           |
-| Storage        | Private Cloudflare R2 bucket; store references, not image bytes, in database rows       |
-| Localization   | Shared English/Thai `LanguageProvider`                                                    |
+| Layer          | Implementation                                                                    |
+| -------------- | --------------------------------------------------------------------------------- |
+| Frontend       | React 19, TypeScript, Vite, Tailwind CSS v4, Wouter, Radix UI, Lucide Icons       |
+| API            | Express, tRPC 11, Zod validation                                                  |
+| Persistence    | Supabase PostgreSQL accessed through Drizzle ORM                                  |
+| Inference      | Ultralytics and SmallUNet ONNX exports, ONNX Runtime Node, Sharp preprocessing    |
+| Authentication | Manus OAuth/session integration                                                   |
+| Storage        | Private Cloudflare R2 bucket; store references, not image bytes, in database rows |
+| Localization   | Shared English/Thai `LanguageProvider`                                            |
 
 The application uses local/server-side inference. Patient images are not sent to an external AI API by the wound-detection flow.
 
@@ -59,6 +59,7 @@ shared/                      Shared constants and types
 - pnpm 10.
 - Supabase PostgreSQL connection available through the server-only `SUPABASE_DATABASE_URL`.
 - Required application/authentication environment variables supplied by the deployment environment. Do not commit `.env` files or credentials.
+- For Manus sign-in, a registered `VITE_APP_ID`, HTTPS `VITE_OAUTH_PORTAL_URL`, `OAUTH_SERVER_URL`, and strong `JWT_SECRET` must be configured at runtime.
 - A CPU-capable runtime for `onnxruntime-node` and native Sharp dependencies.
 - A bucket-scoped Cloudflare R2 API token with object read/write permissions.
 
@@ -69,7 +70,7 @@ pnpm install
 pnpm dev
 ```
 
-The development server starts the Express/tRPC backend and Vite frontend together. The application requires authentication before protected patient and assessment workflows can be opened.
+The development server starts the Express/tRPC backend and Vite frontend together. The application requires authentication before protected patient and assessment workflows can be opened. The login page uses the configured Manus OAuth provider; it does not accept local username/password credentials. Register the exact `https://<site-host>/api/oauth/callback` URL in the Manus app’s allowed redirect URIs.
 
 When `NODE_ENV=development`, the app uses a clearly labeled synthetic **Local Clinician** identity by default, so a local checkout does not redirect to Manus OAuth. This bypass is development-only; set `LOCAL_AUTH_BYPASS=false` to test the unauthenticated flow. Production always keeps Manus authentication enabled and rejects bypass flags.
 
@@ -97,7 +98,7 @@ tailscale serve 3000
 tailscale serve status
 ```
 
-Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve requires HTTPS to be enabled for the tailnet and keeps the service available only to authorized tailnet devices. The HTTPS origin is required because mobile browsers generally do not allow `getUserMedia()` from an ordinary LAN HTTP address. For an isolated local Docker demo without Manus OAuth, start it with `LOCAL_AUTH_BYPASS=true docker compose up --build -d`; leave this unset or set it to `false` for shared or production environments. Never commit `.env`, database credentials, OAuth secrets, or patient data.
+Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve requires HTTPS to be enabled for the tailnet and keeps the service available only to authorized tailnet devices. The HTTPS origin is required because mobile browsers generally do not allow `getUserMedia()` from an ordinary LAN HTTP address. For a shared or production deployment, set the real registered Manus `VITE_APP_ID`, HTTPS `VITE_OAUTH_PORTAL_URL`, `OAUTH_SERVER_URL`, and a strong `JWT_SECRET` in `.env`; recreate the container after changing them. For an isolated local demo without OAuth, `LOCAL_AUTH_BYPASS=true` is development-only and must never be used in production. Never commit `.env`, database credentials, OAuth secrets, or patient data.
 
 ### Cloudflare R2 image storage
 

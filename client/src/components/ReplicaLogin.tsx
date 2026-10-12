@@ -1,88 +1,112 @@
-import { Eye, EyeOff, LockKeyhole, Shield, Stethoscope, UserRound } from "lucide-react";
-import { FormEvent, useState } from "react";
+import {
+  ArrowRight,
+  LoaderCircle,
+  ShieldCheck,
+  Stethoscope,
+} from "lucide-react";
+import { useState } from "react";
 import { startLogin } from "@/const";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-type CareRole = "OFFICER" | "NURSE" | "CAREGIVER";
-
-const roleCopy: Record<CareRole, { th: string; en: string; icon: typeof Stethoscope }> = {
-  OFFICER: { th: "เจ้าหน้าที่", en: "Officer", icon: Stethoscope },
-  NURSE: { th: "พยาบาล", en: "Nurse", icon: UserRound },
-  CAREGIVER: { th: "ผู้ดูแลผู้ป่วย", en: "Caregiver", icon: Shield },
-};
-
 export default function ReplicaLogin() {
   const { language } = useLanguage();
-  const [role, setRole] = useState<CareRole>("OFFICER");
-  const [showPassword, setShowPassword] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const isThai = language === "th";
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    // The existing application uses the Manus OAuth/session provider. The
-    // replica fields are intentionally visual only until a real credential
-    // provider is approved; no password is read or stored by this client.
-    startLogin();
+  async function handleSignIn() {
+    setPending(true);
+    setError(null);
+    try {
+      await startLogin();
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : isThai
+            ? "เริ่มการเข้าสู่ระบบไม่สำเร็จ โปรดลองอีกครั้ง"
+            : "Couldn't start sign-in. Please try again."
+      );
+      setPending(false);
+    }
   }
 
   return (
-    <div className="login-page" lang={language === "th" ? "th" : "en"}>
-      <div className="login-card">
+    <main className="login-page" lang={isThai ? "th" : "en"}>
+      <section className="login-card" aria-labelledby="login-title">
         <div className="login-brand">
           <div className="login-logo-tile">
-            <img src="/assets/diabcare-logo.jpg" alt="DiabCare WoundCam" />
+            <img src="/assets/diabcare-logo.jpg" alt="" />
           </div>
-          <h1>
+          <h1 id="login-title">
             DiabCare <span>WoundCam</span>
           </h1>
+          <p className="login-intro">
+            {isThai
+              ? "พื้นที่ทำงานสำหรับทีมดูแลผู้ป่วยที่ได้รับอนุญาต"
+              : "A secure workspace for authorized care teams."}
+          </p>
         </div>
 
-        <form className="login-form-panel" onSubmit={handleSubmit} aria-describedby="login-provider-note">
-          <div className="role-selector" aria-label={language === "th" ? "เลือกบทบาทการดูแล" : "Choose care role"}>
-            {(Object.keys(roleCopy) as CareRole[]).map((item) => {
-              const copy = roleCopy[item];
-              const Icon = copy.icon;
-              const active = role === item;
-              return (
-                <button
-                  key={item}
-                  type="button"
-                  className={`role-option ${active ? "is-active" : ""}`}
-                  aria-pressed={active}
-                  onClick={() => setRole(item)}
-                >
-                  <Icon aria-hidden="true" />
-                  <span>{language === "th" ? copy.th : copy.en}</span>
-                </button>
-              );
-            })}
+        <div className="login-form-panel">
+          <div className="login-security-icon" aria-hidden="true">
+            <ShieldCheck />
           </div>
-
-          <label className="login-field-label" htmlFor="replica-username">
-            ชื่อผู้ใช้งาน <span>(Username)</span>
-          </label>
-          <div className="login-field">
-            <span className="login-input-icon" aria-hidden="true"><UserRound /></span>
-            <input id="replica-username" readOnly placeholder="ป้อนชื่อผู้ใช้งานทดสอบ (e.g., officer)" autoComplete="username" />
-          </div>
-
-          <label className="login-field-label" htmlFor="replica-password">
-            รหัสผ่าน <span>(Password)</span>
-          </label>
-          <div className="login-field">
-            <span className="login-input-icon" aria-hidden="true"><LockKeyhole /></span>
-            <input id="replica-password" readOnly type={showPassword ? "text" : "password"} placeholder="ป้อนรหัสผ่าน (e.g., 123456)" autoComplete="current-password" />
-            <button type="button" className="login-input-action" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Hide password" : "Show password"}>
-              {showPassword ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
-            </button>
-          </div>
-
-          <button type="submit" className="login-button">เข้าสู่ระบบการทำงาน</button>
-          <p id="login-provider-note" className="login-provider-note">
-            {language === "th" ? "ระบบจะเปิดการยืนยันตัวตนขององค์กร ไม่จัดเก็บรหัสผ่านในแอปนี้" : "Sign-in continues through the organization identity provider. This app never stores a password."}
+          <h2 className="login-panel-title">
+            {isThai ? "เข้าสู่ระบบอย่างปลอดภัย" : "Sign in securely"}
+          </h2>
+          <p className="login-panel-copy">
+            {isThai
+              ? "ใช้บัญชีองค์กรของคุณเพื่อเข้าใช้งาน DiabCare WoundCam"
+              : "Continue with your organization account to access DiabCare WoundCam."}
           </p>
-          <div className="login-footer">POWER BY MTN INVENTOR</div>
-        </form>
-      </div>
-    </div>
+
+          <button
+            type="button"
+            className="login-button"
+            onClick={() => void handleSignIn()}
+            disabled={pending}
+            aria-busy={pending}
+          >
+            {pending ? (
+              <LoaderCircle
+                className="login-button-icon is-spinning"
+                aria-hidden="true"
+              />
+            ) : (
+              <Stethoscope className="login-button-icon" aria-hidden="true" />
+            )}
+            <span>
+              {pending
+                ? isThai
+                  ? "กำลังเชื่อมต่อ…"
+                  : "Connecting…"
+                : isThai
+                  ? "ดำเนินการต่อด้วยบัญชีองค์กร"
+                  : "Continue with organization sign-in"}
+            </span>
+            {!pending && (
+              <ArrowRight className="login-button-arrow" aria-hidden="true" />
+            )}
+          </button>
+
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
+          <p className="login-provider-note">
+            {isThai
+              ? "การยืนยันตัวตนดำเนินการโดยผู้ให้บริการขององค์กร แอปนี้จะไม่รับหรือจัดเก็บรหัสผ่าน"
+              : "Your organization verifies your identity. DiabCare never asks for or stores your password."}
+          </p>
+          <div className="login-footer">
+            {isThai
+              ? "สำหรับบุคลากรที่ได้รับอนุญาตเท่านั้น"
+              : "Authorized care-team access only"}
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }

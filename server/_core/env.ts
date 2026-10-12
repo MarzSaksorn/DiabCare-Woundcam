@@ -1,5 +1,6 @@
 export const ENV = {
   appId: process.env.VITE_APP_ID ?? "",
+  oauthPortalUrl: process.env.VITE_OAUTH_PORTAL_URL ?? "",
   cookieSecret: process.env.JWT_SECRET ?? "",
   // DATABASE_URL is platform-managed in WebDev. Prefer the custom Supabase
   // secret so the application does not accidentally connect to the legacy DB.

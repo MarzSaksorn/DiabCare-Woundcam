@@ -1,8 +1,14 @@
-import { COOKIE_NAME, ONE_YEAR_MS, OAUTH_STATE_COOKIE, decodeOAuthState } from "@shared/const";
+import {
+  COOKIE_NAME,
+  ONE_YEAR_MS,
+  OAUTH_STATE_COOKIE,
+  decodeOAuthState,
+} from "@shared/const";
 import { parse as parseCookieHeader } from "cookie";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
+import { ENV } from "./env";
 import { sdk } from "./sdk";
 
 function getQueryParam(req: Request, key: string): string | undefined {
@@ -11,6 +17,16 @@ function getQueryParam(req: Request, key: string): string | undefined {
 }
 
 export function registerOAuthRoutes(app: Express) {
+  app.get("/api/auth/config", (_req: Request, res: Response) => {
+    const config = getPublicOAuthConfig({
+      VITE_APP_ID: ENV.appId,
+      VITE_OAUTH_PORTAL_URL: ENV.oauthPortalUrl,
+      OAUTH_SERVER_URL: ENV.oAuthServerUrl,
+      JWT_SECRET: ENV.cookieSecret,
+    });
+    res.set("Cache-Control", "no-store").json(config);
+  });
+
   app.get("/api/oauth/callback", async (req: Request, res: Response) => {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");
@@ -24,12 +40,18 @@ export function registerOAuthRoutes(app: Express) {
     // startLogin set in the browser that began this login. An attacker can
     // forge `state`, but cannot plant this cookie in the victim's browser.
     const { nonce } = decodeOAuthState(state);
-    const expectedNonce = parseCookieHeader(req.headers.cookie ?? "")[OAUTH_STATE_COOKIE];
+    const expectedNonce = parseCookieHeader(req.headers.cookie ?? "")[
+      OAUTH_STATE_COOKIE
+    ];
     if (!nonce || nonce !== expectedNonce) {
       res.status(403).json({ error: "invalid oauth state" });
       return;
     }
-    res.clearCookie(OAUTH_STATE_COOKIE, { path: "/", secure: true, sameSite: "none" });
+    res.clearCookie(OAUTH_STATE_COOKIE, {
+      path: "/",
+      secure: true,
+      sameSite: "none",
+    });
 
     try {
       const tokenResponse = await sdk.exchangeCodeForToken(code, state);
@@ -54,7 +76,10 @@ export function registerOAuthRoutes(app: Express) {
       });
 
       const cookieOptions = getSessionCookieOptions(req);
-      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+      res.cookie(COOKIE_NAME, sessionToken, {
+        ...cookieOptions,
+        maxAge: ONE_YEAR_MS,
+      });
 
       res.redirect(302, "/");
     } catch (error) {
@@ -62,4 +87,30 @@ export function registerOAuthRoutes(app: Express) {
       res.status(500).json({ error: "OAuth callback failed" });
     }
   });
+}
+
+export function getPublicOAuthConfig(env: NodeJS.ProcessEnv = process.env) {
+  const appId = env.VITE_APP_ID?.trim() ?? "";
+  const portalUrl = env.VITE_OAUTH_PORTAL_URL?.trim().replace(/\/+$/, "") ?? "";
+  const oauthServerUrl = env.OAUTH_SERVER_URL?.trim() ?? "";
+  const sessionSecret = env.JWT_SECRET?.trim() ?? "";
+  let validPortalUrl = false;
+
+  try {
+    validPortalUrl = new URL(portalUrl).protocol === "https:";
+  } catch {
+    validPortalUrl = false;
+  }
+
+  return {
+    appId,
+    oauthPortalUrl: portalUrl,
+    configured: Boolean(
+      appId &&
+        appId !== "local-development" &&
+        validPortalUrl &&
+        oauthServerUrl &&
+        sessionSecret
+    ),
+  };
 }

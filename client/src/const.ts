@@ -2,19 +2,56 @@ import { OAUTH_STATE_COOKIE, encodeOAuthState } from "@shared/const";
 
 export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
-// Start the Manus OAuth login. Call this from an event handler or effect at the
-// moment you want to navigate, e.g. `onClick={() => startLogin()}`.
-//
-// It has SIDE EFFECTS — it mints a one-time nonce, writes the __Host- state
-// cookie, and navigates immediately — so the cookie nonce always matches the
-// `state` it sends. Do NOT call it during render (no `href={startLogin()}` /
-// `loginUrl={...}`): each call overwrites the cookie, so a stray render-phase
-// call would desync it from an in-flight login and the callback would reject it
-// with "invalid oauth state". It returns void by design, so there is no URL to
-// stash across renders.
-export const startLogin = () => {
-  const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
-  const appId = import.meta.env.VITE_APP_ID;
+type PublicOAuthConfig = {
+  appId: string;
+  oauthPortalUrl: string;
+  configured: boolean;
+};
+
+export async function getOAuthConfig(): Promise<PublicOAuthConfig> {
+  let response: Response;
+  try {
+    response = await fetch("/api/auth/config", {
+      credentials: "include",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+  } catch {
+    throw new Error(
+      "Can't reach the sign-in service. Check your connection and try again."
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Sign-in settings couldn't be loaded (${response.status}). Contact your administrator.`
+    );
+  }
+
+  const config = (await response.json()) as PublicOAuthConfig;
+  if (!config.configured || !config.appId || !config.oauthPortalUrl) {
+    throw new Error(
+      "Organization sign-in isn't configured yet. Ask your administrator to verify the Manus app ID, HTTPS OAuth portal URL, OAuth server URL, and session secret."
+    );
+  }
+
+  return config;
+}
+
+// Start Manus OAuth only after loading the public settings from the server.
+// The backend serves these settings at runtime so Docker builds don't need
+// public auth values baked into the static frontend bundle.
+export const startLogin = async (): Promise<void> => {
+  const { appId, oauthPortalUrl } = await getOAuthConfig();
+  const isLocalhost = ["localhost", "127.0.0.1", "[::1]"].includes(
+    window.location.hostname
+  );
+  if (window.location.protocol !== "https:" && !isLocalhost) {
+    throw new Error(
+      "Sign-in requires HTTPS. Open the secure site URL and try again."
+    );
+  }
+
   const redirectUri = `${window.location.origin}/api/oauth/callback`;
 
   const nonce = crypto.randomUUID();
@@ -27,5 +64,5 @@ export const startLogin = () => {
   url.searchParams.set("state", state);
   url.searchParams.set("type", "signIn");
 
-  window.location.href = url.toString();
+  window.location.assign(url.toString());
 };
