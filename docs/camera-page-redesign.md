@@ -1,62 +1,43 @@
 # Camera Page Redesign
 
-**Mode:** Redesign · Preserve
+**Mode:** Redesign · Overhaul
 **Route:** `/camera` and `/assessments`
 **Branch:** `feat/combined-model-results`
 
 ## Design read
 
-- **Artifact:** Tablet-first clinical wound-image capture workflow.
-- **Audience:** Doctors, nurses, and care-team members capturing evidence under time pressure.
-- **Visual language:** Calm clinical operations UI with an explicit workflow rail, high-contrast action blue, and model output treated as reviewable evidence rather than a diagnosis.
-- **Visual variance:** 4/10. The page changes hierarchy and composition, not product identity.
-- **Motion intensity:** 2/10. Only loading feedback and restrained hover/focus states remain.
-- **Information density:** 8/10. Patient context, capture controls, image evidence, model review, and save assignment remain visible in one workflow.
-- **Asset dependence:** 4/10. The existing DiabCare logo is retained; clinical images remain real user-provided evidence or honest empty states.
-- **Brand fidelity:** 8/10. The page now shares the approved v0 clinical token system and Atkinson Hyperlegible typography.
+This is a tablet-first clinical wound-image capture console for doctors, nurses, and care-team members working under time pressure. The new visual language treats the camera surface as the main instrument, not another dashboard card. HeroUI v3 provides the accessible Card, Input, and Button primitives; scoped clinical CSS supplies the DiabCare identity, camera canvas, model review states, and responsive composition.
+
+The visual-variance dial is 6/10 because the page moves from a dashboard form into a capture console. Motion remains 2/10 because clinical evidence work benefits from stable feedback. Information density stays at 8/10. Asset dependence remains 4/10 because the existing logo is retained and clinical images remain real user evidence. Brand fidelity is 8/10 through the existing logo, Atkinson Hyperlegible, clinical blue tokens, and established DashboardLayout.
 
 ## Positioning questions
 
-- **Narrative role:** Move from safe patient selection to evidence capture, then to clinician-reviewed model output and record assignment.
-- **Viewing distance:** 60–90 cm on a tablet. Body copy starts at 17–20px and key controls use 48px-plus targets.
-- **Visual temperature:** Calm during capture, amber for review-required states, red only for camera or data errors.
-- **Capacity check:** On tablet, the selected patient, three-step rail, camera surface, primary capture controls, and review panel share the first meaningful view. On mobile, the panels stack in workflow order.
+The narrative starts with a **case gate**, moves into **evidence capture**, then ends with **clinician review and record link**. The page is designed for a 60–90 cm tablet viewing distance, with 17–20px body text and 48px-plus primary controls. The page canvas stays calm and off-white. The camera becomes deep navy and instrument-like. Amber marks review-required states. Red appears only for camera or data errors.
+
+The capacity check is deliberate. Before a patient is selected, the screen gives the search and result state enough room without pretending there is camera content. After selection, the main grid gives the evidence surface the larger column and keeps review, model output, and record assignment in a right rail. On mobile, the evidence surface appears first and the review rail follows.
 
 ## Before-and-after plan
 
 ### Preserve
 
-- Existing route paths `/camera` and `/assessments`.
-- Patient search, diabetes-context filters, patient selection, and confirmation behavior.
-- Browser camera permission handling, secure-context checks, live video, frame capture, upload fallback, preview reset, and object URL cleanup.
-- Inference mutation payload, confidence threshold, per-region results, segmentation overlays, overlay toggles, and model disclaimer.
-- Wound-assessment selector, capture date/time field, save mutation, toast feedback, and diagnostic photo history.
-- English/Thai copy and existing translation keys.
-- Accessibility behavior: labels, live regions, keyboard-close help dialog, focus states, disabled states, and explicit empty/error messages.
+The route paths, DashboardLayout, patient search and filtering, patient selection, browser camera permission flow, live video, frame capture, upload fallback, preview reset, object URL cleanup, inference payload, confidence threshold, detection and segmentation overlays, overlay toggles, wound-assessment selector, capture date/time, save mutation, toast feedback, diagnostic history, bilingual copy, focus states, live regions, keyboard help dialog, and clinical disclaimer all remain intact.
 
 ### Improve
 
-- Replace the former compact green/blue visual layer with the approved blue clinical system.
-- Add a visible three-step workflow rail so the next action is always clear.
-- Promote selected patient context into a persistent banner before the camera opens.
-- Increase typography, spacing, control heights, and camera frame proportions for tablet use.
-- Make model output visually subordinate to clinician review while preserving all technical result detail.
-- Add responsive rules for stacked mobile panels and a consistent 48px control rhythm.
+The former multi-card dashboard framing becomes a compact clinical header followed by a case gate. The selected patient becomes a persistent active-case banner. The active workflow uses a two-column console: a dark navy camera evidence surface on the left and a review/record rail on the right. HeroUI `Card`, `Input`, and `Button` components provide the new accessible control foundation. The page keeps tablet-sized controls and stacks cleanly on mobile.
 
 ### Remove
 
-- Decorative gradients and soft shadows that made the capture surface read like a marketing card.
-- Tiny uppercase labels that carried important workflow meaning without enough supporting hierarchy.
-- The old visual mismatch between the camera page and the approved v0 dashboard system.
+The redesign removes the old full-width stepper, repeated dashboard chrome, large empty selector framing, generic soft-shadow treatment, and green/blue visual mismatch. It does not remove any workflow or data state.
 
 ## Protected contracts
 
-No backend, database schema, API, route, form field, mutation payload, local state key, inference model contract, or clinical disclaimer was changed. The redesign changes presentation and component composition only.
+No backend, database schema, API, route, form field, mutation payload, local state key, inference model contract, or clinical disclaimer changed. The redesign changes presentation, composition, and component primitives only.
 
 ## Highest-risk change
 
-The highest-risk area is the overlay and model-result layout because `WoundInferenceResults` is shared behavior. The redesign keeps its class API and data flow intact, then applies scoped camera-page styles around it instead of rewriting inference logic.
+The highest-risk area is the camera and model-result composition because `WoundInferenceResults` owns shared behavior. The redesign keeps the component API and data flow intact and scopes the new layout around its existing result markup.
 
 ## Rollback / fallback
 
-The previous visual layer remains in Git history at the parent commit. If review rejects the new layout, revert the camera page and `camera-redesign.css` while retaining the shared token extraction, which is behavior-neutral.
+The previous visual pass remains in Git history at commit `c3528bb`. The new styling is isolated in `camera-redesign.css`, while the HeroUI dependency can be removed independently if the product chooses to keep the custom primitives.

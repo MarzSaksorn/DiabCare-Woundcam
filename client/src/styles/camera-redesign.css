@@ -1,660 +1,551 @@
-.camera-v2-page {
-  --camera-blue: #0369a1;
-  --camera-blue-dark: #075985;
-  --camera-blue-soft: #e0f2fe;
-  --camera-canvas: #f8fafc;
-  --camera-surface: #ffffff;
-  --camera-text: #0f172a;
-  --camera-muted: #475569;
-  --camera-subtle: #64748b;
-  --camera-border: #cbd5e1;
-  --camera-border-soft: #e2e8f0;
-  --camera-critical: #dc2626;
-  --camera-critical-soft: #fef2f2;
-  --camera-warning: #d97706;
-  --camera-warning-soft: #fffbeb;
-  --camera-stable: #16a34a;
-  --camera-stable-soft: #f0fdf4;
-  --camera-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+.camera-console {
+  --console-blue: #0369a1;
+  --console-blue-dark: #075985;
+  --console-blue-soft: #e0f2fe;
+  --console-navy: #091923;
+  --console-navy-2: #0e2533;
+  --console-navy-border: #1d4358;
+  --console-canvas: #f8fafc;
+  --console-surface: #ffffff;
+  --console-text: #0f172a;
+  --console-muted: #475569;
+  --console-subtle: #64748b;
+  --console-border: #cbd5e1;
+  --console-border-soft: #e2e8f0;
+  --console-critical: #dc2626;
+  --console-critical-soft: #fef2f2;
+  --console-warning: #d97706;
+  --console-warning-soft: #fffbeb;
+  --console-stable: #16a34a;
+  --console-stable-soft: #f0fdf4;
   width: 100%;
-  max-width: 1280px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 8px 0 40px;
-  color: var(--camera-text);
+  padding: 2px 0 36px;
+  color: var(--console-text);
   font-family: "Atkinson Hyperlegible", sans-serif;
   font-size: 18px;
   line-height: 1.4;
 }
 
-.camera-v2-page *,
-.camera-v2-page *::before,
-.camera-v2-page *::after {
+.camera-console *,
+.camera-console *::before,
+.camera-console *::after {
   box-sizing: border-box;
 }
 
-.camera-v2-page button,
-.camera-v2-page input,
-.camera-v2-page select {
+.camera-console button,
+.camera-console input,
+.camera-console select {
   font: inherit;
 }
 
-.camera-v2-page button {
+.camera-console button {
   cursor: pointer;
 }
 
-.camera-v2-page button:focus-visible,
-.camera-v2-page a:focus-visible,
-.camera-v2-page input:focus-visible,
-.camera-v2-page select:focus-visible {
-  outline: 4px solid rgba(3, 105, 161, 0.26);
+.camera-console button:focus-visible,
+.camera-console a:focus-visible,
+.camera-console input:focus-visible,
+.camera-console select:focus-visible {
+  outline: 4px solid rgba(3, 105, 161, 0.3);
   outline-offset: 3px;
 }
 
-.camera-v2-page h1,
-.camera-v2-page h2,
-.camera-v2-page p {
+.camera-console h1,
+.camera-console h2,
+.camera-console h3,
+.camera-console p {
   text-wrap: pretty;
 }
 
-.camera-v2-page h1,
-.camera-v2-page h2,
-.camera-v2-page p {
+.camera-console h1,
+.camera-console h2,
+.camera-console h3,
+.camera-console p {
   margin-top: 0;
 }
 
-.camera-v2-header {
+.camera-console-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 32px;
-  margin-bottom: 26px;
+  margin-bottom: 22px;
 }
 
-.camera-v2-back {
+.camera-console-title-block {
+  min-width: 0;
+}
+
+.camera-console-back {
   display: inline-flex;
   min-height: 40px;
   align-items: center;
   gap: 5px;
-  color: var(--camera-blue-dark);
+  color: var(--console-blue-dark);
   font-size: 17px;
   font-weight: 700;
   text-decoration: none;
 }
 
-.camera-v2-back:hover {
-  color: var(--camera-blue);
+.camera-console-back:hover {
+  color: var(--console-blue);
   text-decoration: underline;
   text-underline-offset: 4px;
 }
 
-.camera-v2-back svg {
+.camera-console-back svg {
   width: 21px;
   height: 21px;
 }
 
-.camera-v2-eyebrow,
-.camera-v2-kicker {
-  display: inline-flex;
+.camera-console-overline {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  color: var(--camera-blue);
+  gap: 10px;
+  margin-top: 13px;
+  color: var(--console-blue);
   font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
 }
 
-.camera-v2-eyebrow {
-  margin-top: 15px;
+.camera-console-secure-chip {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  background: var(--console-stable-soft);
+  padding: 0 10px;
+  color: var(--console-stable);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
-.camera-v2-eyebrow > span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--camera-blue);
-  box-shadow: 0 0 0 4px rgba(3, 105, 161, 0.11);
+.camera-console-secure-chip svg {
+  width: 17px;
+  height: 17px;
 }
 
-.camera-v2-header h1 {
-  margin: 8px 0 7px;
-  color: var(--camera-text);
-  font-size: clamp(34px, 4vw, 48px);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1.14;
+.camera-console-header h1 {
+  margin: 7px 0 4px;
+  color: var(--console-text);
+  font-size: clamp(32px, 4vw, 46px);
+  letter-spacing: -0.045em;
+  line-height: 1.12;
 }
 
-.camera-v2-header p {
-  max-width: 760px;
+.camera-console-header p {
+  max-width: 720px;
   margin: 0;
-  color: var(--camera-muted);
-  font-size: 20px;
+  color: var(--console-muted);
+  font-size: 19px;
   line-height: 1.45;
 }
 
-.camera-v2-header-meta {
-  display: grid;
+.camera-console-brand {
+  display: flex;
   flex: 0 0 auto;
-  justify-items: end;
-  gap: 12px;
-}
-
-.camera-v2-protected-badge,
-.camera-v2-product-mark {
-  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  white-space: nowrap;
+  gap: 11px;
+  padding-bottom: 4px;
 }
 
-.camera-v2-protected-badge {
-  color: var(--camera-stable);
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.camera-v2-protected-badge svg {
-  width: 20px;
-  height: 20px;
-}
-
-.camera-v2-product-mark {
-  color: var(--camera-blue-dark);
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.camera-v2-product-mark img {
-  width: 42px;
-  height: 34px;
-  border-radius: 7px;
+.camera-console-brand img {
+  width: 48px;
+  height: 38px;
+  border-radius: 8px;
   object-fit: cover;
   object-position: left center;
 }
 
-.camera-v2-stepper {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
-  margin-bottom: 22px;
-  border: 1px solid var(--camera-border);
-  border-radius: 12px;
-  background: var(--camera-surface);
-  box-shadow: var(--camera-shadow);
-  overflow: hidden;
-}
-
-.camera-v2-step {
-  position: relative;
-  display: flex;
-  min-height: 82px;
-  align-items: center;
-  gap: 12px;
-  border-right: 1px solid var(--camera-border-soft);
-  padding: 14px 20px;
-}
-
-.camera-v2-step:last-child {
-  border-right: 0;
-}
-
-.camera-v2-step:not(:last-child)::after {
-  position: absolute;
-  top: 50%;
-  right: -8px;
-  z-index: 1;
-  width: 15px;
-  height: 15px;
-  border-top: 1px solid var(--camera-border);
-  border-right: 1px solid var(--camera-border);
-  background: var(--camera-surface);
-  content: "";
-  transform: translateY(-50%) rotate(45deg);
-}
-
-.camera-v2-step-number {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 auto;
-  place-items: center;
-  border: 1px solid var(--camera-border);
-  border-radius: 50%;
-  color: var(--camera-subtle);
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.camera-v2-step-number svg {
-  width: 20px;
-  height: 20px;
-}
-
-.camera-v2-step-copy {
-  min-width: 0;
-}
-
-.camera-v2-step-copy strong,
-.camera-v2-step-copy small {
+.camera-console-brand strong,
+.camera-console-brand small {
   display: block;
 }
 
-.camera-v2-step-copy strong {
-  color: var(--camera-text);
-  font-size: 18px;
+.camera-console-brand strong {
+  color: var(--console-blue-dark);
+  font-size: 19px;
 }
 
-.camera-v2-step-copy small {
-  margin-top: 3px;
-  color: var(--camera-subtle);
+.camera-console-brand small {
+  margin-top: 2px;
+  color: var(--console-subtle);
   font-size: 15px;
 }
 
-.camera-v2-step-active {
-  background: var(--camera-blue-soft);
+.camera-console-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--console-border) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
 }
 
-.camera-v2-step-active .camera-v2-step-number {
-  border-color: var(--camera-blue);
-  background: var(--camera-blue);
-  color: white;
+.camera-console-card.card {
+  padding: 0;
 }
 
-.camera-v2-step-active .camera-v2-step-copy strong {
-  color: var(--camera-blue-dark);
-}
-
-.camera-v2-step-complete .camera-v2-step-number {
-  border-color: var(--camera-stable);
-  background: var(--camera-stable-soft);
-  color: var(--camera-stable);
-}
-
-.camera-v2-step-complete .camera-v2-step-copy strong {
-  color: var(--camera-stable);
-}
-
-.camera-v2-panel {
-  border: 1px solid var(--camera-border);
-  border-radius: 12px;
-  background: var(--camera-surface);
-  box-shadow: var(--camera-shadow);
-}
-
-.camera-v2-panel-header {
+.camera-console-card-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
-  border-bottom: 1px solid var(--camera-border-soft);
-  padding: 24px 26px 20px;
+  border-bottom: 1px solid var(--console-border-soft);
+  padding: 22px 24px 18px;
 }
 
-.camera-v2-panel-header h2 {
+.camera-console-card-header h2 {
   margin: 7px 0 4px;
-  color: var(--camera-text);
-  font-size: 27px;
+  color: var(--console-text);
+  font-size: 26px;
   letter-spacing: -0.025em;
   line-height: 1.2;
 }
 
-.camera-v2-panel-header p {
-  max-width: 620px;
+.camera-console-card-header p {
+  max-width: 680px;
   margin: 0;
-  color: var(--camera-muted);
+  color: var(--console-muted);
   font-size: 18px;
   line-height: 1.45;
 }
 
-.camera-v2-record-count {
+.camera-console-phase {
+  display: block;
+  color: var(--console-blue);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.camera-console-record-count {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 38px;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   border: 1px solid #bae6fd;
   border-radius: 999px;
   background: #f0f9ff;
-  padding: 0 13px;
-  color: var(--camera-blue-dark);
+  padding: 0 12px;
+  color: var(--console-blue-dark);
   font-size: 16px;
   font-weight: 700;
   white-space: nowrap;
 }
 
-.camera-v2-record-count svg {
+.camera-console-record-count svg {
   width: 20px;
   height: 20px;
 }
 
-.camera-v2-selector {
-  overflow: hidden;
+.camera-console-case-gate {
+  background: var(--console-surface) !important;
 }
 
-.camera-v2-selector-grid {
+.camera-console-case-content {
   display: grid;
-  grid-template-columns: minmax(250px, 0.43fr) minmax(0, 1fr);
-  gap: 0;
-  min-height: 410px;
+  grid-template-columns: minmax(250px, 0.4fr) minmax(0, 1fr);
+  padding: 0 !important;
 }
 
-.camera-v2-filter-rail {
-  border-right: 1px solid var(--camera-border-soft);
+.camera-console-case-tools {
+  border-right: 1px solid var(--console-border-soft);
   background: #f8fafc;
-  padding: 22px 20px;
+  padding: 22px;
 }
 
-.camera-v2-search {
-  display: flex;
-  min-height: 52px;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid var(--camera-border);
-  border-radius: 8px;
-  background: var(--camera-surface);
-  padding: 0 13px;
+.camera-console-search-wrap {
+  position: relative;
 }
 
-.camera-v2-search:focus-within {
-  border-color: var(--camera-blue);
-  box-shadow: 0 0 0 4px rgba(3, 105, 161, 0.14);
-}
-
-.camera-v2-search svg {
+.camera-console-search-wrap > svg {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  z-index: 1;
   width: 21px;
   height: 21px;
-  flex: 0 0 auto;
-  color: var(--camera-blue-dark);
+  color: var(--console-blue-dark);
+  pointer-events: none;
+  transform: translateY(-50%);
 }
 
-.camera-v2-search input {
-  min-width: 0;
-  width: 100%;
-  border: 0;
-  outline: 0;
-  color: var(--camera-text);
-  font-size: 18px;
+.camera-console-search-input {
+  min-height: 52px;
+  border: 1px solid var(--console-border) !important;
+  border-radius: 9px !important;
+  background: white !important;
+  padding-left: 42px !important;
+  color: var(--console-text) !important;
+  font-size: 18px !important;
+  box-shadow: none !important;
 }
 
-.camera-v2-search input::placeholder {
-  color: var(--camera-subtle);
+.camera-console-search-input:hover {
+  border-color: #94a3b8 !important;
 }
 
-.camera-v2-filter-row {
+.camera-console-search-input:focus-visible {
+  border-color: var(--console-blue) !important;
+  box-shadow: 0 0 0 4px rgba(3, 105, 161, 0.14) !important;
+}
+
+.camera-console-filter-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 5px;
   margin-top: 16px;
-  border: 1px solid var(--camera-border-soft);
-  border-radius: 8px;
+  border: 1px solid var(--console-border-soft);
+  border-radius: 9px;
   background: #eef2f7;
   padding: 4px;
 }
 
-.camera-v2-filter-row button {
+.camera-console-filter-row button {
   min-height: 44px;
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: var(--camera-muted);
+  color: var(--console-muted);
   font-size: 16px;
   font-weight: 700;
 }
 
-.camera-v2-filter-row button:hover {
+.camera-console-filter-row button:hover {
   background: #e2e8f0;
-  color: var(--camera-blue-dark);
+  color: var(--console-blue-dark);
 }
 
-.camera-v2-filter-row button.is-active {
-  background: var(--camera-blue);
+.camera-console-filter-row button.is-active {
+  background: var(--console-blue);
   color: white;
-  box-shadow: 0 3px 8px rgba(3, 105, 161, 0.18);
 }
 
-.camera-v2-selection-note {
+.camera-console-case-note {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin-top: 24px;
+  margin-top: 22px;
   border: 1px solid #bae6fd;
-  border-radius: 8px;
+  border-radius: 9px;
   background: #f0f9ff;
-  padding: 14px;
+  padding: 13px;
 }
 
-.camera-v2-selection-note > svg {
+.camera-console-case-note > svg {
   width: 21px;
   height: 21px;
   flex: 0 0 auto;
-  color: var(--camera-blue);
+  color: var(--console-blue);
 }
 
-.camera-v2-selection-note strong,
-.camera-v2-selection-note span {
+.camera-console-case-note strong,
+.camera-console-case-note span {
   display: block;
 }
 
-.camera-v2-selection-note strong {
-  color: var(--camera-blue-dark);
+.camera-console-case-note strong {
+  color: var(--console-blue-dark);
   font-size: 17px;
 }
 
-.camera-v2-selection-note span {
+.camera-console-case-note span {
   margin-top: 3px;
-  color: var(--camera-muted);
+  color: var(--console-muted);
   font-size: 15px;
   line-height: 1.4;
 }
 
-.camera-v2-patient-results {
+.camera-console-case-results {
   min-width: 0;
-  padding: 22px 24px 8px;
+  padding: 22px 24px 10px;
 }
 
-.camera-v2-results-heading {
+.camera-console-results-heading {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 11px;
 }
 
-.camera-v2-results-heading > div > span,
-.camera-v2-results-heading > div > strong {
+.camera-console-results-heading strong {
   display: block;
-}
-
-.camera-v2-results-heading > div > strong {
   margin-top: 4px;
-  color: var(--camera-text);
-  font-size: 20px;
+  color: var(--console-text);
+  font-size: 21px;
 }
 
-.camera-v2-results-heading small {
-  color: var(--camera-subtle);
+.camera-console-results-heading small {
+  color: var(--console-subtle);
   font-size: 16px;
   white-space: nowrap;
 }
 
-.camera-v2-selection-preview {
+.camera-console-selected-preview {
   display: flex;
-  min-height: 68px;
+  min-height: 66px;
   align-items: center;
   gap: 11px;
   margin-bottom: 8px;
   border: 1px solid #bae6fd;
-  border-radius: 8px;
+  border-radius: 9px;
   background: #f0f9ff;
   padding: 10px 12px;
 }
 
-.camera-v2-selection-icon {
+.camera-console-selected-icon {
   display: grid;
   width: 38px;
   height: 38px;
   flex: 0 0 auto;
   place-items: center;
   border-radius: 8px;
-  background: var(--camera-blue);
+  background: var(--console-blue);
   color: white;
 }
 
-.camera-v2-selection-icon svg {
+.camera-console-selected-icon svg {
   width: 21px;
   height: 21px;
 }
 
-.camera-v2-selection-preview > div {
+.camera-console-selected-preview > div {
   min-width: 0;
   flex: 1;
 }
 
-.camera-v2-selection-preview > div > span,
-.camera-v2-selection-preview strong,
-.camera-v2-selection-preview small {
+.camera-console-selected-preview > div > span,
+.camera-console-selected-preview strong,
+.camera-console-selected-preview small {
   display: block;
 }
 
-.camera-v2-selection-preview > div > span {
-  color: var(--camera-blue);
+.camera-console-selected-preview > div > span {
+  color: var(--console-blue);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.camera-v2-selection-preview strong {
+.camera-console-selected-preview strong,
+.camera-console-selected-preview small {
   overflow: hidden;
-  margin-top: 1px;
-  color: var(--camera-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console-selected-preview strong {
+  margin-top: 2px;
+  color: var(--console-text);
   font-size: 18px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.camera-v2-selection-preview small {
-  overflow: hidden;
-  color: var(--camera-muted);
+.camera-console-selected-preview small {
+  color: var(--console-muted);
   font-size: 15px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.camera-v2-chip {
-  display: inline-flex;
-  min-height: 32px;
-  align-items: center;
-  gap: 7px;
+.camera-console-ready-tag {
   border-radius: 999px;
-  padding: 0 12px;
-  font-size: 15px;
+  background: var(--console-stable-soft);
+  padding: 6px 10px;
+  color: var(--console-stable);
+  font-size: 14px;
   font-weight: 700;
-  white-space: nowrap;
 }
 
-.camera-v2-chip > span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.camera-v2-chip-blue {
-  background: var(--camera-blue-soft);
-  color: var(--camera-blue-dark);
-}
-
-.camera-v2-chip-stable {
-  background: var(--camera-stable-soft);
-  color: var(--camera-stable);
-}
-
-.camera-v2-chip-warning {
-  background: var(--camera-warning-soft);
-  color: var(--camera-warning);
-}
-
-.camera-v2-patient-list {
+.camera-console-patient-list {
   display: grid;
-  max-height: 370px;
+  max-height: 340px;
   overflow: auto;
-  border-top: 1px solid var(--camera-border-soft);
+  border-top: 1px solid var(--console-border-soft);
 }
 
-.camera-v2-patient-choice {
+.camera-console-patient-choice {
   display: flex;
   width: 100%;
   min-width: 0;
-  min-height: 78px;
+  min-height: 76px;
   align-items: center;
-  gap: 13px;
+  gap: 12px;
   border: 0;
-  border-bottom: 1px solid var(--camera-border-soft);
+  border-bottom: 1px solid var(--console-border-soft);
   border-left: 4px solid transparent;
-  background: var(--camera-surface);
-  padding: 11px 12px 11px 9px;
+  background: white;
+  padding: 10px 10px 10px 8px;
   color: inherit;
   text-align: left;
   transition:
-    background 160ms ease,
-    border-color 160ms ease;
+    background 140ms ease,
+    border-color 140ms ease;
 }
 
-.camera-v2-patient-choice:hover,
-.camera-v2-patient-choice.is-selected {
-  border-left-color: var(--camera-blue);
+.camera-console-patient-choice:hover,
+.camera-console-patient-choice.is-selected {
+  border-left-color: var(--console-blue);
   background: #f8fbff;
 }
 
-.camera-v2-patient-avatar {
+.camera-console-patient-avatar {
   display: grid;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   flex: 0 0 auto;
   place-items: center;
   border-radius: 8px;
-  background: var(--camera-blue-soft);
-  color: var(--camera-blue-dark);
+  background: var(--console-blue-soft);
+  color: var(--console-blue-dark);
 }
 
-.camera-v2-patient-avatar svg {
-  width: 23px;
-  height: 23px;
+.camera-console-patient-avatar svg {
+  width: 22px;
+  height: 22px;
 }
 
-.camera-v2-patient-main {
+.camera-console-patient-main {
   min-width: 0;
   flex: 1;
 }
 
-.camera-v2-patient-main strong,
-.camera-v2-patient-main small,
-.camera-v2-patient-main em {
+.camera-console-patient-main strong,
+.camera-console-patient-main small,
+.camera-console-patient-main em {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.camera-v2-patient-main strong {
-  color: var(--camera-text);
+.camera-console-patient-main strong {
+  color: var(--console-text);
   font-size: 19px;
 }
 
-.camera-v2-patient-main small,
-.camera-v2-patient-main em {
+.camera-console-patient-main small,
+.camera-console-patient-main em {
   margin-top: 2px;
-  color: var(--camera-muted);
-  font-size: 16px;
+  color: var(--console-muted);
+  font-size: 15px;
   font-style: normal;
 }
 
-.camera-v2-patient-main em {
-  color: var(--camera-subtle);
+.camera-console-patient-main em {
+  color: var(--console-subtle);
 }
 
-.camera-v2-patient-check {
+.camera-console-patient-check {
   display: grid;
   width: 28px;
   height: 28px;
@@ -662,362 +553,401 @@
   place-items: center;
 }
 
-.camera-v2-patient-check > span {
+.camera-console-patient-check > span {
   width: 16px;
   height: 16px;
-  border: 2px solid var(--camera-border);
+  border: 2px solid var(--console-border);
   border-radius: 50%;
 }
 
-.camera-v2-patient-check svg {
+.camera-console-patient-check svg {
   width: 24px;
   height: 24px;
-  color: var(--camera-blue);
+  color: var(--console-blue);
 }
 
-.camera-v2-selector-footer {
-  display: flex;
+.camera-console-case-footer {
+  display: flex !important;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  border-top: 1px solid var(--camera-border-soft);
+  border-top: 1px solid var(--console-border-soft);
   background: #f8fafc;
-  padding: 16px 24px;
+  padding: 14px 24px !important;
 }
 
-.camera-v2-selector-footer > span {
+.camera-console-case-footer > span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--camera-muted);
+  color: var(--console-muted);
   font-size: 16px;
 }
 
-.camera-v2-selector-footer > span svg {
-  width: 20px;
-  height: 20px;
-  color: var(--camera-blue);
+.camera-console-case-footer > span svg {
+  width: 19px;
+  height: 19px;
+  color: var(--console-blue);
 }
 
-.camera-v2-primary-button,
-.camera-v2-secondary-button {
+.camera-console-primary-action,
+.camera-console-secondary-action {
   display: inline-flex !important;
-  min-height: 52px !important;
+  min-height: 50px !important;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 8px;
   border-radius: 8px !important;
-  padding: 0 18px !important;
-  font-size: 18px !important;
+  padding: 0 17px !important;
+  font-size: 17px !important;
   font-weight: 700 !important;
   line-height: 1.2;
   white-space: nowrap;
 }
 
-.camera-v2-primary-button {
-  border: 1px solid var(--camera-blue) !important;
-  background: var(--camera-blue) !important;
+.camera-console-primary-action {
+  border: 1px solid var(--console-blue) !important;
+  background: var(--console-blue) !important;
   color: white !important;
   box-shadow: none !important;
 }
 
-.camera-v2-primary-button:hover {
-  border-color: var(--camera-blue-dark) !important;
-  background: var(--camera-blue-dark) !important;
+.camera-console-primary-action:hover {
+  border-color: var(--console-blue-dark) !important;
+  background: var(--console-blue-dark) !important;
 }
 
-.camera-v2-primary-button:disabled {
+.camera-console-primary-action[aria-disabled="true"],
+.camera-console-primary-action:disabled {
   border-color: #cbd5e1 !important;
   background: #e2e8f0 !important;
   color: #64748b !important;
 }
 
-.camera-v2-secondary-button {
-  border: 1px solid var(--camera-blue) !important;
-  background: var(--camera-surface) !important;
-  color: var(--camera-blue-dark) !important;
+.camera-console-secondary-action {
+  border: 1px solid #7dd3fc !important;
+  background: transparent !important;
+  color: #e0f2fe !important;
 }
 
-.camera-v2-secondary-button:hover {
-  background: var(--camera-blue-soft) !important;
+.camera-console-secondary-action:hover {
+  border-color: #bae6fd !important;
+  background: rgba(224, 242, 254, 0.1) !important;
 }
 
-.camera-v2-primary-button svg,
-.camera-v2-secondary-button svg {
-  width: 21px;
-  height: 21px;
+.camera-console-primary-action svg,
+.camera-console-secondary-action svg {
+  width: 20px;
+  height: 20px;
 }
 
-.camera-v2-patient-loading {
-  display: grid;
-  gap: 8px;
-  padding: 11px 0;
-}
-
-.camera-v2-patient-loading span {
-  display: block;
-  height: 66px;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #f1f5f9, #f8fbff, #f1f5f9);
-  background-size: 200% 100%;
-  animation: camera-v2-shimmer 1.2s linear infinite;
-}
-
-.camera-v2-picker-empty {
+.camera-console-empty,
+.camera-console-patient-loading {
   display: flex;
-  min-height: 230px;
+  min-height: 188px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  color: var(--camera-subtle);
+  padding: 22px;
   text-align: center;
 }
 
-.camera-v2-picker-empty svg {
-  width: 34px;
-  height: 34px;
-  color: var(--camera-blue);
+.camera-console-empty svg {
+  width: 32px;
+  height: 32px;
+  color: var(--console-blue);
 }
 
-.camera-v2-picker-empty.is-error svg {
-  color: var(--camera-critical);
+.camera-console-empty.is-error svg {
+  color: var(--console-critical);
 }
 
-.camera-v2-picker-empty strong {
-  margin-top: 11px;
-  color: var(--camera-text);
-  font-size: 21px;
+.camera-console-empty strong {
+  margin-top: 9px;
+  color: var(--console-text);
+  font-size: 20px;
 }
 
-.camera-v2-picker-empty p {
+.camera-console-empty p,
+.camera-console-empty small {
   max-width: 360px;
-  margin: 5px 0 0;
-  color: var(--camera-muted);
+  margin: 4px 0 0;
+  color: var(--console-muted);
   font-size: 16px;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
-.camera-v2-selected-patient {
+.camera-console-empty small {
+  color: var(--console-subtle);
+  font-size: 14px;
+}
+
+.camera-console-patient-loading {
+  gap: 8px;
+}
+
+.camera-console-patient-loading span {
+  display: block;
+  width: 100%;
+  height: 60px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #f1f5f9, #f8fbff, #f1f5f9);
+  background-size: 200% 100%;
+  animation: camera-console-shimmer 1.2s linear infinite;
+}
+
+.camera-console-case-banner {
   display: flex;
-  min-height: 84px;
+  min-height: 78px;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: 13px;
+  margin-bottom: 18px;
   border: 1px solid #bae6fd;
   border-radius: 12px;
   background: #f0f9ff;
-  padding: 14px 18px;
+  padding: 12px 16px;
 }
 
-.camera-v2-selected-avatar {
+.camera-console-case-avatar {
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
   flex: 0 0 auto;
   place-items: center;
   border-radius: 8px;
-  background: var(--camera-blue);
+  background: var(--console-blue);
   color: white;
 }
 
-.camera-v2-selected-avatar svg {
-  width: 24px;
-  height: 24px;
+.camera-console-case-avatar svg {
+  width: 23px;
+  height: 23px;
 }
 
-.camera-v2-selected-copy {
+.camera-console-case-copy {
   min-width: 0;
   flex: 1;
 }
 
-.camera-v2-selected-copy > strong,
-.camera-v2-selected-copy > small {
+.camera-console-case-copy strong,
+.camera-console-case-copy small {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.camera-v2-selected-copy > strong {
+.camera-console-case-copy strong {
   margin-top: 3px;
-  color: var(--camera-text);
-  font-size: 22px;
+  color: var(--console-text);
+  font-size: 21px;
 }
 
-.camera-v2-selected-copy > small {
-  color: var(--camera-muted);
-  font-size: 16px;
+.camera-console-case-copy small {
+  color: var(--console-muted);
+  font-size: 15px;
 }
 
-.camera-v2-change-patient {
+.camera-console-live-tag {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  background: var(--console-stable-soft);
+  padding: 0 11px;
+  color: var(--console-stable);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.camera-console-live-tag > span,
+.camera-console-camera-status > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.camera-console-change-case {
   min-height: 44px;
-  border: 1px solid var(--camera-blue);
+  border: 1px solid var(--console-blue);
   border-radius: 8px;
-  background: var(--camera-surface);
+  background: white;
   padding: 0 13px;
-  color: var(--camera-blue-dark);
+  color: var(--console-blue-dark);
   font-size: 16px;
   font-weight: 700;
   white-space: nowrap;
 }
 
-.camera-v2-change-patient:hover {
-  background: var(--camera-blue-soft);
+.camera-console-change-case:hover {
+  background: var(--console-blue-soft);
 }
 
-.camera-v2-workspace {
+.camera-console-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.14fr) minmax(390px, 0.86fr);
-  gap: 20px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(390px, 0.8fr);
+  gap: 18px;
   align-items: start;
 }
 
-.camera-v2-capture-panel,
-.camera-v2-review-panel {
-  min-width: 0;
-  overflow: hidden;
+.camera-console-evidence-card {
+  border-color: var(--console-navy-border) !important;
+  background: var(--console-navy) !important;
 }
 
-.camera-v2-capture-header {
-  padding-bottom: 18px;
+.camera-console-evidence-card .camera-console-card-header {
+  border-bottom-color: var(--console-navy-border);
+  background: var(--console-navy);
 }
 
-.camera-v2-help-wrap {
+.camera-console-evidence-card .camera-console-card-header h2 {
+  color: white;
+}
+
+.camera-console-evidence-card .camera-console-card-header p {
+  color: #b8cad4;
+}
+
+.camera-console-evidence-card .camera-console-phase {
+  color: #7dd3fc;
+}
+
+.camera-console-evidence-content {
+  background: var(--console-navy);
+  padding: 0 22px 22px !important;
+}
+
+.camera-console-help-wrap {
   position: relative;
   flex: 0 0 auto;
 }
 
-.camera-v2-help {
+.camera-console-help {
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
   place-items: center;
-  border: 1px solid var(--camera-border);
+  border: 1px solid var(--console-navy-border);
   border-radius: 8px;
-  background: var(--camera-surface);
-  color: var(--camera-blue-dark);
+  background: var(--console-navy-2);
+  color: #bae6fd;
 }
 
-.camera-v2-help:hover {
-  border-color: var(--camera-blue);
-  background: var(--camera-blue-soft);
+.camera-console-help:hover {
+  border-color: #7dd3fc;
+  background: #14384b;
 }
 
-.camera-v2-help svg {
-  width: 23px;
-  height: 23px;
+.camera-console-help svg {
+  width: 22px;
+  height: 22px;
 }
 
-.camera-v2-help-popup {
+.camera-console-help-popup {
   position: absolute;
-  z-index: 20;
-  top: 58px;
+  top: 56px;
   right: 0;
+  z-index: 20;
   display: flex;
   width: min(350px, calc(100vw - 42px));
   align-items: flex-start;
-  gap: 14px;
+  gap: 12px;
   border: 1px solid #bae6fd;
   border-radius: 10px;
-  background: var(--camera-surface);
-  padding: 16px;
-  color: var(--camera-muted);
-  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
+  background: white;
+  padding: 15px;
+  color: var(--console-muted);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.18);
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
-.camera-v2-help-popup strong {
+.camera-console-help-popup strong {
   display: block;
-  color: var(--camera-text);
+  color: var(--console-text);
   font-size: 18px;
 }
 
-.camera-v2-help-popup p {
-  margin: 5px 0 0;
+.camera-console-help-popup p {
+  margin: 4px 0 0;
 }
 
-.camera-v2-help-popup > button {
+.camera-console-help-popup > button {
   display: grid;
-  width: 32px;
-  height: 32px;
+  width: 31px;
+  height: 31px;
   flex: 0 0 auto;
   place-items: center;
   border: 0;
   border-radius: 6px;
   background: #f1f5f9;
-  color: var(--camera-muted);
+  color: var(--console-muted);
 }
 
-.camera-v2-help-popup > button:hover {
-  background: var(--camera-blue-soft);
-  color: var(--camera-blue-dark);
+.camera-console-help-popup > button:hover {
+  background: var(--console-blue-soft);
 }
 
-.camera-v2-help-popup > button svg {
-  width: 18px;
-  height: 18px;
-}
-
-.camera-v2-viewport {
+.camera-console-viewport {
   position: relative;
   display: flex;
-  min-height: 520px;
+  min-height: 560px;
   align-items: center;
   justify-content: center;
-  margin: 20px;
   overflow: hidden;
-  border: 1px solid #075985;
-  border-radius: 8px;
+  border: 1px solid var(--console-navy-border);
+  border-radius: 10px;
   background: radial-gradient(
     circle at 50% 38%,
-    #28556e 0%,
-    #12344a 54%,
-    #061d2d 100%
+    #2c586f 0%,
+    #14394e 52%,
+    #061b29 100%
   );
 }
 
-.camera-v2-viewport.has-preview {
-  background: #071b2a;
+.camera-console-viewport.has-preview {
+  background: #061724;
 }
 
-.camera-v2-viewport img {
+.camera-console-viewport img {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 520px;
+  min-height: 560px;
   object-fit: contain;
 }
 
-.camera-v2-viewport.is-live {
-  background: #061824;
+.camera-console-viewport.is-live {
+  background: #04141f;
 }
 
-.camera-v2-live-video {
+.camera-console-live-video {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 520px;
+  min-height: 560px;
   object-fit: cover;
 }
 
-.camera-v2-frame {
+.camera-console-frame {
   position: absolute;
   z-index: 2;
   inset: 14% 16%;
   border: 1px solid rgba(186, 230, 253, 0.45);
-  border-radius: 20px;
+  border-radius: 22px;
 }
 
-.camera-v2-frame span {
+.camera-console-frame span {
   position: absolute;
   width: 34px;
   height: 34px;
   border-color: #bae6fd;
 }
 
-.camera-v2-frame span:nth-child(1) {
+.camera-console-frame span:nth-child(1) {
   top: -1px;
   left: -1px;
   border-top: 4px solid;
@@ -1025,7 +955,7 @@
   border-radius: 7px 0 0;
 }
 
-.camera-v2-frame span:nth-child(2) {
+.camera-console-frame span:nth-child(2) {
   top: -1px;
   right: -1px;
   border-top: 4px solid;
@@ -1033,7 +963,7 @@
   border-radius: 0 7px 0 0;
 }
 
-.camera-v2-frame span:nth-child(3) {
+.camera-console-frame span:nth-child(3) {
   bottom: -1px;
   left: -1px;
   border-bottom: 4px solid;
@@ -1041,7 +971,7 @@
   border-radius: 0 0 0 7px;
 }
 
-.camera-v2-frame span:nth-child(4) {
+.camera-console-frame span:nth-child(4) {
   right: -1px;
   bottom: -1px;
   border-right: 4px solid;
@@ -1049,7 +979,7 @@
   border-radius: 0 0 7px;
 }
 
-.camera-v2-empty {
+.camera-console-empty-camera {
   position: relative;
   z-index: 3;
   width: min(320px, 72%);
@@ -1057,29 +987,29 @@
   text-align: center;
 }
 
-.camera-v2-lens {
+.camera-console-lens {
   display: grid;
-  width: 72px;
-  height: 72px;
+  width: 76px;
+  height: 76px;
   place-items: center;
   margin: 0 auto 15px;
   border: 1px solid rgba(186, 230, 253, 0.36);
-  border-radius: 18px;
+  border-radius: 19px;
   background: rgba(255, 255, 255, 0.12);
   color: #e0f2fe;
 }
 
-.camera-v2-lens svg {
-  width: 32px;
-  height: 32px;
+.camera-console-lens svg {
+  width: 33px;
+  height: 33px;
 }
 
-.camera-v2-empty strong {
+.camera-console-empty-camera strong {
   display: block;
   font-size: 24px;
 }
 
-.camera-v2-empty p {
+.camera-console-empty-camera p {
   max-width: 310px;
   margin: 7px auto 0;
   color: rgba(255, 255, 255, 0.76);
@@ -1087,8 +1017,8 @@
   line-height: 1.45;
 }
 
-.camera-v2-status,
-.camera-v2-live-label {
+.camera-console-camera-status,
+.camera-console-live-label {
   position: absolute;
   z-index: 4;
   display: inline-flex;
@@ -1096,7 +1026,7 @@
   gap: 8px;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
-  background: rgba(4, 15, 21, 0.64);
+  background: rgba(4, 15, 21, 0.66);
   padding: 9px 13px;
   color: rgba(255, 255, 255, 0.86);
   font-size: 15px;
@@ -1104,53 +1034,44 @@
   backdrop-filter: blur(8px);
 }
 
-.camera-v2-status {
+.camera-console-camera-status {
   right: 16px;
   bottom: 16px;
 }
 
-.camera-v2-status > span {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #6ee7b7;
-  box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.16);
-}
-
-.camera-v2-status.is-error > span {
+.camera-console-camera-status.is-error > span {
   background: #fca5a5;
-  box-shadow: 0 0 0 3px rgba(252, 165, 165, 0.16);
 }
 
-.camera-v2-live-label {
+.camera-console-live-label {
   top: 16px;
   left: 16px;
 }
 
-.camera-v2-live-label svg {
+.camera-console-live-label svg {
   width: 19px;
   height: 19px;
 }
 
-.camera-v2-preview-overlay {
+.camera-console-preview-overlay {
   position: absolute;
-  z-index: 4;
   right: 16px;
   bottom: 16px;
   left: 16px;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 8px;
-  background: rgba(5, 19, 27, 0.82);
+  background: rgba(5, 19, 27, 0.84);
   padding: 9px 10px 9px 12px;
   color: white;
   backdrop-filter: blur(10px);
 }
 
-.camera-v2-preview-overlay span {
+.camera-console-preview-overlay span {
   display: inline-flex;
   min-width: 0;
   align-items: center;
@@ -1161,13 +1082,13 @@
   white-space: nowrap;
 }
 
-.camera-v2-preview-overlay span svg {
+.camera-console-preview-overlay span svg {
   width: 19px;
   height: 19px;
   flex: 0 0 auto;
 }
 
-.camera-v2-preview-overlay button {
+.camera-console-preview-overlay button {
   display: grid;
   width: 36px;
   height: 36px;
@@ -1179,656 +1100,665 @@
   color: white;
 }
 
-.camera-v2-preview-overlay button:hover {
-  background: rgba(255, 255, 255, 0.24);
+.camera-console-preview-overlay button:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
-.camera-v2-preview-overlay button svg {
+.camera-console-preview-overlay button svg {
   width: 19px;
   height: 19px;
 }
 
-.camera-v2-error {
+.camera-console-error {
   display: flex;
   align-items: flex-start;
   gap: 9px;
-  margin: 0 20px 12px;
+  margin-top: 11px;
   border: 1px solid #fecaca;
   border-radius: 8px;
-  background: var(--camera-critical-soft);
+  background: var(--console-critical-soft);
   padding: 11px 12px;
-  color: var(--camera-critical);
+  color: var(--console-critical);
   font-size: 16px;
   line-height: 1.45;
 }
 
-.camera-v2-error svg {
+.camera-console-error svg {
   width: 20px;
   height: 20px;
   flex: 0 0 auto;
 }
 
-.camera-v2-actions {
+.camera-console-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  margin: 0 20px;
+  margin-top: 15px;
 }
 
-.camera-v2-actions > * {
+.camera-console-actions > * {
   width: 100%;
 }
 
-.camera-v2-privacy {
+.camera-console-privacy {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin: 14px 21px 20px;
-  color: var(--camera-subtle);
+  margin: 13px 1px 0;
+  color: #a8bec9;
   font-size: 15px;
   line-height: 1.45;
 }
 
-.camera-v2-privacy svg {
+.camera-console-privacy svg {
   width: 19px;
   height: 19px;
   flex: 0 0 auto;
-  color: var(--camera-blue);
+  color: #7dd3fc;
 }
 
-.camera-v2-state-pill {
+.camera-console-review-rail {
+  min-width: 0;
+}
+
+.camera-console-review-card {
+  background: white !important;
+}
+
+.camera-console-review-header {
+  align-items: flex-start;
+}
+
+.camera-console-review-state {
   display: inline-flex;
-  min-height: 36px;
+  min-height: 34px;
   align-items: center;
   border-radius: 999px;
   background: #f1f5f9;
-  padding: 0 12px;
-  color: var(--camera-subtle);
-  font-size: 15px;
+  padding: 0 11px;
+  color: var(--console-subtle);
+  font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
 }
 
-.camera-v2-state-ready {
-  background: var(--camera-stable-soft);
-  color: var(--camera-stable);
+.camera-console-review-ready {
+  background: var(--console-stable-soft);
+  color: var(--console-stable);
 }
 
-.camera-v2-state-analyzing {
-  background: var(--camera-blue-soft);
-  color: var(--camera-blue-dark);
+.camera-console-review-analyzing {
+  background: var(--console-blue-soft);
+  color: var(--console-blue-dark);
 }
 
-.camera-v2-state-captured {
-  background: var(--camera-warning-soft);
-  color: var(--camera-warning);
+.camera-console-review-captured {
+  background: var(--console-warning-soft);
+  color: var(--console-warning);
 }
 
-.camera-v2-review-placeholder {
+.camera-console-review-content {
+  padding: 0 20px 20px !important;
+}
+
+.camera-console-review-empty {
   display: flex;
-  min-height: 218px;
+  min-height: 230px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 20px;
-  border: 1px dashed var(--camera-border);
-  border-radius: 8px;
+  margin: 20px 0 14px;
+  border: 1px dashed var(--console-border);
+  border-radius: 9px;
   background: #f8fafc;
-  color: var(--camera-subtle);
   padding: 22px;
+  color: var(--console-subtle);
   text-align: center;
 }
 
-.camera-v2-review-placeholder svg {
+.camera-console-review-empty svg {
   width: 42px;
   height: 42px;
-  color: var(--camera-blue);
+  color: var(--console-blue);
 }
 
-.camera-v2-review-placeholder strong {
+.camera-console-review-empty strong {
   margin-top: 12px;
-  color: var(--camera-text);
+  color: var(--console-text);
   font-size: 22px;
 }
 
-.camera-v2-review-placeholder p {
-  max-width: 310px;
+.camera-console-review-empty p {
+  max-width: 290px;
   margin: 5px 0 0;
-  color: var(--camera-muted);
+  color: var(--console-muted);
   font-size: 16px;
   line-height: 1.45;
 }
 
-.camera-v2-review-ready {
+.camera-console-review-empty-ready {
   border-color: #bbf7d0;
-  background: var(--camera-stable-soft);
+  background: var(--console-stable-soft);
 }
 
-.camera-v2-review-ready svg {
-  color: var(--camera-stable);
+.camera-console-review-empty-ready svg {
+  color: var(--console-stable);
 }
 
-.camera-v2-review-analyzing {
+.camera-console-review-empty-analyzing {
   border-color: #bae6fd;
   background: #f0f9ff;
 }
 
-.camera-v2-review-analyzing svg {
-  color: var(--camera-blue);
-}
-
-.camera-v2-inference {
-  margin: 0 20px 12px;
+.camera-console-inference {
+  margin: 0 0 12px;
   border: 1px solid #bae6fd;
   border-radius: 8px;
   background: #f0f9ff;
   padding: 14px;
 }
 
-.camera-v2-inference > div {
+.camera-console-inference > div {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  color: var(--camera-blue-dark);
-  font-size: 14px;
+  color: var(--console-blue-dark);
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.camera-v2-inference > div small {
-  color: var(--camera-muted);
+.camera-console-inference > div small {
+  color: var(--console-muted);
   font-size: 14px;
   letter-spacing: 0;
   text-transform: none;
 }
 
-.camera-v2-inference > strong {
+.camera-console-inference > strong {
   display: block;
-  margin-top: 9px;
-  color: var(--camera-text);
+  margin-top: 8px;
+  color: var(--console-text);
   font-size: 23px;
   text-transform: capitalize;
 }
 
-.camera-v2-inference > p {
+.camera-console-inference > p {
   margin: 3px 0 0;
-  color: var(--camera-blue-dark);
+  color: var(--console-blue-dark);
   font-size: 17px;
   font-weight: 700;
 }
 
-.camera-v2-inference > em {
+.camera-console-inference > em {
   display: block;
   margin-top: 9px;
   border-top: 1px solid #bae6fd;
   padding-top: 9px;
-  color: var(--camera-muted);
+  color: var(--console-muted);
   font-size: 15px;
   font-style: normal;
   line-height: 1.45;
 }
 
-.camera-v2-assignment {
-  margin: 14px 20px 20px;
-  border: 1px solid var(--camera-border);
-  border-radius: 8px;
+.camera-console-assignment {
+  margin-top: 15px;
+  border: 1px solid var(--console-border);
+  border-radius: 9px;
   background: #f8fafc;
-  padding: 15px;
+  padding: 14px;
 }
 
-.camera-v2-assignment-title {
+.camera-console-assignment-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
 }
 
-.camera-v2-assignment-title > svg {
-  width: 23px;
-  height: 23px;
-  color: var(--camera-blue);
+.camera-console-assignment-title > svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  color: var(--console-blue);
 }
 
-.camera-v2-assignment-title > div {
+.camera-console-assignment-title > div {
   display: grid;
   gap: 2px;
 }
 
-.camera-v2-assignment-title strong {
-  color: var(--camera-text);
-  font-size: 20px;
+.camera-console-assignment-title strong {
+  color: var(--console-text);
+  font-size: 19px;
 }
 
-.camera-v2-assignment > p {
-  margin: 4px 0 12px 33px;
-  color: var(--camera-muted);
-  font-size: 16px;
+.camera-console-assignment > p {
+  margin: 4px 0 12px 31px;
+  color: var(--console-muted);
+  font-size: 15px;
 }
 
-.camera-v2-assignment label {
+.camera-console-assignment label {
   display: grid;
   gap: 5px;
-  margin-top: 11px;
-  color: var(--camera-muted);
-  font-size: 16px;
+  margin-top: 10px;
+  color: var(--console-muted);
+  font-size: 15px;
   font-weight: 700;
 }
 
-.camera-v2-assignment select,
-.camera-v2-assignment input {
+.camera-console-assignment select,
+.camera-console-assignment input {
   min-width: 0;
   width: 100%;
   min-height: 48px;
-  border: 1px solid var(--camera-border);
+  border: 1px solid var(--console-border);
   border-radius: 8px;
-  background: var(--camera-surface);
-  padding: 0 11px;
-  color: var(--camera-text);
-  font-size: 17px;
+  background: white;
+  padding: 0 10px;
+  color: var(--console-text);
+  font-size: 16px;
 }
 
-.camera-v2-assignment select:disabled,
-.camera-v2-assignment input:disabled {
+.camera-console-assignment select:disabled,
+.camera-console-assignment input:disabled {
   background: #f1f5f9;
-  color: var(--camera-subtle);
+  color: var(--console-subtle);
 }
 
-.camera-v2-assignment .camera-v2-primary-button {
+.camera-console-assignment .camera-console-primary-action {
   width: 100%;
-  margin-top: 15px;
+  margin-top: 14px;
 }
 
-.camera-v2-assignment > small {
+.camera-console-assignment > small {
   display: block;
-  margin-top: 8px;
-  color: var(--camera-subtle);
+  margin-top: 7px;
+  color: var(--console-subtle);
   font-size: 14px;
   line-height: 1.45;
 }
 
-/* WoundInferenceResults keeps its behavior and data model. These scoped styles move its model output into the new system. */
-.camera-v2-panel .replica-camera-overlay-controls {
+/* The inference component keeps its data and accessibility behavior. These styles only change its placement in the console rail. */
+.camera-console .replica-camera-overlay-controls {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px 14px;
-  margin: -7px 20px 15px;
-  border: 1px solid var(--camera-border);
+  gap: 8px 12px;
+  margin: 0 0 14px;
+  border: 1px solid var(--console-border);
   border-radius: 8px;
   background: #f8fafc;
-  padding: 12px;
-  color: var(--camera-text);
+  padding: 11px;
+  color: var(--console-text);
 }
 
-.camera-v2-panel .replica-camera-overlay-controls legend {
+.camera-console .replica-camera-overlay-controls legend {
   grid-column: 1 / -1;
   padding: 0 4px;
-  color: var(--camera-blue-dark);
-  font-size: 14px;
+  color: var(--console-blue-dark);
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.camera-v2-panel .replica-camera-overlay-controls label {
+.camera-console .replica-camera-overlay-controls label {
   display: flex;
-  min-height: 32px;
+  min-height: 31px;
   align-items: center;
   gap: 7px;
-  color: var(--camera-muted);
-  font-size: 15px;
+  color: var(--console-muted);
+  font-size: 14px;
   font-weight: 700;
 }
 
-.camera-v2-panel .replica-camera-overlay-controls label input[type="checkbox"] {
+.camera-console .replica-camera-overlay-controls label input[type="checkbox"] {
   width: 18px;
   height: 18px;
   margin: 0;
-  accent-color: var(--camera-blue);
+  accent-color: var(--console-blue);
 }
 
-.camera-v2-panel .replica-camera-overlay-controls label svg {
-  width: 18px;
-  height: 18px;
-  flex: 0 0 auto;
-  color: var(--camera-blue);
+.camera-console .replica-camera-overlay-controls label svg {
+  width: 17px;
+  height: 17px;
+  color: var(--console-blue);
 }
 
-.camera-v2-panel .replica-camera-opacity {
+.camera-console .replica-camera-opacity {
   grid-column: 1 / -1;
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 10px !important;
+  gap: 9px !important;
 }
 
-.camera-v2-panel .replica-camera-opacity input[type="range"] {
+.camera-console .replica-camera-opacity input[type="range"] {
   width: 100%;
-  accent-color: var(--camera-blue);
+  accent-color: var(--console-blue);
 }
 
-.camera-v2-panel .replica-camera-overlay-legend {
+.camera-console .replica-camera-overlay-legend {
   grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 14px;
-  border-top: 1px solid var(--camera-border-soft);
-  padding-top: 10px;
-  color: var(--camera-subtle);
-  font-size: 14px;
+  gap: 7px 12px;
+  border-top: 1px solid var(--console-border-soft);
+  padding-top: 9px;
+  color: var(--console-subtle);
+  font-size: 13px;
 }
 
-.camera-v2-panel .replica-camera-overlay-legend span {
+.camera-console .replica-camera-overlay-legend span {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
-.camera-v2-panel .replica-camera-overlay-legend i {
+.camera-console .replica-camera-overlay-legend i {
   display: inline-block;
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 2px;
-  background: var(--camera-blue);
+  background: var(--console-blue);
 }
 
-.camera-v2-panel .replica-camera-overlay-legend i.is-box {
+.camera-console .replica-camera-overlay-legend i.is-box {
   border: 2px solid #38bdf8;
   background: transparent;
 }
 
-.camera-v2-panel .replica-camera-overlay-legend i.is-mask {
+.camera-console .replica-camera-overlay-legend i.is-mask {
   background: rgba(34, 197, 94, 0.72);
 }
 
-.camera-v2-panel .replica-camera-overlay-legend i.is-card {
-  background: var(--camera-warning);
+.camera-console .replica-camera-overlay-legend i.is-card {
+  background: var(--console-warning);
 }
 
-.camera-v2-panel .replica-camera-overlay-hint {
+.camera-console .replica-camera-overlay-hint {
   grid-column: 1 / -1;
-  color: var(--camera-subtle);
-  font-size: 14px;
+  color: var(--console-subtle);
+  font-size: 13px;
 }
 
-.camera-v2-panel .replica-camera-regions {
+.camera-console .replica-camera-regions {
   display: grid;
-  gap: 10px;
-  margin: 0 20px 18px;
+  gap: 9px;
+  margin: 0 0 15px;
 }
 
-.camera-v2-panel .replica-camera-regions-heading {
+.camera-console .replica-camera-regions-heading {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
-.camera-v2-panel .replica-camera-regions-heading > div {
+.camera-console .replica-camera-regions-heading > div {
   display: grid;
   gap: 3px;
 }
 
-.camera-v2-panel .replica-camera-regions-heading span,
-.camera-v2-panel .replica-camera-region-model span,
-.camera-v2-panel .replica-camera-region-header span {
-  color: var(--camera-blue);
-  font-size: 13px;
+.camera-console .replica-camera-regions-heading span,
+.camera-console .replica-camera-region-model span,
+.camera-console .replica-camera-region-header span {
+  color: var(--console-blue);
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
-.camera-v2-panel .replica-camera-regions-heading h3 {
+.camera-console .replica-camera-regions-heading h3 {
   margin: 0;
-  color: var(--camera-text);
-  font-size: 21px;
+  color: var(--console-text);
+  font-size: 20px;
 }
 
-.camera-v2-panel .replica-camera-regions-heading small {
-  color: var(--camera-muted);
-  font-size: 15px;
-  line-height: 1.4;
+.camera-console .replica-camera-regions-heading small {
+  color: var(--console-muted);
+  font-size: 14px;
   text-align: right;
 }
 
-.camera-v2-panel .replica-camera-taxonomy-note {
+.camera-console .replica-camera-taxonomy-note {
   display: flex;
   align-items: flex-start;
-  gap: 9px;
+  gap: 8px;
   border: 1px solid #bae6fd;
   border-radius: 8px;
   background: #f0f9ff;
-  padding: 11px 12px;
-  color: var(--camera-blue-dark);
+  padding: 10px;
+  color: var(--console-blue-dark);
 }
 
-.camera-v2-panel .replica-camera-taxonomy-note > svg {
-  width: 20px;
-  height: 20px;
+.camera-console .replica-camera-taxonomy-note > svg {
+  width: 19px;
+  height: 19px;
   flex: 0 0 auto;
 }
 
-.camera-v2-panel .replica-camera-taxonomy-note strong {
+.camera-console .replica-camera-taxonomy-note strong {
   display: block;
-  color: var(--camera-text);
-  font-size: 16px;
+  color: var(--console-text);
+  font-size: 15px;
 }
 
-.camera-v2-panel .replica-camera-taxonomy-note p {
+.camera-console .replica-camera-taxonomy-note p {
   margin: 3px 0 0;
-  color: var(--camera-muted);
-  font-size: 14px;
-  line-height: 1.45;
+  color: var(--console-muted);
+  font-size: 13px;
+  line-height: 1.4;
 }
 
-.camera-v2-panel .replica-camera-region-card {
+.camera-console .replica-camera-region-card {
   display: grid;
-  gap: 10px;
-  border: 1px solid var(--camera-border);
+  gap: 9px;
+  border: 1px solid var(--console-border);
   border-radius: 8px;
-  background: var(--camera-surface);
-  padding: 13px;
+  background: white;
+  padding: 12px;
 }
 
-.camera-v2-panel .replica-camera-region-header {
+.camera-console .replica-camera-region-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  border-bottom: 1px solid var(--camera-border-soft);
-  padding-bottom: 9px;
+  gap: 10px;
+  border-bottom: 1px solid var(--console-border-soft);
+  padding-bottom: 8px;
 }
 
-.camera-v2-panel .replica-camera-region-header > div {
+.camera-console .replica-camera-region-header > div {
   display: grid;
   gap: 3px;
   min-width: 0;
 }
 
-.camera-v2-panel .replica-camera-region-header strong,
-.camera-v2-panel .replica-camera-region-model strong {
+.camera-console .replica-camera-region-header strong,
+.camera-console .replica-camera-region-model strong {
   overflow-wrap: anywhere;
-  color: var(--camera-text);
-  font-size: 17px;
+  color: var(--console-text);
+  font-size: 16px;
 }
 
-.camera-v2-panel .replica-camera-region-header small,
-.camera-v2-panel .replica-camera-region-model small {
-  color: var(--camera-muted);
-  font-size: 14px;
+.camera-console .replica-camera-region-header small,
+.camera-console .replica-camera-region-model small {
+  color: var(--console-muted);
+  font-size: 13px;
   line-height: 1.35;
 }
 
-.camera-v2-panel .replica-camera-region-summary {
+.camera-console .replica-camera-region-summary {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
-.camera-v2-panel .replica-camera-region-model {
+.camera-console .replica-camera-region-model {
   display: grid;
   align-content: start;
   gap: 3px;
   min-width: 0;
 }
 
-.camera-v2-panel .replica-camera-probabilities {
+.camera-console .replica-camera-probabilities {
   display: grid;
-  gap: 6px;
-  border-top: 1px solid var(--camera-border-soft);
-  padding-top: 10px;
+  gap: 5px;
+  border-top: 1px solid var(--console-border-soft);
+  padding-top: 9px;
 }
 
-.camera-v2-panel .replica-camera-probability {
+.camera-console .replica-camera-probability {
   display: grid;
-  grid-template-columns: minmax(115px, 1fr) minmax(80px, 1.5fr) 36px;
+  grid-template-columns: minmax(105px, 1fr) minmax(70px, 1.4fr) 34px;
   align-items: center;
-  gap: 7px;
-  color: var(--camera-muted);
-  font-size: 13px;
+  gap: 6px;
+  color: var(--console-muted);
+  font-size: 12px;
   font-weight: 700;
 }
 
-.camera-v2-panel .replica-camera-probability-track {
-  height: 7px;
+.camera-console .replica-camera-probability-track {
+  height: 6px;
   overflow: hidden;
   border-radius: 999px;
   background: #e2e8f0;
 }
 
-.camera-v2-panel .replica-camera-probability-track > span {
+.camera-console .replica-camera-probability-track > span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--camera-blue);
+  background: var(--console-blue);
 }
 
-.camera-v2-panel .replica-camera-probability > strong {
-  color: var(--camera-text);
-  font-size: 13px;
+.camera-console .replica-camera-probability > strong {
+  color: var(--console-text);
+  font-size: 12px;
   text-align: right;
 }
 
-.camera-v2-panel .replica-camera-segmentation-result {
-  border: 1px solid var(--camera-border-soft);
+.camera-console .replica-camera-segmentation-result {
+  border: 1px solid var(--console-border-soft);
   border-radius: 8px;
   background: #f8fafc;
-  padding: 10px;
+  padding: 9px;
 }
 
-.camera-v2-panel .replica-camera-segmentation-result > span,
-.camera-v2-panel .replica-camera-segmentation-result > strong,
-.camera-v2-panel .replica-camera-segmentation-result > small,
-.camera-v2-panel .replica-camera-segmentation-result > em {
+.camera-console .replica-camera-segmentation-result > span,
+.camera-console .replica-camera-segmentation-result > strong,
+.camera-console .replica-camera-segmentation-result > small,
+.camera-console .replica-camera-segmentation-result > em {
   display: block;
 }
 
-.camera-v2-panel .replica-camera-segmentation-result > span {
-  color: var(--camera-blue);
-  font-size: 13px;
+.camera-console .replica-camera-segmentation-result > span {
+  color: var(--console-blue);
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
 }
 
-.camera-v2-panel .replica-camera-segmentation-result > strong {
+.camera-console .replica-camera-segmentation-result > strong {
   margin-top: 3px;
-  color: var(--camera-text);
-  font-size: 16px;
-}
-
-.camera-v2-panel .replica-camera-segmentation-result > small,
-.camera-v2-panel .replica-camera-segmentation-result > em {
-  margin-top: 3px;
-  color: var(--camera-muted);
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.camera-v2-panel .replica-camera-segmentation-result > em {
-  color: var(--camera-warning);
-  font-style: normal;
-}
-
-.camera-v2-panel .replica-camera-review-status {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 5px 8px;
-  border-radius: 7px;
-  background: var(--camera-stable-soft);
-  padding: 9px 10px;
-  color: var(--camera-stable);
-}
-
-.camera-v2-panel .replica-camera-review-status.is-error {
-  background: var(--camera-warning-soft);
-  color: var(--camera-warning);
-}
-
-.camera-v2-panel .replica-camera-review-status svg {
-  width: 19px;
-  height: 19px;
-  flex: 0 0 auto;
-}
-
-.camera-v2-panel .replica-camera-review-status strong {
+  color: var(--console-text);
   font-size: 15px;
 }
 
-.camera-v2-panel .replica-camera-review-status span,
-.camera-v2-panel .replica-camera-region-card em {
-  color: var(--camera-muted);
+.camera-console .replica-camera-segmentation-result > small,
+.camera-console .replica-camera-segmentation-result > em {
+  margin-top: 3px;
+  color: var(--console-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.camera-console .replica-camera-segmentation-result > em {
+  color: var(--console-warning);
+  font-style: normal;
+}
+
+.camera-console .replica-camera-review-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 7px;
+  border-radius: 7px;
+  background: var(--console-stable-soft);
+  padding: 8px 9px;
+  color: var(--console-stable);
+}
+
+.camera-console .replica-camera-review-status.is-error {
+  background: var(--console-warning-soft);
+  color: var(--console-warning);
+}
+
+.camera-console .replica-camera-review-status svg {
+  width: 18px;
+  height: 18px;
+}
+
+.camera-console .replica-camera-review-status strong {
   font-size: 14px;
 }
 
-.camera-v2-panel .replica-camera-region-card em {
-  border-top: 1px solid var(--camera-border-soft);
-  padding-top: 8px;
+.camera-console .replica-camera-review-status span,
+.camera-console .replica-camera-region-card em {
+  color: var(--console-muted);
+  font-size: 13px;
+}
+
+.camera-console .replica-camera-region-card em {
+  border-top: 1px solid var(--console-border-soft);
+  padding-top: 7px;
   font-style: normal;
   line-height: 1.4;
 }
 
-.camera-v2-panel .replica-camera-inconclusive {
+.camera-console .replica-camera-inconclusive {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 5px 9px;
-  margin: 0 20px 14px;
+  gap: 5px 8px;
+  margin: 0 0 13px;
   border: 1px solid #fcd34d;
   border-radius: 8px;
-  background: var(--camera-warning-soft);
-  padding: 12px;
-  color: var(--camera-warning);
+  background: var(--console-warning-soft);
+  padding: 11px;
+  color: var(--console-warning);
 }
 
-.camera-v2-panel .replica-camera-inconclusive > svg {
+.camera-console .replica-camera-inconclusive > svg {
   grid-row: span 3;
-  width: 20px;
-  height: 20px;
-  margin-top: 1px;
+  width: 19px;
+  height: 19px;
 }
 
-.camera-v2-panel .replica-camera-inconclusive h3 {
+.camera-console .replica-camera-inconclusive h3 {
   margin: 0;
   color: #92400e;
-  font-size: 18px;
+  font-size: 17px;
 }
 
-.camera-v2-panel .replica-camera-inconclusive p,
-.camera-v2-panel .replica-camera-inconclusive small {
+.camera-console .replica-camera-inconclusive p,
+.camera-console .replica-camera-inconclusive small {
   margin: 0;
   color: #78350f;
-  font-size: 14px;
-  line-height: 1.45;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
-.camera-v2-viewport .camera-detection-layer {
+.camera-console .camera-detection-layer {
   position: absolute;
   z-index: 3;
   inset: 0;
   pointer-events: none;
 }
 
-.camera-v2-viewport .camera-segmentation-mask {
+.camera-console .camera-segmentation-mask {
   position: absolute;
   z-index: 1;
   overflow: hidden;
@@ -1836,7 +1766,7 @@
   pointer-events: none;
 }
 
-.camera-v2-viewport .camera-segmentation-mask img {
+.camera-console .camera-segmentation-mask img {
   display: block;
   width: 100%;
   height: 100%;
@@ -1844,7 +1774,7 @@
   object-fit: fill;
 }
 
-.camera-v2-viewport .camera-detection-box {
+.camera-console .camera-detection-box {
   position: absolute;
   z-index: 2;
   border: 2px solid #38bdf8;
@@ -1852,251 +1782,184 @@
   box-shadow: 0 0 0 1px rgba(3, 105, 161, 0.36);
 }
 
-.camera-v2-viewport .camera-detection-box span {
+.camera-console .camera-detection-box span {
   position: absolute;
-  top: -29px;
+  top: -28px;
   left: -2px;
   display: inline-flex;
-  min-height: 26px;
+  min-height: 25px;
   align-items: center;
   border-radius: 5px 5px 0 0;
-  background: #0369a1;
-  padding: 0 8px;
+  background: var(--console-blue);
+  padding: 0 7px;
   color: white;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }
 
-.camera-v2-page .camera-history-card {
-  margin-top: 22px;
-  border: 1px solid var(--camera-border);
-  border-radius: 12px;
-  background: var(--camera-surface);
-  box-shadow: var(--camera-shadow);
+.camera-console-history {
+  margin-top: 18px;
 }
 
-@keyframes camera-v2-shimmer {
+.camera-console-history .camera-history-card {
+  margin-top: 0;
+  border: 1px solid var(--console-border);
+  border-radius: 12px;
+  background: white;
+  box-shadow: none;
+}
+
+@keyframes camera-console-shimmer {
   to {
     background-position: -200% 0;
   }
 }
 
 @media (max-width: 1120px) {
-  .camera-v2-page {
+  .camera-console {
     padding-right: 8px;
     padding-left: 8px;
   }
 
-  .camera-v2-workspace {
+  .camera-console-workspace {
     grid-template-columns: 1fr;
   }
 
-  .camera-v2-viewport,
-  .camera-v2-viewport img,
-  .camera-v2-live-video {
-    min-height: 520px;
+  .camera-console-review-rail {
+    order: 2;
   }
 }
 
 @media (max-width: 760px) {
-  .camera-v2-page {
-    padding: 4px 0 30px;
+  .camera-console {
+    padding: 0 0 28px;
     font-size: 17px;
   }
 
-  .camera-v2-header {
+  .camera-console-header {
     align-items: flex-start;
     flex-direction: column;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-
-  .camera-v2-header h1 {
-    font-size: 34px;
-  }
-
-  .camera-v2-header p {
-    font-size: 18px;
-  }
-
-  .camera-v2-header-meta {
-    width: 100%;
-    align-items: flex-start;
-    justify-items: start;
-  }
-
-  .camera-v2-stepper {
-    grid-template-columns: 1fr;
+    gap: 14px;
     margin-bottom: 18px;
   }
 
-  .camera-v2-step {
-    min-height: 62px;
-    border-right: 0;
-    border-bottom: 1px solid var(--camera-border-soft);
-    padding: 10px 14px;
+  .camera-console-header h1 {
+    font-size: 34px;
   }
 
-  .camera-v2-step:last-child {
-    border-bottom: 0;
+  .camera-console-header p {
+    font-size: 18px;
   }
 
-  .camera-v2-step:not(:last-child)::after {
-    top: auto;
-    right: auto;
-    bottom: -8px;
-    left: 29px;
-    transform: rotate(135deg);
+  .camera-console-brand {
+    padding: 0;
   }
 
-  .camera-v2-step-number {
-    width: 34px;
-    height: 34px;
-  }
-
-  .camera-v2-step-copy strong {
-    font-size: 17px;
-  }
-
-  .camera-v2-step-copy small {
-    font-size: 14px;
-  }
-
-  .camera-v2-panel-header {
-    padding: 19px 16px 16px;
-  }
-
-  .camera-v2-panel-header h2 {
-    font-size: 24px;
-  }
-
-  .camera-v2-panel-header p {
-    font-size: 17px;
-  }
-
-  .camera-v2-selector-grid {
+  .camera-console-case-content {
     grid-template-columns: 1fr;
   }
 
-  .camera-v2-filter-rail {
+  .camera-console-case-tools {
     border-right: 0;
-    border-bottom: 1px solid var(--camera-border-soft);
+    border-bottom: 1px solid var(--console-border-soft);
     padding: 16px;
   }
 
-  .camera-v2-patient-results {
-    padding: 17px 14px 6px;
+  .camera-console-case-results {
+    padding: 17px 14px 8px;
   }
 
-  .camera-v2-selector-footer {
+  .camera-console-case-footer {
     align-items: stretch;
     flex-direction: column;
-    padding: 15px 16px 17px;
+    padding: 14px 16px 16px !important;
   }
 
-  .camera-v2-selector-footer > span {
-    align-items: flex-start;
-    font-size: 15px;
-  }
-
-  .camera-v2-selector-footer .camera-v2-primary-button {
+  .camera-console-case-footer .camera-console-primary-action {
     width: 100%;
   }
 
-  .camera-v2-selected-patient {
+  .camera-console-case-banner {
     align-items: flex-start;
     flex-wrap: wrap;
-    gap: 10px;
-    padding: 13px;
+    gap: 9px;
+    padding: 12px;
   }
 
-  .camera-v2-selected-copy {
-    min-width: calc(100% - 62px);
+  .camera-console-case-copy {
+    min-width: calc(100% - 60px);
   }
 
-  .camera-v2-selected-patient > .camera-v2-chip {
-    margin-left: 58px;
+  .camera-console-case-banner > .camera-console-live-tag {
+    margin-left: 55px;
   }
 
-  .camera-v2-change-patient {
+  .camera-console-change-case {
     margin-left: auto;
   }
 
-  .camera-v2-viewport,
-  .camera-v2-viewport img,
-  .camera-v2-live-video {
+  .camera-console-card-header {
+    padding: 18px 16px 15px;
+  }
+
+  .camera-console-card-header h2 {
+    font-size: 24px;
+  }
+
+  .camera-console-card-header p {
+    font-size: 17px;
+  }
+
+  .camera-console-evidence-content {
+    padding: 0 16px 16px !important;
+  }
+
+  .camera-console-viewport,
+  .camera-console-viewport img,
+  .camera-console-live-video {
     min-height: 350px;
   }
 
-  .camera-v2-viewport {
-    margin: 16px;
-  }
-
-  .camera-v2-frame {
+  .camera-console-frame {
     inset: 15% 11%;
   }
 
-  .camera-v2-empty strong {
-    font-size: 21px;
-  }
-
-  .camera-v2-empty p {
-    font-size: 16px;
-  }
-
-  .camera-v2-actions {
+  .camera-console-actions {
     grid-template-columns: 1fr;
-    margin: 0 16px;
   }
 
-  .camera-v2-privacy {
-    margin-right: 17px;
-    margin-left: 17px;
+  .camera-console-review-content {
+    padding: 0 16px 16px !important;
   }
 
-  .camera-v2-review-placeholder {
+  .camera-console-review-empty {
     min-height: 180px;
-    margin: 16px;
+    margin: 16px 0 13px;
   }
 
-  .camera-v2-inference,
-  .camera-v2-panel .replica-camera-inconclusive,
-  .camera-v2-assignment {
-    margin-right: 16px;
-    margin-left: 16px;
-  }
-
-  .camera-v2-panel .replica-camera-overlay-controls {
+  .camera-console .replica-camera-overlay-controls {
     grid-template-columns: 1fr;
-    margin-right: 16px;
-    margin-left: 16px;
   }
 
-  .camera-v2-panel .replica-camera-opacity {
+  .camera-console .replica-camera-opacity {
     grid-column: auto;
   }
 
-  .camera-v2-panel .replica-camera-region-summary,
-  .camera-v2-panel .replica-camera-probability {
+  .camera-console .replica-camera-region-summary,
+  .camera-console .replica-camera-probability {
     grid-template-columns: 1fr;
   }
 
-  .camera-v2-panel .replica-camera-probability > strong {
+  .camera-console .replica-camera-probability > strong {
     text-align: left;
-  }
-
-  .camera-v2-panel .replica-camera-regions {
-    margin-right: 16px;
-    margin-left: 16px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .camera-v2-page *,
-  .camera-v2-page *::before,
-  .camera-v2-page *::after {
-    scroll-behavior: auto !important;
+  .camera-console *,
+  .camera-console *::before,
+  .camera-console *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
