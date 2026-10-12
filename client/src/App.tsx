@@ -12,20 +12,30 @@ import DiagnosticCamera from "./pages/DiagnosticCamera";
 import PatientRegistration from "./pages/PatientRegistration";
 import RegisteredPatientRecord from "./pages/RegisteredPatientRecord";
 import RegisteredPatientEdit from "./pages/RegisteredPatientEdit";
+import Reports from "./pages/Reports";
+import Settings from "./pages/Settings";
+import DesignSystemV0 from "./pages/DesignSystemV0";
 
 function Router() {
   return (
     <Switch>
+      <Route path="/design-system" component={DesignSystemV0} />
       <Route path="/patients/new" component={PatientRegistration} />
-      <Route path="/patients/registered/:id/edit" component={RegisteredPatientEdit} />
-      <Route path="/patients/registered/:id" component={RegisteredPatientRecord} />
+      <Route
+        path="/patients/registered/:id/edit"
+        component={RegisteredPatientEdit}
+      />
+      <Route
+        path="/patients/registered/:id"
+        component={RegisteredPatientRecord}
+      />
       <Route path={"/patients/:id"} component={PatientRecord} />
       <Route path="/camera" component={DiagnosticCamera} />
+      <Route path="/reports" component={Reports} />
+      <Route path="/settings" component={Settings} />
       <Route path={"/"} component={Home} />
       <Route path="/patients" component={Patients} />
       <Route path="/assessments" component={DiagnosticCamera} />
-      <Route path="/reports" component={Home} />
-      <Route path="/settings" component={Home} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -3,6 +3,13 @@ import { createLocalDevelopmentUser } from "./_core/context";
 import { appRouter } from "./routers";
 
 describe("Supabase-backed diabetes API", () => {
+  it("reports dependency readiness instead of an unconditional healthy response", async () => {
+    const caller = appRouter.createCaller({ req: {} as never, res: {} as never, user: createLocalDevelopmentUser() });
+    const health = await caller.system.health({ timestamp: Date.now() });
+    expect(health.ok).toBe(false);
+    expect(health.dependencies.database).toBe(false);
+  }, 20_000);
+
   it("reports the removed imported datasets through the protected API procedure", async () => {
     const caller = appRouter.createCaller({
       req: {} as never,
@@ -19,6 +26,7 @@ describe("Supabase-backed diabetes API", () => {
     expect(summary.patientCount).toBe(0);
     expect(summary.observationCount).toBe(0);
     expect(patients).toHaveLength(0);
+    await expect(caller.diabetes.patientsPage({ query: "", offset: 0, limit: 1 })).rejects.toThrow("Database is unavailable");
   }, 20_000);
 
   it("reports the removed example cohort as empty", async () => {
@@ -41,6 +49,7 @@ describe("Supabase-backed diabetes API", () => {
 
     const registered = await caller.diabetes.registeredPatients({ limit: 1 });
     expect(Array.isArray(registered)).toBe(true);
+    await expect(caller.diabetes.registeredPatientsPage({ query: "", offset: 0, limit: 1 })).rejects.toThrow("Database is unavailable");
     if (registered[0]) expect(registered[0]).not.toHaveProperty("clinicalNotes");
   }, 20_000);
 

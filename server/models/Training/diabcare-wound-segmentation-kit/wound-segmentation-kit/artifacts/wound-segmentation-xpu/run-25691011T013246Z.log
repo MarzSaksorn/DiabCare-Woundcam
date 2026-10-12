@@ -1,0 +1,37 @@
+{"epoch": 1, "train_loss": 1.3332253821352695, "validation": {"loss": 1.1666808453473179, "dice": 0.5898030048066919}}
+{"epoch": 2, "train_loss": 1.0403558301164748, "validation": {"loss": 0.9112089763988148, "dice": 0.6000425138256766}}
+{"epoch": 3, "train_loss": 0.8279024001131666, "validation": {"loss": 0.8026385090567849, "dice": 0.5141945630311966}}
+{"epoch": 4, "train_loss": 0.6182334293076333, "validation": {"loss": 0.5311971360986883, "dice": 0.6598621769384905}}
+{"epoch": 5, "train_loss": 0.4761175529119816, "validation": {"loss": 0.49832584912126715, "dice": 0.6301961920478127}}
+{"epoch": 6, "train_loss": 0.41147790801651934, "validation": {"loss": 0.6232253800738942, "dice": 0.4984383068301461}}
+{"epoch": 7, "train_loss": 0.37265000302106777, "validation": {"loss": 0.46933136744932696, "dice": 0.6175609664483503}}
+{"epoch": 8, "train_loss": 0.3511331211379234, "validation": {"loss": 0.3914373977617784, "dice": 0.6831411583857103}}
+{"epoch": 9, "train_loss": 0.3333912710560129, "validation": {"loss": 0.393849101933566, "dice": 0.6853904561562971}}
+{"epoch": 10, "train_loss": 0.3160728946962255, "validation": {"loss": 0.3882792294025421, "dice": 0.6843675158240579}}
+{"epoch": 11, "train_loss": 0.3165382035869233, "validation": {"loss": 0.3784565153447064, "dice": 0.7017205384644595}}
+{"epoch": 12, "train_loss": 0.3041766157492678, "validation": {"loss": 0.3830696398561651, "dice": 0.6924106830900366}}
+{"epoch": 13, "train_loss": 0.2994015260421215, "validation": {"loss": 0.3671113469383933, "dice": 0.6951386495070024}}
+{"epoch": 14, "train_loss": 0.27952906283292367, "validation": {"loss": 0.3637751720168374, "dice": 0.6993041336536407}}
+{"epoch": 15, "train_loss": 0.2829828953489344, "validation": {"loss": 0.35109172761440277, "dice": 0.7199782241474498}}
+{"epoch": 16, "train_loss": 0.2846112199761766, "validation": {"loss": 0.39822938631881366, "dice": 0.6684090928597883}}
+{"epoch": 17, "train_loss": 0.2830017740105061, "validation": {"loss": 0.385906765406782, "dice": 0.6774701205166903}}
+{"epoch": 18, "train_loss": 0.26688069287449756, "validation": {"loss": 0.3667258389971473, "dice": 0.6930341503836892}}
+{"epoch": 19, "train_loss": 0.25435745660611925, "validation": {"loss": 0.3489632863890041, "dice": 0.7123971473086964}}
+{"epoch": 20, "train_loss": 0.26326230231751785, "validation": {"loss": 0.369857133789496, "dice": 0.7079634503884749}}
+{"epoch": 21, "train_loss": 0.25741470446611975, "validation": {"loss": 0.3455130620436235, "dice": 0.7153990512544458}}
+{"epoch": 22, "train_loss": 0.25235353077345707, "validation": {"loss": 0.3329685018821196, "dice": 0.7300057546658949}}
+{"epoch": 23, "train_loss": 0.2547503315863457, "validation": {"loss": 0.3593194227327, "dice": 0.7131395881826227}}
+{"epoch": 24, "train_loss": 0.25263107140013513, "validation": {"loss": 0.32598912580446765, "dice": 0.7265843315558}}
+{"epoch": 25, "train_loss": 0.23540391289490334, "validation": {"loss": 0.3361139378764413, "dice": 0.7192260785536333}}
+{"epoch": 26, "train_loss": 0.2414703069532171, "validation": {"loss": 0.32031316784295166, "dice": 0.7312455150214109}}
+{"epoch": 27, "train_loss": 0.23769085830513467, "validation": {"loss": 0.333960928700187, "dice": 0.7217967185107145}}
+{"epoch": 28, "train_loss": 0.23346055251486758, "validation": {"loss": 0.3390887054530057, "dice": 0.730076627297835}}
+{"epoch": 29, "train_loss": 0.24249403036021172, "validation": {"loss": 0.35419565303759143, "dice": 0.7077971209179271}}
+{"epoch": 30, "train_loss": 0.24522926087709182, "validation": {"loss": 0.32809868996793573, "dice": 0.722489370541139}}
+{
+  "output_dir": "/home/mark/Project/DiabCare-Woundcam/server/models/Training/diabcare-wound-segmentation-kit/wound-segmentation-kit/artifacts/wound-segmentation-xpu",
+  "test_metrics": {
+    "loss": 0.24030996561050416,
+    "dice": 0.8017373493739537
+  }
+}

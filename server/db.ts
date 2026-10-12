@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ilike, inArray, isNull, lte, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import {
@@ -16,7 +16,7 @@ import {
   users,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
-import { storagePut } from "./storage";
+import { storageDelete, storagePut } from "./storage";
 
 let _pool: Pool | null = null;
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -37,11 +37,9 @@ export async function getDb() {
     try {
       _pool = new Pool({
         connectionString: databaseUrl,
-        // Supabase pooler connections require TLS. The managed runtime's
-        // certificate bundle reports the pooler's chain as self-signed, so
-        // use encrypted transport without rejecting that chain. Credentials
-        // and data remain protected in transit; the URL is still server-only.
-        ssl: { rejectUnauthorized: false },
+        ssl: ENV.databaseSslCa
+          ? { ca: ENV.databaseSslCa, rejectUnauthorized: true }
+          : { rejectUnauthorized: ENV.isProduction },
         max: 5,
         idleTimeoutMillis: 10_000,
         connectionTimeoutMillis: 10_000,
@@ -182,6 +180,37 @@ export async function getDiabetesPatients(limit = 100) {
   const countByPatient = new Map(counts.map((row) => [row.patientId, Number(row.count)]));
 
   return patients.map((patient) => ({ ...patient, observationCount: countByPatient.get(patient.id) ?? 0 }));
+}
+
+type DiabetesContextFilter = "all" | "type1" | "type2" | "gdm";
+
+function diabetesContextWhere(table: typeof diabetesPatients | typeof registeredPatients, context: DiabetesContextFilter) {
+  if (context === "type1") return eq(table.type1, 1);
+  if (context === "type2") return eq(table.type2, 1);
+  if (context === "gdm") return eq(table.gdm, 1);
+  return undefined;
+}
+
+export async function getDiabetesPatientsPage(input: { query?: string; context?: DiabetesContextFilter; offset: number; limit: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+
+  const query = input.query?.trim();
+  const where = and(
+    diabetesContextWhere(diabetesPatients, input.context ?? "all"),
+    query ? or(ilike(diabetesPatients.age, `%${query}%`), ilike(diabetesPatients.identifyBy, `%${query}%`), ilike(diabetesPatients.sex, `%${query}%`)) : undefined,
+  );
+  const [patients, totalRows] = await Promise.all([
+    db.select().from(diabetesPatients).where(where).orderBy(asc(diabetesPatients.sourceRowNumber), asc(diabetesPatients.id)).limit(input.limit).offset(input.offset),
+    db.select({ count: sql<number>`count(*)` }).from(diabetesPatients).where(where),
+  ]);
+  const patientIds = patients.map((patient) => patient.id);
+  const counts = patientIds.length
+    ? await db.select({ patientId: diabetesPatientObservations.patientId, count: sql<number>`count(*)` }).from(diabetesPatientObservations).where(inArray(diabetesPatientObservations.patientId, patientIds)).groupBy(diabetesPatientObservations.patientId)
+    : [];
+  const countByPatient = new Map(counts.map((row) => [row.patientId, Number(row.count)]));
+  const total = Number(totalRows[0]?.count ?? 0);
+  return { patients: patients.map((patient) => ({ ...patient, observationCount: countByPatient.get(patient.id) ?? 0 })), total, hasMore: input.offset + patients.length < total };
 }
 
 export async function getDiabetesPatient(patientId: number) {
@@ -346,6 +375,106 @@ export async function getRegisteredPatients(limit = 100) {
   return patients.map((patient) => ({ ...patient, observationCount: patient.importedPatientId ? countByPatient.get(patient.importedPatientId) ?? 0 : 0 }));
 }
 
+export async function getRegisteredPatientsPage(input: { query?: string; context?: DiabetesContextFilter; offset: number; limit: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+
+  const query = input.query?.trim();
+  const where = and(
+    isNull(registeredPatients.archivedAt),
+    diabetesContextWhere(registeredPatients, input.context ?? "all"),
+    query
+      ? or(
+          ilike(registeredPatients.patientCode, `%${query}%`),
+          ilike(registeredPatients.displayName, `%${query}%`),
+          ilike(registeredPatients.registrationLocation, `%${query}%`),
+        )
+      : undefined,
+  );
+  const [patients, totalRows] = await Promise.all([
+    db
+      .select({
+        id: registeredPatients.id,
+        patientCode: registeredPatients.patientCode,
+        displayName: registeredPatients.displayName,
+        phone: registeredPatients.phone,
+        dateOfBirth: registeredPatients.dateOfBirth,
+        age: registeredPatients.age,
+        registrationLocation: registeredPatients.registrationLocation,
+        identifyBy: registeredPatients.identifyBy,
+        type1: registeredPatients.type1,
+        type2: registeredPatients.type2,
+        gdm: registeredPatients.gdm,
+        sex: registeredPatients.sex,
+        careTeam: registeredPatients.careTeam,
+        importedPatientId: registeredPatients.importedPatientId,
+        createdAt: registeredPatients.createdAt,
+      })
+      .from(registeredPatients)
+      .where(where)
+      .orderBy(desc(registeredPatients.createdAt), desc(registeredPatients.id))
+      .limit(input.limit)
+      .offset(input.offset),
+    db.select({ count: sql<number>`count(*)` }).from(registeredPatients).where(where),
+  ]);
+
+  const importedIds = patients.map((patient) => patient.importedPatientId).filter((id): id is number => Boolean(id));
+  const counts = importedIds.length
+    ? await db
+        .select({ patientId: diabetesPatientObservations.patientId, count: sql<number>`count(*)` })
+        .from(diabetesPatientObservations)
+        .where(inArray(diabetesPatientObservations.patientId, importedIds))
+        .groupBy(diabetesPatientObservations.patientId)
+    : [];
+  const countByPatient = new Map(counts.map((row) => [row.patientId, Number(row.count)]));
+  const total = Number(totalRows[0]?.count ?? 0);
+  return {
+    patients: patients.map((patient) => ({ ...patient, observationCount: patient.importedPatientId ? countByPatient.get(patient.importedPatientId) ?? 0 : 0 })),
+    total,
+    hasMore: input.offset + patients.length < total,
+  };
+}
+
+export async function getClinicalDashboardSummary() {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+
+  const [patientCountRows, assessmentCountRows, photoCountRows, recentPatients, recentPhotos] = await Promise.all([
+    db.select({ count: sql<number>`count(*)` }).from(registeredPatients).where(isNull(registeredPatients.archivedAt)),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(patientWoundAssessments)
+      .innerJoin(registeredPatients, eq(patientWoundAssessments.patientId, registeredPatients.id))
+      .where(isNull(registeredPatients.archivedAt)),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(patientWoundMedia)
+      .innerJoin(registeredPatients, eq(patientWoundMedia.patientId, registeredPatients.id))
+      .where(and(isNull(registeredPatients.archivedAt), isNull(patientWoundMedia.hiddenAt))),
+    db
+      .select({ id: registeredPatients.id, patientCode: registeredPatients.patientCode, displayName: registeredPatients.displayName, registrationLocation: registeredPatients.registrationLocation, updatedAt: registeredPatients.updatedAt })
+      .from(registeredPatients)
+      .where(isNull(registeredPatients.archivedAt))
+      .orderBy(desc(registeredPatients.updatedAt), desc(registeredPatients.id))
+      .limit(5),
+    db
+      .select({ id: patientWoundMedia.id, patientId: patientWoundMedia.patientId, patientCode: registeredPatients.patientCode, displayName: registeredPatients.displayName, storageUrl: patientWoundMedia.storageUrl, fileName: patientWoundMedia.fileName, capturedAt: patientWoundMedia.capturedAt, createdAt: patientWoundMedia.createdAt })
+      .from(patientWoundMedia)
+      .innerJoin(registeredPatients, eq(patientWoundMedia.patientId, registeredPatients.id))
+      .where(and(isNull(registeredPatients.archivedAt), isNull(patientWoundMedia.hiddenAt)))
+      .orderBy(desc(patientWoundMedia.capturedAt), desc(patientWoundMedia.createdAt))
+      .limit(5),
+  ]);
+
+  return {
+    registeredPatientCount: Number(patientCountRows[0]?.count ?? 0),
+    woundAssessmentCount: Number(assessmentCountRows[0]?.count ?? 0),
+    visiblePhotoCount: Number(photoCountRows[0]?.count ?? 0),
+    recentPatients,
+    recentPhotos,
+  };
+}
+
 export type RegisteredPatientProfileUpdate = Omit<NewRegisteredPatient, "patientCode" | "createdByUserId">;
 export type NewPatientMedication = {
   patientId: number;
@@ -425,6 +554,17 @@ export async function getWoundPhotoHistory(input: { patientId?: number; from?: D
   return { photos, total, hasMore: input.offset + photos.length < total };
 }
 
+export async function getVisibleWoundMediaByStorageKey(storageKey: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [media] = await db
+    .select({ id: patientWoundMedia.id, patientId: patientWoundMedia.patientId, storageKey: patientWoundMedia.storageKey })
+    .from(patientWoundMedia)
+    .where(and(eq(patientWoundMedia.storageKey, storageKey), isNull(patientWoundMedia.hiddenAt)))
+    .limit(1);
+  return media ?? null;
+}
+
 export async function updateRegisteredPatient(patientId: number, input: RegisteredPatientProfileUpdate, actorUserId: number | null) {
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable");
@@ -459,7 +599,13 @@ export async function addPatientWoundMedia(input: NewPatientWoundMedia & { image
   }
   const safeName = input.fileName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-160) || "wound-photo";
   const stored = await storagePut(`patient-wound-media/${input.patientId}/${safeName}`, input.imageBuffer, input.mimeType);
-  const [media] = await db.insert(patientWoundMedia).values({ patientId: input.patientId, woundAssessmentId: input.woundAssessmentId ?? null, storageKey: stored.key, storageUrl: stored.url, fileName: input.fileName, mimeType: input.mimeType, fileSizeBytes: input.fileSizeBytes, caption: input.caption ?? null, capturedOn: input.capturedOn ?? null, recordedByUserId: input.recordedByUserId }).returning();
+  let media;
+  try {
+    [media] = await db.insert(patientWoundMedia).values({ patientId: input.patientId, woundAssessmentId: input.woundAssessmentId ?? null, storageKey: stored.key, storageUrl: stored.url, fileName: input.fileName, mimeType: input.mimeType, fileSizeBytes: input.fileSizeBytes, caption: input.caption ?? null, capturedOn: input.capturedOn ?? null, capturedAt: input.capturedAt, recordedByUserId: input.recordedByUserId }).returning();
+  } catch (error) {
+    await storageDelete(stored.key).catch(deleteError => console.error("[Storage] Failed to clean up orphaned wound photo", deleteError));
+    throw error;
+  }
   await recordPatientAudit(input.patientId, input.recordedByUserId, "wound_photo_uploaded", `Wound photo uploaded: ${input.fileName} at ${input.capturedAt.toISOString()}`);
   return media;
 }
@@ -477,8 +623,9 @@ export async function setPatientWoundMediaHidden(mediaId: number, hidden: boolea
 export async function deletePatientWoundMedia(mediaId: number, actorUserId: number | null) {
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable");
-  const [media] = await db.select({ id: patientWoundMedia.id, patientId: patientWoundMedia.patientId, fileName: patientWoundMedia.fileName }).from(patientWoundMedia).where(eq(patientWoundMedia.id, mediaId)).limit(1);
+  const [media] = await db.select({ id: patientWoundMedia.id, patientId: patientWoundMedia.patientId, fileName: patientWoundMedia.fileName, storageKey: patientWoundMedia.storageKey, storageUrl: patientWoundMedia.storageUrl }).from(patientWoundMedia).where(eq(patientWoundMedia.id, mediaId)).limit(1);
   if (!media) return null;
+  if (media.storageUrl.startsWith("/r2-storage/")) await storageDelete(media.storageKey);
   await recordPatientAudit(media.patientId, actorUserId, "wound_photo_deleted", `Wound photo permanently deleted: ${media.fileName}`);
   const [deleted] = await db.delete(patientWoundMedia).where(eq(patientWoundMedia.id, mediaId)).returning({ id: patientWoundMedia.id, patientId: patientWoundMedia.patientId });
   return deleted;

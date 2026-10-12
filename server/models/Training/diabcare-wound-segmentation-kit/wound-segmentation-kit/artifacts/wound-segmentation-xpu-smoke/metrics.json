@@ -1,0 +1,38 @@
+{
+  "config": {
+    "task": "wound-segmentation",
+    "source_root": "/home/mark/Project/DiabCare-Woundcam/server/models/Training/diabcare-wound-segmentation-kit/wound-segmentation-kit/data/wound-segmentation-patches",
+    "output_dir": "/home/mark/Project/DiabCare-Woundcam/server/models/Training/diabcare-wound-segmentation-kit/wound-segmentation-kit/artifacts/wound-segmentation-xpu-smoke",
+    "image_size": 128,
+    "epochs": 1,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "seed": 42,
+    "device": "xpu",
+    "source_split_mode": "native_source_split_not_patient_safe",
+    "patient_group_id_available": false
+  },
+  "train_records": 32,
+  "validation_records": 3,
+  "test_records": 278,
+  "classes": [
+    "background",
+    "wound"
+  ],
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.6175728738307953,
+      "validation": {
+        "loss": 1.721022367477417,
+        "dice": 0.062020644545555115
+      }
+    }
+  ],
+  "test_metrics": {
+    "loss": 1.732175612449646,
+    "dice": 0.052478792092629845
+  },
+  "resumed_from": null,
+  "prototype_warning": "Uses source-provided splits and is not patient-leakage-safe; not for clinical decisions."
+}

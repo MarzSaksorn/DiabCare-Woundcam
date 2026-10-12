@@ -1,6 +1,28 @@
 {
+  "model": "diabetes-wound-detector",
+  "version": "onnx-ultralytics-8.3.0",
   "task": "detect",
+  "format": "onnx",
   "imgsz": 640,
+  "input": {
+    "name": "images",
+    "shape": ["batch", 3, 640, 640],
+    "color_order": "RGB",
+    "normalization": "pixel / 255",
+    "letterbox": true
+  },
+  "output": {
+    "name": "output0",
+    "shape": [1, 300, 6],
+    "layout": "xyxy, confidence, class id"
+  },
+  "class_order": [
+    "callus_corn",
+    "dfu_ulcer",
+    "infected_wound",
+    "necrotic_wound",
+    "normal_foot"
+  ],
   "classes": {
     "0": "callus_corn",
     "1": "dfu_ulcer",
@@ -8,6 +30,12 @@
     "3": "necrotic_wound",
     "4": "normal_foot"
   },
+  "onnx_sha256": "80055714a44b3df6e97371b69da74930a63e63ca51e138fe24a2a19fb71e6a02",
+  "export_version": "Ultralytics 8.3.0",
+  "training_run": "not-recorded",
   "model_source": "best.pt exported to ONNX with Ultralytics 8.3.0",
+  "source_split_mode": "not-recorded",
+  "patient_group_id_available": false,
+  "clinical_use": false,
   "clinical_note": "Model output is decision support and must not be presented as a diagnosis."
 }

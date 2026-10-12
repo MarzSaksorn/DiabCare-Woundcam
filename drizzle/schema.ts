@@ -15,7 +15,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 /**
- * Core user table backing the existing Manus OAuth/session flow.
+ * Core user table backing the Supabase Auth session flow.
  * Database columns use snake_case to match the Supabase schema while the
  * application-facing properties remain camelCase for compatibility.
  */

@@ -199,9 +199,9 @@ The server must reject finalization when the matrix is not exactly 120 × 90, th
 
 ### Current limitation
 
-The current web backend authenticates protected tRPC procedures through the server-side session context in `server/_core/context.ts`. The browser receives a session cookie through the existing Manus OAuth flow. The Android companion does not currently have a documented native login or bearer-token endpoint.
+The current web backend authenticates protected tRPC procedures through the server-side session context in `server/_core/context.ts`. The browser signs in with Supabase Auth email/password credentials, keeps the Supabase session in the client, and sends the access token as `Authorization: Bearer <token>` on protected requests. The Android companion does not yet have a documented native login or pairing endpoint.
 
-Do not copy the browser cookie, use the Supabase database password, embed `SUPABASE_DATABASE_URL`, or ship a server secret in the APK.
+Do not copy the browser session from the web view, use the Supabase database password, embed `SUPABASE_DATABASE_URL`, or ship a server secret in the APK. A future native flow should use a short-lived, purpose-built pairing token.
 
 ### Recommended companion pairing flow
 

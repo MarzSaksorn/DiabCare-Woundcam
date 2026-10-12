@@ -1,0 +1,39 @@
+{
+  "data_root": "/private-data/diabcare-wounds",
+  "output_root": "/private-data/diabcare-wounds/artifacts",
+  "tasks": {
+    "detection": {
+      "manifest": "data/manifests/detection.split.jsonl",
+      "command": [
+        "python",
+        "scripts/train_detection.py",
+        "--manifest",
+        "{manifest}",
+        "--output",
+        "{output_root}/detection"
+      ]
+    },
+    "classification": {
+      "manifest": "data/manifests/classification.split.jsonl",
+      "command": [
+        "python",
+        "scripts/train_classification.py",
+        "--manifest",
+        "{manifest}",
+        "--output",
+        "{output_root}/classification"
+      ]
+    },
+    "segmentation": {
+      "manifest": "data/manifests/segmentation.split.jsonl",
+      "command": [
+        "python",
+        "scripts/train_segmentation.py",
+        "--manifest",
+        "{manifest}",
+        "--output",
+        "{output_root}/segmentation"
+      ]
+    }
+  }
+}

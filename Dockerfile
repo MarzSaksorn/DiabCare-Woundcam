@@ -10,6 +10,10 @@ RUN npm install --global corepack@latest \
 
 COPY . .
 RUN corepack pnpm build
+RUN mkdir -p dist/models \
+  && cp server/models/diabetes-wound-detector.onnx server/models/diabetes-wound-detector.labels.json dist/models/ \
+  && cp server/models/azh-classifier.onnx server/models/azh-classifier.labels.json dist/models/ \
+  && cp server/models/wound-segmentation.onnx server/models/wound-segmentation.labels.json dist/models/
 
 FROM node:22-bookworm-slim AS runtime
 WORKDIR /app
@@ -20,8 +24,6 @@ ENV NODE_ENV=production \
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-# The bundled server resolves the model from dist/models at runtime.
-COPY --from=builder /app/server/models ./dist/models
 
 USER node
 EXPOSE 3000

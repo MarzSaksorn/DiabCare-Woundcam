@@ -1,0 +1,56 @@
+{
+  "model": "wound-segmentation",
+  "version": "wound-segmentation-xpu-best",
+  "task": "binary_segmentation",
+  "format": "onnx",
+  "input": {
+    "name": "images",
+    "shape": [
+      "batch",
+      3,
+      128,
+      128
+    ],
+    "color_order": "RGB",
+    "normalization": "pixel / 255"
+  },
+  "output": {
+    "name": "mask_logits",
+    "shape": [
+      "batch",
+      1,
+      128,
+      128
+    ]
+  },
+  "classes": [
+    "background",
+    "wound"
+  ],
+  "threshold": 0.5,
+  "clinical_use": false,
+  "exporter_version": "wound-segmentation-export-1",
+  "opset": 17,
+  "training_run": "prototype-20261009-continued-wound-segmentation",
+  "checkpoint_epoch": 26,
+  "source_checkpoint": "server/models/Training/diabcare-wound-segmentation-kit/wound-segmentation-kit/artifacts/wound-segmentation-xpu/best.pt",
+  "source_checkpoint_sha256": "3ef1bbe1e4ab2952fc8d3bc85ccc3393310d0d771051d3b9feea42ae65a808e9",
+  "onnx_sha256": "269ed002a5bc5fa20c2d11dfb85b5b00f9c768e0e40a5ca28022477c4ff8f48e",
+  "source_split_mode": "native_source_split_not_patient_safe",
+  "patient_group_id_available": false,
+  "parity_validation": {
+    "validator": "wound-segmentation-parity-1",
+    "checkpoint_sha256": "3ef1bbe1e4ab2952fc8d3bc85ccc3393310d0d771051d3b9feea42ae65a808e9",
+    "onnx_sha256": "269ed002a5bc5fa20c2d11dfb85b5b00f9c768e0e40a5ca28022477c4ff8f48e",
+    "opset": 17,
+    "fixtures": 12,
+    "max_abs_logit_difference": 2.765655517578125e-05,
+    "mean_abs_logit_difference": 1.5151893961729002e-06,
+    "max_abs_probability_difference": 5.781650543212891e-06,
+    "max_abs_coverage_difference": 0.0,
+    "thresholded_masks_match": true,
+    "threshold": 0.5,
+    "tolerance": 0.0001,
+    "passed": true
+  }
+}

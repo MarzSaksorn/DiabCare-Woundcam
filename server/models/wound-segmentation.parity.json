@@ -1,0 +1,15 @@
+{
+  "validator": "wound-segmentation-parity-1",
+  "checkpoint_sha256": "3ef1bbe1e4ab2952fc8d3bc85ccc3393310d0d771051d3b9feea42ae65a808e9",
+  "onnx_sha256": "269ed002a5bc5fa20c2d11dfb85b5b00f9c768e0e40a5ca28022477c4ff8f48e",
+  "opset": 17,
+  "fixtures": 12,
+  "max_abs_logit_difference": 2.765655517578125e-05,
+  "mean_abs_logit_difference": 1.5151893961729002e-06,
+  "max_abs_probability_difference": 5.781650543212891e-06,
+  "max_abs_coverage_difference": 0.0,
+  "thresholded_masks_match": true,
+  "threshold": 0.5,
+  "tolerance": 0.0001,
+  "passed": true
+}

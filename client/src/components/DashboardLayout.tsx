@@ -1,67 +1,116 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
-import { startLogin } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { Activity, FileText, Languages, LayoutDashboard, LogOut, PanelLeft, Settings, Users } from "lucide-react";
-import { CSSProperties, useEffect, useRef, useState } from "react";
-import { useLocation } from "wouter";
-import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
-import { Button } from "./ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { isNavItemActive } from "@shared/navigation";
+import { Bell, Camera, FileText, Languages, LayoutDashboard, LogOut, Settings, UserRound, Users } from "lucide-react";
+import { type ReactNode } from "react";
+import { useLocation } from "wouter";
+import ReplicaLogin from "./ReplicaLogin";
+import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 
-const menuItems = [
-  { icon: LayoutDashboard, label: "overview", path: "/" },
-  { icon: Users, label: "patients", path: "/patients" },
-  { icon: Activity, label: "assessments", path: "/assessments" },
-  { icon: FileText, label: "reports", path: "/reports" },
-  { icon: Settings, label: "settings", path: "/settings" },
+type DashboardLayoutProps = { children: ReactNode; demoMode?: boolean };
+type NavItem = { path: string; label: string; icon: typeof LayoutDashboard };
+
+const navItems: NavItem[] = [
+  { path: "/", label: "overview", icon: LayoutDashboard },
+  { path: "/patients", label: "patients", icon: Users },
+  { path: "/camera", label: "camera", icon: Camera },
+  { path: "/reports", label: "reports", icon: FileText },
+  { path: "/settings", label: "settings", icon: Settings },
 ];
 
-const SIDEBAR_WIDTH_KEY = "sidebar-width";
-const DEFAULT_WIDTH = 258;
-const MIN_WIDTH = 200;
-const MAX_WIDTH = 420;
-
-type DashboardLayoutProps = { children: React.ReactNode; demoMode?: boolean };
-
-export default function DashboardLayout({ children, demoMode = false }: DashboardLayoutProps) {
-  const [sidebarWidth, setSidebarWidth] = useState(() => {
-    const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
-    return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
-  });
-  const { loading, user } = useAuth();
-
-  useEffect(() => { localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString()); }, [sidebarWidth]);
-  if (loading && !demoMode) return <DashboardLayoutSkeleton />;
-  if (!user && !demoMode) return <div className="flex min-h-screen items-center justify-center"><div className="flex w-full max-w-md flex-col items-center gap-8 p-8"><div className="flex flex-col items-center gap-6"><h1 className="text-center text-2xl font-semibold tracking-tight">Sign in to continue</h1><p className="max-w-sm text-center text-sm text-muted-foreground">Access to this dashboard requires authentication. Continue to launch the login flow.</p></div><Button onClick={() => startLogin()} size="lg" className="w-full shadow-lg transition-all hover:shadow-xl">Sign in</Button></div></div>;
-
-  return <SidebarProvider style={{ "--sidebar-width": `${sidebarWidth}px` } as CSSProperties}><DashboardLayoutContent demoMode={demoMode} setSidebarWidth={setSidebarWidth}>{children}</DashboardLayoutContent></SidebarProvider>;
+function isActivePath(path: string, location: string) {
+  if (path === "/") return location === "/";
+  if (path === "/camera") return location === "/camera" || location === "/assessments";
+  return location === path || location.startsWith(`${path}/`);
 }
 
-type DashboardLayoutContentProps = { children: React.ReactNode; setSidebarWidth: (width: number) => void; demoMode: boolean };
-
-function DashboardLayoutContent({ children, setSidebarWidth, demoMode }: DashboardLayoutContentProps) {
-  const { user, logout } = useAuth();
-  const [location, setLocation] = useLocation();
-  const { state, toggleSidebar, setOpenMobile } = useSidebar();
-  const isCollapsed = state === "collapsed";
-  const [isResizing, setIsResizing] = useState(false);
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const activeMenuItem = menuItems.find(item => isNavItemActive(item.path, location));
-  const isMobile = useIsMobile();
-  const displayUser = user ?? { name: "Dr. Morgan Lee", email: "demo@riverside.health" };
+export default function DashboardLayout({ children, demoMode = false }: DashboardLayoutProps) {
+  const { loading, user, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
 
-  useEffect(() => { if (isCollapsed) setIsResizing(false); }, [isCollapsed]);
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => { if (!isResizing) return; const sidebarLeft = sidebarRef.current?.getBoundingClientRect().left ?? 0; const newWidth = e.clientX - sidebarLeft; if (newWidth >= MIN_WIDTH && newWidth <= MAX_WIDTH) setSidebarWidth(newWidth); };
-    const handleMouseUp = () => setIsResizing(false);
-    if (isResizing) { document.addEventListener("mousemove", handleMouseMove); document.addEventListener("mouseup", handleMouseUp); document.body.style.cursor = "col-resize"; document.body.style.userSelect = "none"; }
-    return () => { document.removeEventListener("mousemove", handleMouseMove); document.removeEventListener("mouseup", handleMouseUp); document.body.style.cursor = ""; document.body.style.userSelect = ""; };
-  }, [isResizing, setSidebarWidth]);
+  if (loading && !demoMode) return <DashboardLayoutSkeleton />;
+  if (!user && !demoMode) return <ReplicaLogin />;
 
-  return <><div className="relative shrink-0" ref={sidebarRef}><Sidebar collapsible="icon" className="border-r-0" disableTransition={isResizing}><SidebarHeader className="h-[88px] justify-center"><div className="flex w-full items-center gap-3 px-2 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0"><button type="button" onClick={toggleSidebar} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#eef3f0] text-[#4f7463] transition-colors hover:bg-[#dfeae3] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:rounded-lg" aria-label="Toggle navigation"><PanelLeft className="h-4 w-4" /></button>{!isCollapsed && <div className="min-w-0 flex-1"><div className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#6d9681]" /><span className="font-display text-lg tracking-[-0.04em] text-[#132238]">DiabCare</span><button type="button" onClick={() => setLanguage(language === "en" ? "th" : "en")} className="ml-auto inline-flex h-7 items-center gap-1 rounded-lg bg-[#f1f4f2] px-2 text-[10px] font-bold text-[#4f7463] transition-colors hover:bg-[#e7efeb]" aria-label={`${t("language")}: ${language === "en" ? t("thai") : t("english")}`}><Languages className="h-3.5 w-3.5" />{language === "en" ? "ไทย" : "EN"}</button></div><p className="mt-0.5 pl-[18px] text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">{t("woundcam")}</p></div>}</div></SidebarHeader><SidebarContent className="gap-0"><div className="px-4 pb-3 pt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 group-data-[collapsible=icon]:hidden">{t("careWorkspace")}</div><SidebarMenu className="space-y-1 px-2">{menuItems.map(item => { const isActive = isNavItemActive(item.path, location); return <SidebarMenuItem key={item.path}><SidebarMenuButton isActive={isActive} onClick={() => { setLocation(item.path); if (isMobile) setOpenMobile(false); }} tooltip={t(item.label)} aria-current={isActive ? "page" : undefined} className="h-11 rounded-xl font-medium transition-all"><item.icon className={`h-4 w-4 ${isActive ? "text-[#4f7463]" : "text-slate-400"}`} /><span>{t(item.label)}</span></SidebarMenuButton></SidebarMenuItem>; })}</SidebarMenu></SidebarContent><SidebarFooter className="p-3"><DropdownMenu><DropdownMenuTrigger asChild><button className="group flex w-full items-center gap-3 rounded-xl px-1.5 py-2 text-left transition-colors hover:bg-[#f4f7f5] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Avatar className="h-9 w-9 shrink-0 border border-[#dbe7df]"><AvatarFallback className="bg-[#e7efeb] text-xs font-bold text-[#4f7463]">{displayUser.name?.charAt(0).toUpperCase()}</AvatarFallback></Avatar><div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden"><p className="truncate text-sm font-semibold leading-none text-[#25354a]">{displayUser.name}</p><p className="mt-1.5 truncate text-[11px] text-slate-400">{displayUser.email}</p></div></button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-52"><DropdownMenuItem onClick={() => setLanguage(language === "en" ? "th" : "en")} className="cursor-pointer"><Languages className="mr-2 h-4 w-4" /><span>{t("language")}: {language === "en" ? t("thai") : t("english")}</span></DropdownMenuItem>{!demoMode && <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive"><LogOut className="mr-2 h-4 w-4" /><span>{t("signOut")}</span></DropdownMenuItem>}{demoMode && <DropdownMenuItem disabled>Demo preview mode</DropdownMenuItem>}</DropdownMenuContent></DropdownMenu></SidebarFooter></Sidebar><div className={`absolute right-0 top-0 h-full w-1 cursor-col-resize transition-colors hover:bg-[#6d9681]/20 ${isCollapsed ? "hidden" : ""}`} onMouseDown={() => { if (!isCollapsed) setIsResizing(true); }} style={{ zIndex: 50 }} /></div><SidebarInset className="min-w-0 overflow-x-hidden">{isMobile && <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-slate-100 bg-[#fbfcfb]/95 px-2 backdrop-blur"><div className="flex items-center gap-2"><SidebarTrigger className="h-9 w-9 rounded-lg bg-white" /><span className="text-sm font-semibold text-[#25354a]">{activeMenuItem ? t(activeMenuItem.label) : t("overview")}</span></div><button type="button" onClick={() => setLanguage(language === "en" ? "th" : "en")} className="inline-flex h-8 items-center gap-1 rounded-lg bg-white px-2 text-[10px] font-bold text-[#4f7463]" aria-label={t("language")}><Languages className="h-3.5 w-3.5" />{language === "en" ? "ไทย" : "EN"}</button></div>}<main className="min-h-screen min-w-0 flex-1 bg-[#f6f7f4] p-4 sm:p-5 lg:p-6">{children}</main></SidebarInset></>;
+  const displayUser = user ?? { name: "Local Clinician", email: "local@diabcare.local" };
+  const dateLabel = new Intl.DateTimeFormat(language === "th" ? "th-TH" : "en-US", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+
+  return (
+    <div className="app-shell" lang={language === "th" ? "th" : "en"}>
+      <header className="app-header">
+        <div className="app-header-inner">
+          <div className="app-header-brand">
+            <img src="/assets/diabcare-logo.jpg" alt="DiabCare WoundCam" />
+            <div>
+              <p className="app-header-title">DiabCare Dashboard</p>
+              <p className="app-header-date">{dateLabel}</p>
+            </div>
+          </div>
+          <div className="app-header-actions">
+            <button type="button" className="language-toggle" onClick={() => setLanguage(language === "th" ? "en" : "th")} aria-label={t("language")}>
+              <span className={language === "th" ? "is-active" : ""}>TH</span>
+              <span className={language === "en" ? "is-active" : ""}>EN</span>
+            </button>
+            <button type="button" className="icon-action" aria-label={language === "th" ? "การแจ้งเตือน" : "Notifications"}>
+              <Bell aria-hidden="true" />
+              <span className="notification-dot" aria-hidden="true" />
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" className="profile-action" aria-label={displayUser.name ?? "Profile"}>
+                  <UserRound aria-hidden="true" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem disabled className="flex-col items-start gap-1">
+                  <span className="font-semibold">{displayUser.name}</span>
+                  <span className="text-xs text-slate-400">{displayUser.email}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage(language === "th" ? "en" : "th")} className="cursor-pointer">
+                  <Languages className="mr-2 h-4 w-4" /> {t("language")}
+                </DropdownMenuItem>
+                {!demoMode && <DropdownMenuItem onClick={() => void logout()} className="cursor-pointer text-rose-600 focus:text-rose-600"><LogOut className="mr-2 h-4 w-4" /> {t("signOut")}</DropdownMenuItem>}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </header>
+
+      <main className="mobile-content">{children}</main>
+      <ReplicaBottomNavigation />
+    </div>
+  );
+}
+
+function ReplicaBottomNavigation() {
+  const [location, setLocation] = useLocation();
+  const { t } = useLanguage();
+  const isMobile = useIsMobile();
+
+  return (
+    <nav className={`bottom-nav ${isMobile ? "is-mobile" : ""}`} aria-label="Primary navigation">
+      {navItems.map(({ path, label, icon: Icon }) => {
+        const active = isActivePath(path, location);
+        const center = path === "/camera";
+        return (
+          <button
+            key={path}
+            type="button"
+            className={`bottom-nav-item ${center ? "is-camera" : ""} ${active ? "is-active" : ""}`}
+            onClick={() => setLocation(path)}
+            aria-current={active ? "page" : undefined}
+          >
+            <span className="bottom-nav-icon"><Icon aria-hidden="true" /></span>
+            <span>{t(label)}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
 }

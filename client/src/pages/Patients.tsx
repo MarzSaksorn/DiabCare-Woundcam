@@ -1,123 +1,83 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
-import { AlertTriangle, ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, ClipboardList, Filter, RefreshCw, Search, ShieldAlert, Users, X } from "lucide-react";
-import { useMemo, useState } from "react";
-import { Link } from "wouter";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDate, formatNumber } from "@/lib/locale";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { AlertTriangle, ArrowRight, CalendarClock, CheckCircle2, Database, FileText, Filter, HeartPulse, MapPin, RefreshCw, Search, ShieldAlert, UserRound, Users } from "lucide-react";
+import { useState } from "react";
+import { Link } from "wouter";
 
-type FilterState = "all" | "review" | "complete" | "imported";
-type DiabetesFilter = "all" | "type1" | "type2" | "gdm" | "none";
-type SexFilter = "all" | "FEMALE" | "MALE";
-type PatientListRow = {
-  id: number;
-  recordKind: "imported" | "registered";
-  sourceRowNumber?: number;
-  patientCode?: string;
-  displayName?: string | null;
-  registrationLocation?: string;
-  age: string | number | null;
-  sex: "FEMALE" | "MALE";
-  identifyBy: string;
-  type1: number;
-  type2: number;
-  gdm: number;
-  observationCount: number;
-  importedPatientId?: number | null;
-  createdAt: Date | string | null;
-};
 const PAGE_SIZE = 12;
+type ViewKind = "registered" | "imported";
+type SearchMode = "patient" | "location" | "context";
+type DiabetesContext = "all" | "type1" | "type2" | "gdm";
 
-function PatientsPageContent() {
-  const patientsQuery = trpc.diabetes.patients.useQuery({ limit: 100 });
-  const registeredPatientsQuery = trpc.diabetes.registeredPatients.useQuery({ limit: 100 });
-  const summaryQuery = trpc.diabetes.summary.useQuery();
+export default function Patients() {
+  const { language, t } = useLanguage();
+  const [view, setView] = useState<ViewKind>("registered");
+  const [searchMode, setSearchMode] = useState<SearchMode>("patient");
+  const [context, setContext] = useState<DiabetesContext>("all");
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<FilterState>("all");
-  const [diabetesFilter, setDiabetesFilter] = useState<DiabetesFilter>("all");
-  const [sexFilter, setSexFilter] = useState<SexFilter>("all");
-  const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
-  const { t, language } = useLanguage();
+  const registered = trpc.diabetes.registeredPatientsPage.useQuery({ query, context, offset: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE }, { retry: false });
+  const imported = trpc.diabetes.patientsPage.useQuery({ query, context, offset: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE }, { retry: false });
+  const summary = trpc.diabetes.summary.useQuery(undefined, { retry: false });
+  const activeQuery = view === "registered" ? registered : imported;
+  const total = view === "registered" ? registered.data?.total ?? 0 : imported.data?.total ?? 0;
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const loading = activeQuery.isLoading;
+  const error = activeQuery.error;
+  const placeholder = searchMode === "patient" ? (language === "th" ? "ค้นหาข้อมูลคนไข้ตามชื่อ หรือรหัสประจำตัว HN..." : "Search by patient name or HN code...") : searchMode === "location" ? (language === "th" ? "ค้นหาตามพื้นที่ หรือตำบล..." : "Search by location or district...") : (language === "th" ? "ค้นหาตามข้อมูลโรคร่วม..." : "Search by diabetes context...");
 
-  const rows = useMemo<PatientListRow[]>(() => {
-    const normalized = query.trim().toLowerCase();
-    const linkedImportedIds = new Set((registeredPatientsQuery.data ?? []).map((patient) => patient.importedPatientId).filter((id): id is number => Boolean(id)));
-    const importedRows: PatientListRow[] = (patientsQuery.data ?? []).filter((patient) => !linkedImportedIds.has(patient.id)).map((patient) => ({ ...patient, recordKind: "imported" as const }));
-    const registeredRows: PatientListRow[] = (registeredPatientsQuery.data ?? []).map((patient) => ({
-      ...patient,
-      recordKind: "registered" as const,
-      identifyBy: patient.identifyBy,
-      observationCount: patient.observationCount,
-      age: patient.age,
-    }));
-    return [...importedRows, ...registeredRows].filter((patient) => {
-      const recordLabel = patient.recordKind === "registered" ? `${patient.patientCode} ${patient.displayName ?? ""} ${patient.registrationLocation ?? ""}` : `imported cohort record ${(patient.sourceRowNumber ?? 1) - 1}`;
-      const matchesQuery = !normalized || [
-        recordLabel,
-        patient.id,
-        patient.age,
-        patient.sex,
-        patient.identifyBy,
-      ].join(" ").toLowerCase().includes(normalized);
-      const isComplete = Boolean(patient.age && patient.sex && patient.identifyBy);
-      const matchesStatus = filter === "all" || (filter === "imported" && patient.recordKind === "imported") || (filter === "complete" && isComplete) || (filter === "review" && !isComplete);
-      const context = patient.type2 ? "type2" : patient.type1 ? "type1" : patient.gdm ? "gdm" : "none";
-      const matchesDiabetes = diabetesFilter === "all" || context === diabetesFilter;
-      const matchesSex = sexFilter === "all" || patient.sex === sexFilter;
-      return matchesQuery && matchesStatus && matchesDiabetes && matchesSex;
-    });
-  }, [diabetesFilter, filter, patientsQuery.data, query, registeredPatientsQuery.data, sexFilter]);
-
-  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  const safePage = Math.min(page, pageCount);
-  const visibleRows = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-  const totalRecords = (patientsQuery.data?.length ?? 0) + (registeredPatientsQuery.data?.length ?? 0);
-  const totalObservations = summaryQuery.data?.observationCount ?? patientsQuery.data?.reduce((sum, patient) => sum + patient.observationCount, 0) ?? 0;
-
-  function updateQuery(value: string) { setQuery(value); setPage(1); }
-  function updateFilter(value: FilterState) { setFilter(value); setPage(1); }
-  function resetFilters() {
+  function changeView(next: ViewKind) {
+    setView(next);
+    setPage(1);
     setQuery("");
-    setFilter("all");
-    setDiabetesFilter("all");
-    setSexFilter("all");
+    setContext("all");
+  }
+
+  function chooseContext(next: DiabetesContext) {
+    setContext(next);
     setPage(1);
   }
 
-  return <DashboardLayout><div className="mx-auto w-full max-w-[1500px] space-y-6 px-1 py-1 sm:px-3 lg:px-6 lg:py-4">
-    <header className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end"><div><div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500"><span className="h-2 w-2 rounded-full bg-[#6d9681]" /> {t("careWorkspace")} <span className="text-slate-300">/</span> {t("patientRecords")}</div><h1 className="font-display text-4xl leading-none tracking-[-0.04em] text-[#132238] sm:text-5xl">{t("patients")}</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">{t("patientsPageDescription")}</p></div><div className="flex flex-wrap items-center gap-2"><Button onClick={() => { patientsQuery.refetch(); registeredPatientsQuery.refetch(); }} variant="outline" className="h-10 rounded-xl border-slate-200 bg-white text-slate-600"><RefreshCw className={`mr-2 h-4 w-4 ${patientsQuery.isFetching || registeredPatientsQuery.isFetching ? "animate-spin" : ""}`} /> {t("refresh")}</Button><Button variant="outline" className="h-10 rounded-xl border-slate-200 bg-white text-slate-600"><ClipboardList className="mr-2 h-4 w-4" /> {t("exportMetadata")}</Button><Link href="/patients/new" className="inline-flex h-10 items-center rounded-xl bg-[#132238] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#203552]"><Users className="mr-2 h-4 w-4" /> {t("registerPatient")}</Link></div></header>
+  function refresh() {
+    void registered.refetch();
+    void imported.refetch();
+    void summary.refetch();
+  }
 
-    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={Users} label={t("recordsInScope")} value={totalRecords} helper={t("localDatabase")} tone="navy" /><Metric icon={ShieldAlert} label={t("needsReview")} value={patientsQuery.data ? patientsQuery.data.length : "—"} helper={t("importedUnverified")} tone="amber" /><Metric icon={ClipboardList} label={t("observations")} value={formatNumber(totalObservations, language)} helper={t("sourcePreservedValues")} tone="sage" /><Metric icon={CheckCircle2} label={t("baselineComplete")} value={totalRecords} helper={t("fieldsWithValue")} tone="sage" /></section>
+  return <DashboardLayout>
+    <div className="replica-page patients-replica-page">
+      <header className="patients-replica-header"><div><span className="replica-eyebrow"><span /> {language === "th" ? "ทะเบียนผู้ป่วย" : "PATIENT REGISTRY"}</span><h1>{language === "th" ? "รายชื่อคนไข้เป้าหมาย" : "Patient registry"}</h1><p>{language === "th" ? "ค้นหาและเปิดข้อมูลจากแหล่งที่มาจริง โดยคงแยกระเบียนคลินิกและกลุ่มนำเข้า" : "Search and open source records while keeping registered clinical and imported cohorts separate."}</p></div><div className="patients-replica-actions"><button type="button" onClick={refresh} className="replica-secondary-button"><RefreshCw className={loading ? "animate-spin" : ""} aria-hidden="true" /> {t("refresh")}</button><Link href="/patients/new" className="replica-primary-button"><Users aria-hidden="true" /> {t("registerPatient")}</Link></div></header>
 
-    <section className="panel-card overflow-hidden"><div className="flex flex-col gap-4 border-b border-slate-100 px-5 py-5 lg:flex-row lg:items-center lg:justify-between lg:px-6"><div><div className="flex flex-wrap items-center gap-2"><h2 className="font-display text-[23px] tracking-[-0.03em] text-[#132238]">{t("patientRecords")}</h2><Badge className="rounded-full bg-[#eef3f0] text-[#4f7463] hover:bg-[#eef3f0]">{rows.length} {t("matching")}</Badge></div><p className="mt-1 text-sm text-slate-400">{t("sourcePreservedBaseline")}</p></div><div className="flex w-full gap-2 lg:w-auto"><div className="relative min-w-0 flex-1 lg:w-72"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><Input value={query} onChange={(event) => updateQuery(event.target.value)} placeholder={t("searchRecords")} aria-label={t("searchRecords")} className="h-10 rounded-lg border-slate-200 bg-white pl-9 pr-9 text-sm" />{query && <button onClick={() => updateQuery("")} aria-label={t("clearSearch")} className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:bg-slate-100"><X className="h-4 w-4" /></button>}</div><Button type="button" variant="outline" aria-expanded={showFilters} aria-controls="patient-record-filters" onClick={() => setShowFilters((value) => !value)} className="h-10 rounded-lg border-slate-200 px-3 text-slate-500"><Filter className="mr-2 h-4 w-4" /> {t("filters")}</Button></div></div>
+      <section className="patients-source-bar"><div className="patients-source-heading"><Database aria-hidden="true" /><div><strong>{view === "registered" ? (language === "th" ? "ผู้ป่วยที่ลงทะเบียน" : "Registered patients") : (language === "th" ? "ข้อมูลผู้ป่วยนำเข้า" : "Imported patient cohort")}</strong><small>{view === "registered" ? (language === "th" ? "ระเบียนคลินิกที่ยังใช้งาน" : "Active clinical records") : (summary.data?.batch?.sourceFilename || (language === "th" ? "แหล่งข้อมูลนำเข้า" : "Imported source data"))}</small></div></div><div className="patients-source-toggle" role="tablist" aria-label={language === "th" ? "แหล่งข้อมูลผู้ป่วย" : "Patient source"}><button type="button" role="tab" aria-selected={view === "registered"} className={view === "registered" ? "is-active" : ""} onClick={() => changeView("registered")}>{language === "th" ? "คลินิก" : "Clinical"}</button><button type="button" role="tab" aria-selected={view === "imported"} className={view === "imported" ? "is-active" : ""} onClick={() => changeView("imported")}>{language === "th" ? "นำเข้า" : "Imported"}</button></div></section>
 
-      {showFilters && <div id="patient-record-filters" className="grid gap-3 border-b border-slate-100 bg-[#fbfcfb] px-5 py-4 sm:grid-cols-3 sm:px-6"><label className="grid gap-1.5 text-xs font-semibold text-slate-500"><span>{t("reviewStatus")}</span><select value={filter} onChange={(event) => updateFilter(event.target.value as FilterState)} className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm font-normal text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d9681]"><option value="all">{t("allRecords")}</option><option value="review">{t("needsReview")}</option><option value="complete">{t("baselineComplete")}</option><option value="imported">{t("imported")}</option></select></label><label className="grid gap-1.5 text-xs font-semibold text-slate-500"><span>{t("diabetesContext")}</span><select value={diabetesFilter} onChange={(event) => { setDiabetesFilter(event.target.value as DiabetesFilter); setPage(1); }} className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm font-normal text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d9681]"><option value="all">{t("allRecords")}</option><option value="type1">{t("type1")}</option><option value="type2">{t("type2")}</option><option value="gdm">{t("gdm")}</option><option value="none">{t("notSpecified")}</option></select></label><label className="grid gap-1.5 text-xs font-semibold text-slate-500"><span>{t("sex")}</span><select value={sexFilter} onChange={(event) => { setSexFilter(event.target.value as SexFilter); setPage(1); }} className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm font-normal text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d9681]"><option value="all">{t("allRecords")}</option><option value="FEMALE">{t("female")}</option><option value="MALE">{t("male")}</option></select></label></div>}
+      <section className="patients-replica-controls"><div className="patients-search-modes" role="tablist" aria-label={language === "th" ? "ประเภทการค้นหา" : "Search mode"}><button type="button" role="tab" aria-selected={searchMode === "patient"} className={searchMode === "patient" ? "is-active" : ""} onClick={() => setSearchMode("patient")}><UserRound aria-hidden="true" /> {language === "th" ? "ชื่อ / HN" : "Name / HN"}</button><button type="button" role="tab" aria-selected={searchMode === "location"} className={searchMode === "location" ? "is-active" : ""} onClick={() => setSearchMode("location")}><MapPin aria-hidden="true" /> {language === "th" ? "พื้นที่ / ตำบล" : "Location"}</button><button type="button" role="tab" aria-selected={searchMode === "context"} className={searchMode === "context" ? "is-active" : ""} onClick={() => setSearchMode("context")}><HeartPulse aria-hidden="true" /> {language === "th" ? "โรคร่วม" : "Comorbidity"}</button></div><div className="patients-replica-search"><Search aria-hidden="true" /><input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder={placeholder} aria-label={language === "th" ? "ค้นหาระเบียน" : "Search records"} /></div></section>
 
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-5 py-3 sm:px-6">{([['all', t("allRecords")], ['review', t("needsReview")], ['complete', t("baselineComplete")], ['imported', t("imported")]] as const).map(([value, label]) => <button key={value} onClick={() => updateFilter(value)} className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${filter === value ? "bg-[#132238] text-white" : "bg-[#f1f4f2] text-slate-500 hover:bg-[#e7efeb] hover:text-[#25354a]"}`}>{label}</button>)}<span className="ml-auto text-[11px] text-slate-400">{t("localDatabase")} · {summaryQuery.data?.batch?.createdAt ? formatDate(summaryQuery.data.batch.createdAt, language) : "—"}</span></div>
+      <section className="patients-filter-strip" aria-label={language === "th" ? "ตัวกรองผู้ป่วย" : "Patient filters"}><Filter aria-hidden="true" /><FilterChip active={context === "all"} label={language === "th" ? "ทั้งหมด" : "All"} value={context === "all" ? formatNumber(total, language) : "—"} onClick={() => chooseContext("all")} /><FilterChip disabled label={language === "th" ? "นัดวันนี้" : "Appointments"} value="—" /><FilterChip disabled label={language === "th" ? "เสี่ยงสูง" : "High risk"} value="—" /><FilterChip disabled label={language === "th" ? "วิกฤต" : "Critical"} value="—" /><FilterChip active={context === "type1"} label="Type 1" value={context === "type1" ? formatNumber(total, language) : "—"} onClick={() => chooseContext("type1")} /><FilterChip active={context === "type2"} label="Type 2" value={context === "type2" ? formatNumber(total, language) : "—"} onClick={() => chooseContext("type2")} /><FilterChip active={context === "gdm"} label="GDM" value={context === "gdm" ? formatNumber(total, language) : "—"} onClick={() => chooseContext("gdm")} /></section>
 
-      {patientsQuery.isLoading && <div className="space-y-2 p-6">{[1, 2, 3, 4, 5].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl bg-[#f1f4f2]" />)}</div>}
-      {patientsQuery.error && <div className="flex items-start gap-3 px-6 py-12"><AlertTriangle className="mt-0.5 h-5 w-5 text-[#c86b52]" /><div><h3 className="text-sm font-bold text-[#25354a]">{t("patientsLoadError")}</h3><p className="mt-1 text-xs text-slate-400">{t("patientsLoadErrorDetail")}</p><Button onClick={() => patientsQuery.refetch()} variant="outline" className="mt-4 h-9 rounded-lg text-xs">{t("tryAgain")}</Button></div></div>}
-      {!patientsQuery.isLoading && !patientsQuery.error && visibleRows.length === 0 && <div className="flex flex-col items-center px-6 py-16 text-center"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f1f4f2] text-slate-400"><Search className="h-5 w-5" /></div><h3 className="mt-4 text-sm font-bold text-[#25354a]">{t("noRecordsMatch")}</h3><p className="mt-1 max-w-sm text-xs leading-5 text-slate-400">{t("noRecordsMatchDetail")}</p><Button onClick={resetFilters} variant="ghost" className="mt-3 h-8 text-xs text-[#4f7463]">{t("resetView")}</Button></div>}
-      {!patientsQuery.isLoading && !patientsQuery.error && visibleRows.length > 0 && <><div className="hidden grid-cols-[1.45fr_.75fr_.8fr_1fr_.75fr_.65fr_auto] gap-4 border-b border-slate-100 bg-[#fbfcfb] px-6 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 lg:grid"><span>{t("record")}</span><span>{t("ageSex")}</span><span>{t("diabetes")}</span><span>{t("dataState")}</span><span>{t("observations")}</span><span>{t("updated")}</span><span /></div><div className="divide-y divide-slate-100">{visibleRows.map((patient) => <PatientListRow key={`${patient.recordKind}-${patient.id}`} patient={patient} language={language} t={t} />)}</div><div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"><p className="text-xs text-slate-400">{t("showing")} {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, rows.length)} {t("of")} {rows.length} {t("records")}</p><div className="flex items-center gap-2"><Button variant="outline" disabled={safePage === 1} onClick={() => setPage((value) => Math.max(1, value - 1))} className="h-8 rounded-lg border-slate-200 px-2 text-xs"><ChevronLeft className="h-3.5 w-3.5" /> {t("previous")}</Button><span className="min-w-16 text-center text-xs font-semibold text-slate-500">{t("page")} {safePage} / {pageCount}</span><Button variant="outline" disabled={safePage === pageCount} onClick={() => setPage((value) => Math.min(pageCount, value + 1))} className="h-8 rounded-lg border-slate-200 px-2 text-xs">{t("next")} <ChevronRight className="h-3.5 w-3.5" /></Button></div></div></>}
-    </section>
+      <section className="patients-replica-list-section"><div className="patients-replica-list-heading"><div><span className="replica-eyebrow">{language === "th" ? "ระเบียนจากฐานข้อมูล" : "CONNECTED RECORDS"}</span><h2>{language === "th" ? "รายชื่อคนไข้เป้าหมาย" : "Connected patient records"}</h2></div><span>{language === "th" ? "พบ " : "Found "}{formatNumber(total, language)} {language === "th" ? "ราย" : "records"}</span></div>
+        {loading && <LoadingCards />}
+        {!loading && error && <div className="replica-empty-state is-error"><AlertTriangle aria-hidden="true" /><strong>{language === "th" ? "โหลดข้อมูลไม่สำเร็จ" : "Records could not be loaded"}</strong><p>{language === "th" ? "ระบบจะแสดงข้อผิดพลาดแทนการเติมข้อมูลตัวอย่าง" : "The app shows the failure instead of filling the view with sample records."}</p><button type="button" className="replica-text-button" onClick={refresh}>{t("tryAgain")} <ArrowRight aria-hidden="true" /></button></div>}
+        {!loading && !error && total === 0 && <div className="replica-empty-state"><Search aria-hidden="true" /><strong>{query || context !== "all" ? (language === "th" ? "ไม่พบระเบียนที่ตรงกัน" : "No matching records") : (view === "registered" ? (language === "th" ? "ยังไม่มีผู้ป่วยที่ลงทะเบียน" : "No registered patients yet") : (language === "th" ? "ยังไม่มีข้อมูลนำเข้า" : "No imported records yet"))}</strong><p>{query || context !== "all" ? (language === "th" ? "ลองใช้คำค้นหาหรือตัวกรองอื่น" : "Try a different search term or filter.") : (language === "th" ? "ข้อมูลที่บันทึกจากระบบเชื่อมต่อจะแสดงที่นี่" : "Records from the connected backend will appear here.")}</p></div>}
+        {!loading && !error && total > 0 && <div className="patients-replica-cards">{view === "registered" && registered.data?.patients.map((patient) => <RegisteredPatientCard key={`registered-${patient.id}`} patient={patient} language={language} />)}{view === "imported" && imported.data?.patients.map((patient) => <ImportedPatientCard key={`imported-${patient.id}`} patient={patient} language={language} />)}</div>}
+        {!loading && !error && total > 0 && <div className="patients-pagination"><span>{language === "th" ? `หน้า ${page} จาก ${pageCount}` : `Page ${page} of ${pageCount}`}</span><div><button type="button" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>{language === "th" ? "ก่อนหน้า" : "Previous"}</button><button type="button" disabled={page >= pageCount} onClick={() => setPage((value) => Math.min(pageCount, value + 1))}>{language === "th" ? "ถัดไป" : "Next"}</button></div></div>}
+      </section>
 
-    <section className="flex items-start gap-3 rounded-xl border border-[#e6ece8] bg-[#f7faf8] px-4 py-3"><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-[#6d9681]" /><p className="text-xs leading-5 text-slate-500"><strong className="text-[#25354a]">{t("decisionSupport")} </strong> {t("importedValuesCareNote")}</p></section>
-  </div></DashboardLayout>;
+      <section className="replica-panel replica-safety-banner"><ShieldAlert aria-hidden="true" /><div><strong>{t("decisionSupport")}</strong><p>{language === "th" ? "ข้อมูลนำเข้าเป็นค่าที่เก็บรักษาจากต้นทาง ไม่ใช่การยืนยันตัวตนหรือการวินิจฉัยผู้ป่วย" : "Imported values preserve source provenance. They don't identify or diagnose a clinical patient."}</p></div></section>
+    </div>
+  </DashboardLayout>;
 }
 
-function Metric({ icon: Icon, label, value, helper, tone }: { icon: typeof Users; label: string; value: number | string; helper: string; tone: "navy" | "amber" | "sage" }) {
-  return <div className="metric-card"><div className={`metric-icon metric-icon-${tone}`}><Icon className="h-[18px] w-[18px]" /></div><div className="min-w-0"><p className="text-sm font-medium text-slate-500">{label}</p><p className="mt-1 font-display text-3xl tracking-[-0.04em] text-[#132238]">{value}</p><p className="mt-1 text-xs text-slate-400">{helper}</p></div><ArrowRight className="ml-auto mt-1 h-4 w-4 text-slate-300" /></div>;
-}
+type RegisteredPatient = { id: number; patientCode: string; displayName: string | null; age: number | null; registrationLocation: string; identifyBy: string; type1: number; type2: number; gdm: number; sex: "FEMALE" | "MALE"; observationCount: number; createdAt: Date | string };
+type ImportedPatient = { id: number; sourceRowNumber: number; age: string; identifyBy: string; type1: number; type2: number; gdm: number; sex: "FEMALE" | "MALE"; observationCount: number; createdAt: Date | string };
 
-function PatientListRow({ patient, language, t }: { patient: PatientListRow; language: "en" | "th"; t: (key: string) => string }) {
-  const isRegistered = patient.recordKind === "registered";
-  const content = <><div className="flex min-w-0 items-center gap-3"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#edf1f5] text-[#4f647d]"><Users className="h-4 w-4" /></div><div className="min-w-0"><p className="truncate text-sm font-semibold text-[#25354a]">{isRegistered ? (patient.displayName || patient.patientCode) : `${t("importedCohortRecord")} #${(patient.sourceRowNumber ?? 1) - 1}`}</p><p className="mt-0.5 truncate text-xs text-slate-400">{isRegistered ? `${patient.patientCode} · ${patient.registrationLocation}` : `${t("internalId")} ${patient.id} · ${t("sourceRow")} ${patient.sourceRowNumber}`}</p></div></div><div className="text-sm text-slate-600"><span className="lg:hidden text-[10px] font-bold uppercase tracking-[.1em] text-slate-400">{t("ageSex")} · </span>{patient.age || t("notRecorded")} · {patient.sex}</div><div className="text-sm text-slate-600"><span className="lg:hidden text-[10px] font-bold uppercase tracking-[.1em] text-slate-400">{t("context")} · </span>{patient.type2 ? t("type2") : patient.type1 ? t("type1") : patient.gdm ? t("gdm") : t("notSpecified")}</div><div><span className={`status-badge ${isRegistered ? "status-complete" : "status-review"}`}><span className="status-dot" />{isRegistered ? t("registeredPatients") : t("importedUnverified")}</span></div><div className="text-sm font-semibold text-[#25354a]"><span className="lg:hidden text-[10px] font-bold uppercase tracking-[.1em] text-slate-400">{t("observations")} · </span>{formatNumber(patient.observationCount, language)}</div><div className="text-xs text-slate-400"><span className="lg:hidden text-[10px] font-bold uppercase tracking-[.1em] text-slate-400">{t("updated")} · </span>{patient.createdAt ? formatDate(patient.createdAt, language) : "—"}</div><ArrowRight className="hidden h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 lg:block" /></>;
-  if (isRegistered) return <Link href={`/patients/registered/${patient.id}`} className="group grid gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fbfcfb] sm:px-6 lg:grid-cols-[1.45fr_.75fr_.8fr_1fr_.75fr_.65fr_auto] lg:items-center lg:gap-4">{content}</Link>;
-  return <Link href={`/patients/${patient.id}`} className="group grid gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fbfcfb] sm:px-6 lg:grid-cols-[1.45fr_.75fr_.8fr_1fr_.75fr_.65fr_auto] lg:items-center lg:gap-4">{content}</Link>;
-}
+type Language = "th" | "en";
+function diabetesContext(patient: { type1: number; type2: number; gdm: number }, language: Language) { if (patient.type1) return "Type 1"; if (patient.type2) return "Type 2"; if (patient.gdm) return "GDM"; return language === "th" ? "ไม่ได้บันทึก" : "Not recorded"; }
+function sexLabel(sex: "FEMALE" | "MALE", language: Language) { return sex === "FEMALE" ? (language === "th" ? "หญิง" : "Female") : (language === "th" ? "ชาย" : "Male"); }
 
-export default PatientsPageContent;
+function RegisteredPatientCard({ patient, language }: { patient: RegisteredPatient; language: Language }) { return <Link href={`/patients/registered/${patient.id}`} className="patient-replica-card"><span className="patient-replica-avatar"><Users aria-hidden="true" /></span><span className="patient-replica-main"><strong>{patient.displayName || patient.patientCode}</strong><small>{patient.patientCode} · {patient.age ?? "—"} {language === "th" ? "ปี" : "years"} · {diabetesContext(patient, language)}</small><span className="patient-replica-meta"><span>{patient.observationCount} {language === "th" ? "การสังเกต" : "observations"}</span><span>{patient.registrationLocation}</span></span></span><span className="patient-replica-status is-clinical"><CheckCircle2 aria-hidden="true" /> {language === "th" ? "คลินิก" : "Clinical"}</span><span className="patient-replica-date">{language === "th" ? "ลงทะเบียนล่าสุด" : "Registered"}<strong>{formatDate(patient.createdAt, language)}</strong></span><ArrowRight className="patient-replica-arrow" aria-hidden="true" /></Link>; }
+function ImportedPatientCard({ patient, language }: { patient: ImportedPatient; language: Language }) { return <Link href={`/patients/${patient.id}`} className="patient-replica-card is-imported"><span className="patient-replica-avatar is-cyan"><FileText aria-hidden="true" /></span><span className="patient-replica-main"><strong>{language === "th" ? `ระเบียนนำเข้า #${patient.sourceRowNumber}` : `Imported record #${patient.sourceRowNumber}`}</strong><small>{patient.age} {language === "th" ? "ปี" : "years"} · {sexLabel(patient.sex, language)} · {diabetesContext(patient, language)}</small><span className="patient-replica-meta"><span>{patient.observationCount} {language === "th" ? "การสังเกต" : "observations"}</span><span>{patient.identifyBy}</span></span></span><span className="patient-replica-status is-imported"><Database aria-hidden="true" /> {language === "th" ? "ต้นทาง" : "Source"}</span><span className="patient-replica-date">{language === "th" ? "นำเข้าเมื่อ" : "Imported"}<strong>{formatDate(patient.createdAt, language)}</strong></span><ArrowRight className="patient-replica-arrow" aria-hidden="true" /></Link>; }
+
+function FilterChip({ label, value, active = false, disabled = false, onClick }: { label: string; value: string; active?: boolean; disabled?: boolean; onClick?: () => void }) { return <button type="button" className={`patients-filter-chip ${active ? "is-active" : ""} ${disabled ? "is-disabled" : ""}`} disabled={disabled} onClick={onClick}><span>{label}</span><strong>{value}</strong></button>; }
+function LoadingCards() { return <div className="patients-loading-cards"><span /><span /><span /></div>; }

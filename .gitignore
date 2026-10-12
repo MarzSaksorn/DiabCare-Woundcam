@@ -112,3 +112,15 @@ temp/
 # Manus version file (auto-generated, not part of source)
 client/public/__manus__/version.json
 .project-config.json
+
+# Clinical image datasets and training outputs must stay outside Git.
+data/raw/
+data/staging/
+data/artifacts/
+*.tar
+*.tar.gz
+*.zip
+*.7z
+*.pt
+*.pth
+*.ckpt
