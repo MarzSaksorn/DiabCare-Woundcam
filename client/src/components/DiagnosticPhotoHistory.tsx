@@ -33,8 +33,8 @@ export default function DiagnosticPhotoHistory() {
         </div>
         <ImageIcon className="h-5 w-5 text-[#79a58c]" />
       </div>
-      <div className="grid gap-3 border-y border-slate-100 py-4 md:grid-cols-[1.4fr_1fr_1fr_auto] md:items-end">
-        <label className="grid gap-1.5 text-sm font-semibold text-slate-600">
+      <div className="camera-history-filters grid gap-3 border-y border-slate-100 py-4 md:grid-cols-[1.4fr_1fr_1fr_auto] md:items-end">
+        <label className="camera-history-field grid gap-1.5 text-sm font-semibold text-slate-600">
           <span>{t("filterByPatient")}</span>
           <select
             value={patientId}
@@ -50,7 +50,7 @@ export default function DiagnosticPhotoHistory() {
             ))}
           </select>
         </label>
-        <label className="grid gap-1.5 text-sm font-semibold text-slate-600">
+        <label className="camera-history-field grid gap-1.5 text-sm font-semibold text-slate-600">
           <span>{t("fromDate")}</span>
           <Input
             type="date"
@@ -58,7 +58,7 @@ export default function DiagnosticPhotoHistory() {
             onChange={event => setFrom(event.target.value)}
           />
         </label>
-        <label className="grid gap-1.5 text-sm font-semibold text-slate-600">
+        <label className="camera-history-field grid gap-1.5 text-sm font-semibold text-slate-600">
           <span>{t("toDate")}</span>
           <Input
             type="date"
@@ -79,7 +79,7 @@ export default function DiagnosticPhotoHistory() {
         </button>
       </div>
       {history.isLoading ? (
-        <div className="grid gap-3 py-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="camera-history-grid grid gap-3 py-5 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map(item => (
             <div
               key={item}
@@ -94,11 +94,11 @@ export default function DiagnosticPhotoHistory() {
           <p>{t("noCaptureHistoryDetail")}</p>
         </div>
       ) : (
-        <div className="grid gap-4 py-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="camera-history-grid grid gap-4 py-5 sm:grid-cols-2 lg:grid-cols-3">
           {photos.map(photo => (
             <figure
               key={photo.id}
-              className="overflow-hidden rounded-2xl border border-slate-100 bg-white"
+              className="camera-history-record overflow-hidden rounded-2xl border border-slate-100 bg-white"
             >
               <AuthenticatedHistoryImage
                 storageUrl={photo.storageUrl}

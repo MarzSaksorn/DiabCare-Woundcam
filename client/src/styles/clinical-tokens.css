@@ -1,33 +1,54 @@
 @font-face {
-  font-family: "Atkinson Hyperlegible";
+  font-family: "Prompt";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/assets/fonts/atkinson/9Bt23C1KxNDXMspQ1lPyU89-1h6ONRlW45GE5Q.ttf")
-    format("truetype");
+  src: url("/assets/fonts/prompt/prompt-400.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: "Atkinson Hyperlegible";
+  font-family: "Prompt";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/assets/fonts/prompt/prompt-500.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Prompt";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/prompt/prompt-600.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Prompt";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("/assets/fonts/atkinson/9Bt73C1KxNDXMspQ1lPyU89-1h6ONRlW45G8WbcNcw.ttf")
-    format("truetype");
+  src: url("/assets/fonts/prompt/prompt-700.ttf") format("truetype");
 }
 
 @theme {
-  --color-clinical-blue: #0369a1;
-  --color-clinical-blue-dark: #075985;
   --color-clinical-canvas: #f8fafc;
   --color-clinical-surface: #ffffff;
-  --color-clinical-text: #0f172a;
-  --color-clinical-muted: #475569;
+  --color-clinical-ink: #0f172a;
+  --color-clinical-steel: #475569;
+  --color-clinical-muted: #64748b;
   --color-clinical-border: #cbd5e1;
-  --color-clinical-critical: #dc2626;
-  --color-clinical-warning: #d97706;
-  --color-clinical-stable: #16a34a;
-  --radius-clinical-card: 12px;
-  --radius-clinical-button: 8px;
-  --font-clinical: "Atkinson Hyperlegible", sans-serif;
+  --color-clinical-partition: #f1f5f9;
+  --color-clinical-cyan: #0284c7;
+  --color-clinical-navy: #0369a1;
+  --color-clinical-emerald: #059669;
+  --color-clinical-amber: #d97706;
+  --color-clinical-error: #ba1a1a;
+  --color-clinical-viewfinder: #0b1926;
+  --radius-clinical-sm: 0.125rem;
+  --radius-clinical: 0.25rem;
+  --radius-clinical-md: 0.375rem;
+  --radius-clinical-lg: 0.5rem;
+  --radius-clinical-xl: 0.75rem;
+  --font-clinical: "Prompt", sans-serif;
+  --font-clinical-mono: "JetBrains Mono", monospace;
 }

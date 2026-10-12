@@ -1964,3 +1964,787 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Stitch semantic design-system calibration */
+.camera-console {
+  --console-blue: #0284c7;
+  --console-blue-dark: #0369a1;
+  --console-blue-soft: #e6eeff;
+  --console-navy: #0b1926;
+  --console-navy-2: #0f2132;
+  --console-navy-border: #1e3345;
+  --console-canvas: #f8fafc;
+  --console-surface: #ffffff;
+  --console-text: #0f172a;
+  --console-muted: #475569;
+  --console-subtle: #64748b;
+  --console-border: #cbd5e1;
+  --console-border-soft: #f1f5f9;
+  --console-critical: #ba1a1a;
+  --console-critical-soft: #ffdad6;
+  --console-warning: #d97706;
+  --console-warning-soft: #fffbeb;
+  --console-stable: #059669;
+  --console-stable-soft: #ecfdf5;
+  max-width: 1440px;
+  padding: 24px 0 40px;
+  background: var(--console-canvas);
+  color: var(--console-text);
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.camera-console h1,
+.camera-console h2,
+.camera-console h3,
+.camera-console p,
+.camera-console button,
+.camera-console input,
+.camera-console select {
+  font-family: "Prompt", "Sarabun", sans-serif;
+}
+
+.camera-console .camera-console-header {
+  align-items: flex-end;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(203, 213, 225, 0.72);
+  padding: 0 0 24px;
+}
+
+.camera-console .camera-console-back {
+  min-height: 28px;
+  color: var(--console-text);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.camera-console .camera-console-back:hover {
+  color: var(--console-blue-dark);
+}
+
+.camera-console .camera-console-overline {
+  gap: 8px;
+  margin-top: 14px;
+  color: var(--console-blue-dark);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.camera-console .camera-console-secure-chip {
+  min-height: 24px;
+  padding: 0 8px;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.camera-console .camera-console-secure-chip svg {
+  width: 14px;
+  height: 14px;
+}
+
+.camera-console .camera-console-header h1 {
+  margin: 6px 0 2px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 36px;
+}
+
+.camera-console .camera-console-header p {
+  max-width: 760px;
+  font-size: 15px;
+  line-height: 24px;
+}
+
+.camera-console .camera-console-brand {
+  gap: 9px;
+  border: 1px solid var(--console-border-soft);
+  border-radius: 8px;
+  background: var(--console-surface);
+  padding: 8px 12px;
+}
+
+.camera-console .camera-console-brand img {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+}
+
+.camera-console .camera-console-brand strong {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.camera-console .camera-console-brand small {
+  font-size: 11px;
+}
+
+.camera-console .camera-console-card {
+  border-color: var(--console-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+}
+
+.camera-console .camera-console-card-header {
+  padding: 24px;
+}
+
+.camera-console .camera-console-card-header h2 {
+  margin: 4px 0 2px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 28px;
+}
+
+.camera-console .camera-console-card-header p {
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.camera-console .camera-console-phase {
+  color: var(--console-blue-dark);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.camera-console .camera-console-record-count {
+  min-height: 34px;
+  border-color: var(--console-border-soft);
+  border-radius: 999px;
+  background: var(--console-surface);
+  padding: 0 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.camera-console .camera-console-case-content {
+  grid-template-columns: minmax(320px, 4fr) minmax(0, 8fr);
+  min-height: 580px;
+}
+
+.camera-console .camera-console-case-tools {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  border-right-color: var(--console-border);
+  background: #f8f9ff;
+  padding: 20px;
+}
+
+.camera-console .camera-console-search-wrap > svg {
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  color: var(--console-muted);
+}
+
+.camera-console .camera-console-search-input {
+  min-height: 40px;
+  border-color: var(--console-border) !important;
+  border-radius: 6px !important;
+  padding-left: 36px !important;
+  font-size: 14px !important;
+}
+
+.camera-console .camera-console-filter-row {
+  margin-top: 14px;
+  border-color: var(--console-border-soft);
+  border-radius: 6px;
+  background: #e6eeff;
+}
+
+.camera-console .camera-console-filter-row button {
+  min-height: 38px;
+  border-radius: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.camera-console .camera-console-filter-row button.is-active {
+  background: var(--console-blue);
+}
+
+.camera-console .camera-console-case-note {
+  margin-top: 0;
+  border-color: rgba(203, 213, 225, 0.7);
+  border-radius: 8px;
+  background: #eff4ff;
+  padding: 14px;
+}
+
+.camera-console .camera-console-case-note strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-case-note span {
+  font-size: 12px;
+}
+
+.camera-console .camera-console-case-results {
+  padding: 20px 20px 0;
+}
+
+.camera-console .camera-console-results-heading {
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--console-border);
+  padding-bottom: 12px;
+}
+
+.camera-console .camera-console-results-heading strong {
+  margin-top: 2px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-results-heading small {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+
+.camera-console .camera-console-selected-preview {
+  display: none;
+}
+
+.camera-console .camera-console-patient-list {
+  max-height: 440px;
+  border-top: 0;
+}
+
+.camera-console .camera-console-patient-choice {
+  min-height: 76px;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid transparent;
+  border-bottom-color: rgba(203, 213, 225, 0.6);
+  border-radius: 8px;
+  margin: 2px 0;
+  padding: 12px 12px;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+
+.camera-console .camera-console-patient-choice:hover {
+  border-color: transparent;
+  background: #f8f9ff;
+}
+
+.camera-console .camera-console-patient-choice.is-selected {
+  border: 2px solid var(--console-blue);
+  background: #eff4ff;
+  padding: 11px 11px;
+}
+
+.camera-console .camera-console-patient-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: #e6eeff;
+  color: var(--console-blue-dark);
+}
+
+.camera-console
+  .camera-console-patient-choice.is-selected
+  .camera-console-patient-avatar {
+  background: var(--console-blue);
+  color: white;
+}
+
+.camera-console .camera-console-patient-main strong {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.camera-console .camera-console-patient-main small,
+.camera-console .camera-console-patient-main em {
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.camera-console .camera-console-patient-main em {
+  display: none;
+}
+
+.camera-console .camera-console-patient-check svg {
+  color: var(--console-blue);
+}
+
+.camera-console .camera-console-case-footer {
+  min-height: 70px;
+  border-top-color: var(--console-border);
+  background: #f8f9ff;
+  padding: 16px 20px !important;
+}
+
+.camera-console .camera-console-case-footer > span {
+  font-size: 13px;
+}
+
+.camera-console .camera-console-primary-action,
+.camera-console .camera-console-secondary-action {
+  min-height: 44px !important;
+  border-radius: 6px !important;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+.camera-console .camera-console-primary-action {
+  border-color: var(--console-blue) !important;
+  background: var(--console-blue) !important;
+}
+
+.camera-console .camera-console-primary-action:hover {
+  border-color: var(--console-blue-dark) !important;
+  background: var(--console-blue-dark) !important;
+}
+
+.camera-console .camera-console-primary-action:active,
+.camera-console .camera-console-secondary-action:active,
+.camera-console .camera-console-change-case:active {
+  transform: translateY(1px);
+}
+
+.camera-console .camera-console-secondary-action {
+  border-color: #64748b !important;
+  background: var(--console-navy-2) !important;
+  color: #eaf1ff !important;
+}
+
+.camera-console .camera-console-empty,
+.camera-console .camera-console-patient-loading {
+  min-height: 300px;
+}
+
+.camera-console .camera-console-empty strong {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-empty p,
+.camera-console .camera-console-empty small {
+  font-size: 14px;
+}
+
+.camera-console .camera-console-case-banner {
+  min-height: 72px;
+  margin-bottom: 24px;
+  border-color: var(--console-border);
+  border-radius: 12px;
+  background: var(--console-surface);
+  padding: 16px;
+}
+
+.camera-console .camera-console-case-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #e6eeff;
+  color: var(--console-blue-dark);
+}
+
+.camera-console .camera-console-case-copy strong {
+  margin-top: 1px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.camera-console .camera-console-case-copy small {
+  font-size: 12px;
+}
+
+.camera-console .camera-console-live-tag {
+  min-height: 30px;
+  padding: 0 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+
+.camera-console .camera-console-change-case {
+  min-height: 40px;
+  border-color: var(--console-border);
+  border-radius: 6px;
+  padding: 0 12px;
+  color: var(--console-muted);
+  font-size: 13px;
+}
+
+.camera-console .camera-console-workspace {
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 24px;
+}
+
+.camera-console .camera-console-evidence-card {
+  border-color: #172c3f !important;
+  border-radius: 12px !important;
+  background: #0b1329 !important;
+}
+
+.camera-console .camera-console-evidence-content {
+  padding: 0 20px 20px !important;
+}
+
+.camera-console .camera-console-viewport,
+.camera-console .camera-console-live-video,
+.camera-console .camera-console-viewport img {
+  min-height: 0;
+}
+
+.camera-console .camera-console-viewport {
+  aspect-ratio: 4 / 3;
+  margin-top: 20px;
+  border-color: #172c3f;
+  border-radius: 10px;
+  background-color: #080d1c;
+  background-image: radial-gradient(
+    rgba(56, 189, 248, 0.18) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+}
+
+.camera-console .camera-console-frame {
+  inset: 12% 18%;
+  border-color: rgba(56, 189, 248, 0.42);
+  border-radius: 8px;
+  background: rgba(2, 132, 199, 0.03);
+}
+
+.camera-console .camera-console-frame span {
+  width: 24px;
+  height: 24px;
+  border-color: #38bdf8;
+  border-width: 3px;
+}
+
+.camera-console .camera-console-empty-camera strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-empty-camera p {
+  font-size: 13px;
+}
+
+.camera-console .camera-console-lens {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+.camera-console .camera-console-lens svg {
+  width: 24px;
+  height: 24px;
+}
+
+.camera-console .camera-console-camera-status,
+.camera-console .camera-console-live-label {
+  border-color: rgba(100, 116, 139, 0.65);
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+
+.camera-console .camera-console-camera-status {
+  right: 12px;
+  bottom: 12px;
+}
+
+.camera-console .camera-console-live-label {
+  top: 12px;
+  left: 12px;
+}
+
+.camera-console .camera-console-actions {
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.camera-console .camera-console-privacy {
+  margin-top: 10px;
+  font-size: 11px;
+}
+
+.camera-console .camera-console-review-card {
+  border-radius: 12px !important;
+}
+
+.camera-console .camera-console-review-content {
+  padding: 0 20px 20px !important;
+}
+
+.camera-console .camera-console-review-empty {
+  min-height: 280px;
+  margin: 20px 0;
+  border-width: 2px;
+  border-color: var(--console-border-soft);
+  border-radius: 10px;
+  background: rgba(248, 249, 255, 0.65);
+}
+
+.camera-console .camera-console-review-empty strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-review-empty p {
+  font-size: 13px;
+}
+
+.camera-console .camera-console-assignment {
+  border-color: var(--console-border);
+  border-radius: 8px;
+  background: #f8f9ff;
+}
+
+.camera-console .camera-console-assignment-title strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-assignment label {
+  gap: 4px;
+  margin-top: 9px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.camera-console .camera-console-assignment select,
+.camera-console .camera-console-assignment input {
+  min-height: 40px;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+}
+
+.camera-console .camera-console-assignment > small {
+  font-size: 11px;
+}
+
+.camera-console .camera-console-history .camera-history-card {
+  border-color: var(--console-border);
+  border-radius: 12px;
+  padding: 24px;
+  background: var(--console-surface);
+}
+
+.camera-console .camera-console-history .camera-card-header {
+  align-items: center;
+  border-bottom-color: var(--console-border);
+  padding: 0 0 16px;
+}
+
+.camera-console .camera-console-history .camera-kicker {
+  color: var(--console-subtle);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.camera-console .camera-console-history .camera-card-header h2 {
+  margin: 2px 0 0;
+  color: var(--console-text);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.camera-console .camera-console-history .camera-card-header > svg {
+  color: var(--console-blue);
+}
+
+.camera-console .camera-console-history .camera-history-filters {
+  gap: 12px;
+  border-top: 0;
+  border-bottom: 1px solid var(--console-border);
+  padding: 16px 0;
+}
+
+.camera-console .camera-console-history .camera-history-field {
+  gap: 4px;
+  color: var(--console-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.camera-console .camera-console-history .camera-history-field select,
+.camera-console .camera-console-history .camera-history-field input,
+.camera-console .camera-console-history .camera-history-filters > button {
+  min-height: 40px;
+  border-color: var(--console-border);
+  border-radius: 6px;
+  padding: 0 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+}
+
+.camera-console .camera-console-history .camera-history-filters > button {
+  background: white;
+  color: var(--console-muted);
+  font-family: "Prompt", "Sarabun", sans-serif;
+}
+
+.camera-console .camera-console-history .camera-history-grid {
+  gap: 16px;
+  padding: 20px 0;
+}
+
+.camera-console .camera-console-history .camera-history-record {
+  overflow: hidden;
+  border-color: var(--console-border);
+  border-radius: 8px;
+  background: white;
+}
+
+.camera-console .camera-console-history .camera-history-record figcaption {
+  border-top-color: var(--console-border-soft);
+  padding: 14px;
+}
+
+.camera-console .camera-console-history .camera-history-record strong {
+  color: var(--console-text);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+}
+
+.camera-console .camera-console-history .camera-history-record span {
+  color: var(--console-muted);
+  font-size: 12px;
+}
+
+.camera-console .camera-console-history .record-empty-state {
+  min-height: 180px;
+  border: 1px dashed var(--console-border);
+  border-radius: 8px;
+  background: #f8f9ff;
+  padding: 32px 20px;
+}
+
+.camera-console .camera-console-history .record-empty-state h3 {
+  margin: 8px 0 2px;
+  color: var(--console-text);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-history .record-empty-state p,
+.camera-console .camera-console-history > .camera-history-card > p {
+  color: var(--console-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+@media (max-width: 1120px) {
+  .camera-console .camera-console-case-content {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .camera-console {
+    padding: 16px 0 28px;
+  }
+
+  .camera-console .camera-console-header {
+    padding-bottom: 20px;
+  }
+
+  .camera-console .camera-console-header h1 {
+    font-size: 22px;
+    line-height: 28px;
+  }
+
+  .camera-console .camera-console-header p {
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  .camera-console .camera-console-card-header,
+  .camera-console .camera-console-case-tools,
+  .camera-console .camera-console-case-footer {
+    padding: 16px !important;
+  }
+
+  .camera-console .camera-console-case-results {
+    padding: 16px 14px 0;
+  }
+
+  .camera-console .camera-console-card-header h2 {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .camera-console .camera-console-case-content {
+    min-height: 0;
+  }
+
+  .camera-console .camera-console-empty {
+    min-height: 220px;
+  }
+
+  .camera-console .camera-console-case-banner {
+    margin-bottom: 16px;
+  }
+
+  .camera-console .camera-console-workspace {
+    gap: 16px;
+  }
+
+  .camera-console .camera-console-viewport {
+    margin-top: 16px;
+  }
+
+  .camera-console .camera-console-review-empty {
+    min-height: 220px;
+  }
+
+  .camera-console .camera-console-history .camera-history-card {
+    padding: 16px;
+  }
+}
+
+.camera-console .camera-console-patient-line {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.camera-console .camera-console-patient-line .camera-console-patient-code {
+  display: inline;
+  margin: 0;
+  color: var(--console-subtle);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.camera-console
+  .camera-console-patient-main
+  > small:not(.camera-console-patient-code) {
+  display: block;
+}

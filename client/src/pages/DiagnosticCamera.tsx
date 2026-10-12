@@ -9,6 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import {
   AlertTriangle,
+  ArrowRight,
   Camera,
   Check,
   CheckCircle2,
@@ -386,14 +387,12 @@ export default function DiagnosticCamera() {
               </span>
             </div>
             <h1>
-              {language === "th"
-                ? "ศูนย์บันทึกภาพแผล"
-                : "Wound capture console"}
+              {language === "th" ? "ศูนย์บันทึกภาพแผล" : "Wound image capture"}
             </h1>
             <p>
               {language === "th"
-                ? "เลือกผู้ป่วย บันทึกภาพที่ชัดเจน และตรวจสอบผลช่วยตัดสินใจในขั้นตอนเดียว"
-                : "Choose a patient, capture clear evidence, and review decision support in one focused workflow."}
+                ? "เลือกผู้ป่วย ถ่ายภาพแผลที่ชัดเจน แล้วตรวจสอบผลก่อนบันทึก"
+                : "Select the patient, take a clear wound image, and review the result before saving."}
             </p>
           </div>
           <div className="camera-console-brand">
@@ -538,10 +537,6 @@ function PatientSelector({
       : language === "th"
         ? "ไม่สามารถเชื่อมต่อฐานข้อมูลได้"
         : "The connected database is unavailable";
-  const selectedPatient = patients.find(
-    patient => String(patient.id) === selectedId
-  );
-
   return (
     <HeroCard
       variant="default"
@@ -645,24 +640,6 @@ function PatientSelector({
                 : `${patients.length} records found`}
             </small>
           </div>
-          {selectedPatient && (
-            <div className="camera-console-selected-preview">
-              <span className="camera-console-selected-icon">
-                <CheckCircle2 aria-hidden="true" />
-              </span>
-              <div>
-                <span>Selected for capture</span>
-                <strong>
-                  {selectedPatient.displayName || selectedPatient.patientCode}
-                </strong>
-                <small>
-                  {selectedPatient.patientCode} ·{" "}
-                  {selectedPatient.registrationLocation}
-                </small>
-              </div>
-              <span className="camera-console-ready-tag">Ready</span>
-            </div>
-          )}
           {loading && (
             <div className="camera-console-patient-loading">
               <span />
@@ -733,6 +710,7 @@ function PatientSelector({
           {language === "th"
             ? "ยืนยันผู้ป่วยและไปต่อ"
             : "Confirm patient and continue"}
+          <ArrowRight aria-hidden="true" />
         </HeroButton>
       </HeroCard.Footer>
     </HeroCard>
@@ -761,9 +739,15 @@ function PatientChoice({
         <UserRound aria-hidden="true" />
       </span>
       <span className="camera-console-patient-main">
-        <strong>{patient.displayName || patient.patientCode}</strong>
+        <span className="camera-console-patient-line">
+          <strong>{patient.displayName || patient.patientCode}</strong>
+          {patient.displayName && (
+            <small className="camera-console-patient-code">
+              {patient.patientCode}
+            </small>
+          )}
+        </span>
         <small>
-          {patient.patientCode} ·{" "}
           {patient.age === null
             ? language === "th"
               ? "อายุไม่ระบุ"
