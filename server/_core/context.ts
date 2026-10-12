@@ -1,6 +1,6 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { sdk } from "./sdk";
+import { authenticateSupabaseRequest } from "./supabaseAuth";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -9,7 +9,7 @@ export type TrpcContext = {
 };
 
 export function isLocalAuthBypassEnabled(env: NodeJS.ProcessEnv = process.env) {
-  // Local Vite/tsx development has no Manus session. Production must always
+  // Local Vite/tsx development has no Supabase session. Production must always
   // use the configured identity provider, even if a stale env var is present.
   if (env.NODE_ENV === "production") return false;
   if (env.DISABLE_LOGIN_PAGE === "true") return true;
@@ -37,7 +37,7 @@ export async function createContext(
   let user: User | null = null;
 
   try {
-    user = await sdk.authenticateRequest(opts.req);
+    user = await authenticateSupabaseRequest(opts.req);
   } catch (error) {
     // Authentication is optional for public procedures.
     user = null;

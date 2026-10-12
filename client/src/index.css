@@ -988,3 +988,5 @@ button { cursor: pointer; }
 .login-footer { margin-top: 16px; padding-top: 14px; border-top: 1px solid #e2e8f0; color: #475569; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-align: center; }
 @keyframes login-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .login-button-icon.is-spinning { animation-duration: 2s; } .login-button { transition: none; } }
+
+.login-input-action:focus-visible { outline: 2px solid #16345c; outline-offset: 2px; }

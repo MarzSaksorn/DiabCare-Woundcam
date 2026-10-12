@@ -49,7 +49,7 @@ These are **source-code findings**, not proof that live infrastructure is health
 | Area | Replica today | Existing backend | Integration implication |
 | --- | --- | --- | --- |
 | Editable UI | Hashed compiled JS/CSS; no `.tsx` source or source maps in the local copy | React 19 / TypeScript / Vite app | Recover or reconstruct source before reliable integration. |
-| Authentication | Hardcoded demo users; selected role drives client state | Manus OAuth callback, session identity, `auth.me`, `auth.logout` | Keep the login appearance; replace the actual authentication behavior. |
+| Authentication | Hardcoded demo users; selected role drives client state | Supabase Auth email/password session, bearer-token verification, `auth.me`, `auth.logout` | Keep the login appearance; use provisioned Supabase users and server-side roles. |
 | Roles | `OFFICER`, `nurse`, `CAREGIVER` | `users.role` supports `user` / `admin` | Clinical role/assignment enforcement needs a reviewed server-side model. |
 | Patients | Application root calls a simulated patient generator | Imported cohort plus registered patient tables | Replace generator with authorized API queries. Never import the sample list as real patients. |
 | Analysis | Function `sk` generates classes/confidence/other values with `Math.random()` | `wound.infer` runs the packaged ONNX detector on CPU | Remove mock analysis from connected mode, including random measurements and severity. |
@@ -78,7 +78,7 @@ The replica also uses demo classes such as `normal_skin` and `non_dfu_wound`. Ne
 
 ### Live verification still required
 
-This task environment has no configured database URL, JWT secret, OAuth server configuration, or Forge storage credentials. The Supabase connector is disabled. No live DB query, live storage test, current user-role audit, or deployed-model health check was performed.
+This historical audit did not include a live DB query, current user-role audit, or deployed-model health check. The current implementation verifies Supabase Auth configuration through the runtime config endpoint; production still requires separately configured database, R2, and model health checks.
 
 The old README mentions historical record counts; its connection tests also expect empty imported datasets. Do not take either as a current production inventory. Several DB read helpers return empty arrays or zero counts when configuration is missing, so a passing test can mean “DB unavailable,” not “DB connected.”
 
@@ -93,7 +93,8 @@ Browser: editable replica React/TypeScript UI
            │
            ▼
 Node 22 Express application
-  ├─ /api/oauth/callback             existing authentication flow
+  ├─ /api/auth/config                public Supabase Auth runtime config
+  ├─ Authorization: Bearer <token>   Supabase access token on protected requests
   ├─ /api/trpc                      existing API gateway
   ├─ authorized media delivery      hardened storage route
   ├─ DB service                     Drizzle + pg
@@ -143,8 +144,8 @@ Preserve the compiled snapshot outside the new build's public root so it cannot 
 | --- | --- |
 | `SUPABASE_DATABASE_URL` | Server-only; use the existing project connection, session pooler for an IPv4-only persistent runtime. |
 | `DATABASE_URL` | Legacy fallback; make unintended fallback fail clearly rather than silently connecting elsewhere. |
-| `JWT_SECRET`, `OAUTH_SERVER_URL`, `OWNER_OPEN_ID` | Server-only auth configuration; preserve secret handling. |
-| `VITE_APP_ID`, `VITE_OAUTH_PORTAL_URL` | Public login configuration only, not database credentials. |
+| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | Supabase Auth runtime configuration; only the publishable key may reach the browser. |
+| `OWNER_OPEN_ID` | Server-side Supabase Auth UUID that receives the application admin role. |
 | `BUILT_IN_FORGE_API_URL`, `BUILT_IN_FORGE_API_KEY` | Server-side storage dependency; verify availability in the chosen deployment. |
 | `LOCAL_AUTH_BYPASS` | Must be `false` in shared staging and production; reject production startup if enabled. |
 | Model path / manifest | Server deployment artifact; not a client download or remote Roboflow call. |
@@ -157,7 +158,7 @@ Fix TLS certificate trust using the approved CA rather than preserving `rejectUn
 
 | Replica screen / action | Existing contract to reuse | Missing work / acceptance requirement |
 | --- | --- | --- |
-| Login, current user, logout | `auth.me`, `auth.logout`, `/api/oauth/callback` | Session gate; no hardcoded demo credentials in connected mode. Clinical role comes from the server. |
+| Login, current user, logout | Supabase Auth client, `auth.me`, `auth.logout`, `/api/auth/config` | Session gate; no hardcoded demo credentials in connected mode. Clinical role comes from the server. |
 | Home dashboard | `diabetes.summary`, registered patients/assessments | Proposed dashboard aggregate for real registered-patient counts and reviewed trends; existing summary is an import summary, not appointment/healing metrics. |
 | Imported cohort | `diabetes.patients`, `diabetes.detail`, `diabetes.observations` | Keep source-preserved data separate from named clinical records. Add server pagination/filtering. |
 | Example dataset view | `diabetes.exampleBatches`, `diabetes.exampleRecords` | Preserve read-only access and provenance; do not present ML examples as clinical patients. |
@@ -317,7 +318,7 @@ Use synthetic or approved de-identified data for automated tests. Do not create/
 1. Keep the old deployment available while developing the connected replica on a branch/staging environment.
 2. Use isolated staging data. Capture production inventory and backup read-only only after authorized access is available.
 3. Review compatibility of all additive schema changes and confirm the old UI can still run against the new schema.
-4. Verify target secrets, OAuth callback registration, storage origin behavior, TLS, model artifact and readiness checks.
+4. Verify target secrets, Supabase Auth provider settings, storage origin behavior, TLS, model artifact and readiness checks.
 5. Present exact release commit, migration SQL, target service/domain, access changes and rollback commands for approval. Git push is not deployment approval.
 6. After approval, deploy the connected replica and run protected read-only health and workflow checks. Schedule any production write validation separately with explicit authorization.
 7. If authentication, authorization, media retrieval or inference fails, restore the previous application artifact. Keep persisted valid records and additive schema; do not delete new clinical data to roll back the UI.
@@ -327,7 +328,7 @@ Use synthetic or approved de-identified data for automated tests. Do not create/
 
 - **UI source:** access to the original replica source, or authorize reconstruction from the deployed reference.
 - **Runtime/cutover target:** which existing service will host the full Node app and how the new UI becomes its default. Do not assume the temporary sandbox preview is production.
-- **Login:** preserve Manus OAuth by default. A real username/password form requires an explicit auth-provider decision; none exists in the current backend.
+- **Login:** use Supabase Auth email/password sessions. Provision users through an approved admin workflow and disable public sign-ups for clinical deployments.
 - **Clinical roles:** approve officer/nurse/caregiver permission and patient-assignment rules before exposing caregiver access.
 - **Missing domains:** agree appointment, alert and review-metric rules; disable unsupported cards until those domains exist.
 - **Infrastructure verification:** enable the relevant Supabase connection or use securely configured read-only access when live schema/policy inspection is required. Never request database passwords through chat.

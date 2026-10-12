@@ -1,14 +1,16 @@
 export const ENV = {
-  appId: process.env.VITE_APP_ID ?? "",
-  oauthPortalUrl: process.env.VITE_OAUTH_PORTAL_URL ?? "",
-  cookieSecret: process.env.JWT_SECRET ?? "",
+  supabaseUrl: process.env.SUPABASE_URL ?? "",
+  supabasePublishableKey:
+    process.env.SUPABASE_PUBLISHABLE_KEY ??
+    process.env.SUPABASE_ANON_KEY ??
+    process.env.SUPABASE_KEY ??
+    "",
   // DATABASE_URL is platform-managed in WebDev. Prefer the custom Supabase
   // secret so the application does not accidentally connect to the legacy DB.
   databaseUrl:
     process.env.SUPABASE_DATABASE_URL ?? process.env.DATABASE_URL ?? "",
   supabaseDatabaseUrl: process.env.SUPABASE_DATABASE_URL ?? "",
   databaseSslCa: process.env.DATABASE_SSL_CA?.replace(/\\n/g, "\n") ?? "",
-  oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
   ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",

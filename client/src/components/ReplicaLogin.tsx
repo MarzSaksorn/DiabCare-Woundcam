@@ -1,32 +1,47 @@
 import {
   ArrowRight,
+  Eye,
+  EyeOff,
   LoaderCircle,
+  LockKeyhole,
+  Mail,
   ShieldCheck,
-  Stethoscope,
 } from "lucide-react";
-import { useState } from "react";
-import { startLogin } from "@/const";
+import { FormEvent, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getSupabaseClient } from "@/lib/supabase";
 
 export default function ReplicaLogin() {
   const { language } = useLanguage();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isThai = language === "th";
 
-  async function handleSignIn() {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setPending(true);
     setError(null);
+
     try {
-      await startLogin();
+      const supabase = await getSupabaseClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+      if (signInError) throw signInError;
+      window.location.assign("/");
     } catch (reason) {
       setError(
         reason instanceof Error
           ? reason.message
           : isThai
-            ? "เริ่มการเข้าสู่ระบบไม่สำเร็จ โปรดลองอีกครั้ง"
-            : "Couldn't start sign-in. Please try again."
+            ? "เข้าสู่ระบบไม่สำเร็จ โปรดลองอีกครั้ง"
+            : "Sign-in failed. Please try again."
       );
+    } finally {
       setPending(false);
     }
   }
@@ -48,23 +63,74 @@ export default function ReplicaLogin() {
           </p>
         </div>
 
-        <div className="login-form-panel">
+        <form
+          className="login-form-panel"
+          onSubmit={event => void handleSubmit(event)}
+          aria-describedby="login-help"
+        >
           <div className="login-security-icon" aria-hidden="true">
             <ShieldCheck />
           </div>
           <h2 className="login-panel-title">
-            {isThai ? "เข้าสู่ระบบอย่างปลอดภัย" : "Sign in securely"}
+            {isThai ? "เข้าสู่ระบบ" : "Sign in"}
           </h2>
           <p className="login-panel-copy">
             {isThai
-              ? "ใช้บัญชีองค์กรของคุณเพื่อเข้าใช้งาน DiabCare WoundCam"
-              : "Continue with your organization account to access DiabCare WoundCam."}
+              ? "ใช้บัญชี Supabase ที่ได้รับอนุญาตเพื่อเข้าใช้งาน DiabCare WoundCam"
+              : "Use your authorized Supabase account to access DiabCare WoundCam."}
           </p>
 
+          <label className="login-field-label" htmlFor="supabase-email">
+            {isThai ? "อีเมล" : "Email"}
+          </label>
+          <div className="login-field">
+            <span className="login-input-icon" aria-hidden="true">
+              <Mail />
+            </span>
+            <input
+              id="supabase-email"
+              type="email"
+              value={email}
+              onChange={event => setEmail(event.target.value)}
+              placeholder="name@example.com"
+              autoComplete="email"
+              required
+            />
+          </div>
+
+          <label className="login-field-label" htmlFor="supabase-password">
+            {isThai ? "รหัสผ่าน" : "Password"}
+          </label>
+          <div className="login-field">
+            <span className="login-input-icon" aria-hidden="true">
+              <LockKeyhole />
+            </span>
+            <input
+              id="supabase-password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={event => setPassword(event.target.value)}
+              placeholder={isThai ? "รหัสผ่านของคุณ" : "Your password"}
+              autoComplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              className="login-input-action"
+              onClick={() => setShowPassword(value => !value)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff aria-hidden="true" />
+              ) : (
+                <Eye aria-hidden="true" />
+              )}
+            </button>
+          </div>
+
           <button
-            type="button"
+            type="submit"
             className="login-button"
-            onClick={() => void handleSignIn()}
             disabled={pending}
             aria-busy={pending}
           >
@@ -74,16 +140,16 @@ export default function ReplicaLogin() {
                 aria-hidden="true"
               />
             ) : (
-              <Stethoscope className="login-button-icon" aria-hidden="true" />
+              <ShieldCheck className="login-button-icon" aria-hidden="true" />
             )}
             <span>
               {pending
                 ? isThai
-                  ? "กำลังเชื่อมต่อ…"
-                  : "Connecting…"
+                  ? "กำลังตรวจสอบ…"
+                  : "Checking…"
                 : isThai
-                  ? "ดำเนินการต่อด้วยบัญชีองค์กร"
-                  : "Continue with organization sign-in"}
+                  ? "เข้าสู่ระบบอย่างปลอดภัย"
+                  : "Sign in securely"}
             </span>
             {!pending && (
               <ArrowRight className="login-button-arrow" aria-hidden="true" />
@@ -95,17 +161,17 @@ export default function ReplicaLogin() {
               {error}
             </p>
           )}
-          <p className="login-provider-note">
+          <p id="login-help" className="login-provider-note">
             {isThai
-              ? "การยืนยันตัวตนดำเนินการโดยผู้ให้บริการขององค์กร แอปนี้จะไม่รับหรือจัดเก็บรหัสผ่าน"
-              : "Your organization verifies your identity. DiabCare never asks for or stores your password."}
+              ? "บัญชีและรหัสผ่านจัดการโดย Supabase Auth แอปนี้จะไม่แสดงหรือจัดเก็บรหัสผ่านของคุณ"
+              : "Supabase Auth manages your account. This app does not expose or store your password."}
           </p>
           <div className="login-footer">
             {isThai
               ? "สำหรับบุคลากรที่ได้รับอนุญาตเท่านั้น"
               : "Authorized care-team access only"}
           </div>
-        </div>
+        </form>
       </section>
     </main>
   );

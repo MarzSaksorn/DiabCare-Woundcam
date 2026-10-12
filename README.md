@@ -26,7 +26,7 @@ DiabCare Woundcam is a bilingual clinical companion web application for hospital
 | API            | Express, tRPC 11, Zod validation                                                  |
 | Persistence    | Supabase PostgreSQL accessed through Drizzle ORM                                  |
 | Inference      | Ultralytics and SmallUNet ONNX exports, ONNX Runtime Node, Sharp preprocessing    |
-| Authentication | Manus OAuth/session integration                                                   |
+| Authentication | Supabase Auth email/password sessions                                             |
 | Storage        | Private Cloudflare R2 bucket; store references, not image bytes, in database rows |
 | Localization   | Shared English/Thai `LanguageProvider`                                            |
 
@@ -59,7 +59,7 @@ shared/                      Shared constants and types
 - pnpm 10.
 - Supabase PostgreSQL connection available through the server-only `SUPABASE_DATABASE_URL`.
 - Required application/authentication environment variables supplied by the deployment environment. Do not commit `.env` files or credentials.
-- For Manus sign-in, a registered `VITE_APP_ID`, HTTPS `VITE_OAUTH_PORTAL_URL`, `OAUTH_SERVER_URL`, and strong `JWT_SECRET` must be configured at runtime.
+- For sign-in, configure the Supabase project URL and publishable key at runtime. Never expose a `service_role` or secret key to the browser.
 - A CPU-capable runtime for `onnxruntime-node` and native Sharp dependencies.
 - A bucket-scoped Cloudflare R2 API token with object read/write permissions.
 
@@ -70,9 +70,11 @@ pnpm install
 pnpm dev
 ```
 
-The development server starts the Express/tRPC backend and Vite frontend together. The application requires authentication before protected patient and assessment workflows can be opened. The login page uses the configured Manus OAuth provider; it does not accept local username/password credentials. Register the exact `https://<site-host>/api/oauth/callback` URL in the Manus app’s allowed redirect URIs.
+The development server starts the Express/tRPC backend and Vite frontend together. The application requires authentication before protected patient and assessment workflows can be opened. The login page accepts the email and password of a provisioned Supabase Auth user. The email field is the username for this flow.
 
-When `NODE_ENV=development`, the app uses a clearly labeled synthetic **Local Clinician** identity by default, so a local checkout does not redirect to Manus OAuth. This bypass is development-only; set `LOCAL_AUTH_BYPASS=false` to test the unauthenticated flow. Production always keeps Manus authentication enabled and rejects bypass flags.
+For a clinical deployment, create users through the Supabase Auth dashboard or an approved administration workflow, then disable public sign-ups under **Authentication → Providers → Email**. The server syncs a successfully authenticated Supabase user into the application `users` table with the default `user` role; set `OWNER_OPEN_ID` to the Supabase Auth user UUID that should be an administrator.
+
+When `NODE_ENV=development`, the app uses a clearly labeled synthetic **Local Clinician** identity by default, so a local checkout can run without Supabase Auth. This bypass is development-only; set `LOCAL_AUTH_BYPASS=false` to test the real unauthenticated flow. Production always requires Supabase Auth and rejects bypass flags.
 
 For the training preview, set `DISABLE_LOGIN_PAGE=true` to keep the development identity active even when `LOCAL_AUTH_BYPASS=false`. The flag is development-only and production startup rejects it. Do not use this mode on a shared or untrusted network with clinical data.
 
@@ -98,7 +100,7 @@ tailscale serve 3000
 tailscale serve status
 ```
 
-Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve requires HTTPS to be enabled for the tailnet and keeps the service available only to authorized tailnet devices. The HTTPS origin is required because mobile browsers generally do not allow `getUserMedia()` from an ordinary LAN HTTP address. For a shared or production deployment, set the real registered Manus `VITE_APP_ID`, HTTPS `VITE_OAUTH_PORTAL_URL`, `OAUTH_SERVER_URL`, and a strong `JWT_SECRET` in `.env`; recreate the container after changing them. For an isolated local demo without OAuth, `LOCAL_AUTH_BYPASS=true` is development-only and must never be used in production. Never commit `.env`, database credentials, OAuth secrets, or patient data.
+Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve requires HTTPS to be enabled for the tailnet and keeps the service available only to authorized tailnet devices. The HTTPS origin is required because mobile browsers generally do not allow `getUserMedia()` from an ordinary LAN HTTP address. For a shared or production deployment, set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `.env`; recreate the container after changing them. For an isolated local demo without Supabase Auth, `LOCAL_AUTH_BYPASS=true` is development-only and must never be used in production. Never commit `.env`, database credentials, Supabase secret keys, or patient data.
 
 ### Cloudflare R2 image storage
 
@@ -119,7 +121,7 @@ The old Forge storage helper remains as a compatibility fallback when no `R2_*` 
 
 ## Database
 
-The application database is the connected Supabase project. The schema migration is versioned at `supabase/migrations/20260924000000_create_diabcare_application_schema.sql`; the server accesses it through Drizzle's PostgreSQL adapter using the server-only `SUPABASE_DATABASE_URL`. Copy the connection string from the Supabase Dashboard's **Connect** dialog. For this runtime, use the IPv4-compatible shared **Session pooler** URL on port 5432; the direct `db.<project-ref>.supabase.co` URL resolves to IPv6 and is not reachable here. Do not use the browser Data API from the server. Manus OAuth remains the authentication provider, while the `users` table stores the application-side OAuth identity and role record.
+The application database and authentication provider are the connected Supabase project. The schema migration is versioned at `supabase/migrations/20260924000000_create_diabcare_application_schema.sql`; the server accesses PostgreSQL through Drizzle using the server-only `SUPABASE_DATABASE_URL`. Copy the connection string from the Supabase Dashboard's **Connect** dialog. For this runtime, use the IPv4-compatible shared **Session pooler** URL on port 5432; the direct `db.<project-ref>.supabase.co` URL resolves to IPv6 and is not reachable here. Supabase Auth access tokens arrive in the protected tRPC `Authorization` header, and the server validates them with Supabase before syncing the Auth user into the application `users` table.
 
 The approved migration copied the existing source database into Supabase without deleting the source: one application user, one import batch, 100 de-identified patients, and 42,859 observations. All four public tables have RLS enabled, and anonymous/authenticated Data API access is revoked; patient data is read and written by the protected application server connection only.
 
