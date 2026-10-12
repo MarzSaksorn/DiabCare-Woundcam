@@ -12,6 +12,10 @@ export const ENV = {
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+  r2AccountId: process.env.R2_ACCOUNT_ID ?? "",
+  r2BucketName: process.env.R2_BUCKET_NAME ?? "",
+  r2AccessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
+  r2SecretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
 };
 
 export function assertProductionConfiguration(
