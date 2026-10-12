@@ -16,7 +16,7 @@ import {
   users,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
-import { storageDelete, storagePut } from "./storage";
+import { storagePut } from "./storage";
 
 let _pool: Pool | null = null;
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -459,13 +459,7 @@ export async function addPatientWoundMedia(input: NewPatientWoundMedia & { image
   }
   const safeName = input.fileName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-160) || "wound-photo";
   const stored = await storagePut(`patient-wound-media/${input.patientId}/${safeName}`, input.imageBuffer, input.mimeType);
-  let media;
-  try {
-    [media] = await db.insert(patientWoundMedia).values({ patientId: input.patientId, woundAssessmentId: input.woundAssessmentId ?? null, storageKey: stored.key, storageUrl: stored.url, fileName: input.fileName, mimeType: input.mimeType, fileSizeBytes: input.fileSizeBytes, caption: input.caption ?? null, capturedOn: input.capturedOn ?? null, capturedAt: input.capturedAt, recordedByUserId: input.recordedByUserId }).returning();
-  } catch (error) {
-    await storageDelete(stored.key).catch(deleteError => console.error("[Storage] Failed to clean up orphaned wound photo", deleteError));
-    throw error;
-  }
+  const [media] = await db.insert(patientWoundMedia).values({ patientId: input.patientId, woundAssessmentId: input.woundAssessmentId ?? null, storageKey: stored.key, storageUrl: stored.url, fileName: input.fileName, mimeType: input.mimeType, fileSizeBytes: input.fileSizeBytes, caption: input.caption ?? null, capturedOn: input.capturedOn ?? null, recordedByUserId: input.recordedByUserId }).returning();
   await recordPatientAudit(input.patientId, input.recordedByUserId, "wound_photo_uploaded", `Wound photo uploaded: ${input.fileName} at ${input.capturedAt.toISOString()}`);
   return media;
 }
@@ -483,9 +477,8 @@ export async function setPatientWoundMediaHidden(mediaId: number, hidden: boolea
 export async function deletePatientWoundMedia(mediaId: number, actorUserId: number | null) {
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable");
-  const [media] = await db.select({ id: patientWoundMedia.id, patientId: patientWoundMedia.patientId, fileName: patientWoundMedia.fileName, storageKey: patientWoundMedia.storageKey, storageUrl: patientWoundMedia.storageUrl }).from(patientWoundMedia).where(eq(patientWoundMedia.id, mediaId)).limit(1);
+  const [media] = await db.select({ id: patientWoundMedia.id, patientId: patientWoundMedia.patientId, fileName: patientWoundMedia.fileName }).from(patientWoundMedia).where(eq(patientWoundMedia.id, mediaId)).limit(1);
   if (!media) return null;
-  if (media.storageUrl.startsWith("/r2-storage/")) await storageDelete(media.storageKey);
   await recordPatientAudit(media.patientId, actorUserId, "wound_photo_deleted", `Wound photo permanently deleted: ${media.fileName}`);
   const [deleted] = await db.delete(patientWoundMedia).where(eq(patientWoundMedia.id, mediaId)).returning({ id: patientWoundMedia.id, patientId: patientWoundMedia.patientId });
   return deleted;

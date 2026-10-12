@@ -14,19 +14,19 @@ DiabCare Woundcam is a bilingual clinical companion web application for hospital
 - Server-side wound-image inference using the locally packaged ONNX model and `onnxruntime-node`.
 - Five model classes: `callus_corn`, `dfu_ulcer`, `infected_wound`, `necrotic_wound`, and `normal_foot`.
 - Detection bounding boxes mapped onto the captured preview, with confidence scores and a clinician-review disclaimer.
-- Type-safe tRPC procedures, Drizzle ORM schema, Supabase PostgreSQL persistence, and Cloudflare R2 storage for wound images.
+- Type-safe tRPC procedures, Drizzle ORM schema, Supabase PostgreSQL persistence, and S3-compatible storage helpers.
 
 ## Architecture
 
-| Layer          | Implementation                                                                    |
-| -------------- | --------------------------------------------------------------------------------- |
-| Frontend       | React 19, TypeScript, Vite, Tailwind CSS v4, Wouter, Radix UI, Lucide Icons       |
-| API            | Express, tRPC 11, Zod validation                                                  |
-| Persistence    | Supabase PostgreSQL accessed through Drizzle ORM                                  |
-| Inference      | Ultralytics YOLO export, ONNX Runtime Node, Sharp preprocessing                   |
-| Authentication | Manus OAuth/session integration                                                   |
-| Storage        | Private Cloudflare R2 bucket; store references, not image bytes, in database rows |
-| Localization   | Shared English/Thai `LanguageProvider`                                            |
+| Layer | Implementation |
+| --- | --- |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS v4, Wouter, Radix UI, Lucide Icons |
+| API | Express, tRPC 11, Zod validation |
+| Persistence | Supabase PostgreSQL accessed through Drizzle ORM |
+| Inference | Ultralytics YOLO export, ONNX Runtime Node, Sharp preprocessing |
+| Authentication | Manus OAuth/session integration |
+| Storage | S3-compatible object storage helpers; store references, not image bytes, in database rows |
+| Localization | Shared English/Thai `LanguageProvider` |
 
 The application uses local/server-side inference. Patient images are not sent to an external AI API by the wound-detection flow.
 
@@ -54,7 +54,6 @@ shared/                      Shared constants and types
 - Supabase PostgreSQL connection available through the server-only `SUPABASE_DATABASE_URL`.
 - Required application/authentication environment variables supplied by the deployment environment. Do not commit `.env` files or credentials.
 - A CPU-capable runtime for `onnxruntime-node` and native Sharp dependencies.
-- A bucket-scoped Cloudflare R2 API token with object read/write permissions.
 
 ## Local development
 
@@ -90,23 +89,6 @@ tailscale serve status
 ```
 
 Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve requires HTTPS to be enabled for the tailnet and keeps the service available only to authorized tailnet devices. The HTTPS origin is required because mobile browsers generally do not allow `getUserMedia()` from an ordinary LAN HTTP address. For an isolated local Docker demo without Manus OAuth, start it with `LOCAL_AUTH_BYPASS=true docker compose up --build -d`; leave this unset or set it to `false` for shared or production environments. Never commit `.env`, database credentials, OAuth secrets, or patient data.
-
-### Cloudflare R2 image storage
-
-Captured wound images use the private `diabcare-woundcam` R2 bucket in the APAC location. The server uploads bytes with the AWS S3-compatible R2 API. The browser never receives R2 credentials and never reads a public bucket URL.
-
-Set these server-only variables in the runtime environment:
-
-```bash
-R2_ACCOUNT_ID=[CLOUDFLARE-ACCOUNT-ID]
-R2_BUCKET_NAME=diabcare-woundcam
-R2_ACCESS_KEY_ID=[R2-ACCESS-KEY-ID]
-R2_SECRET_ACCESS_KEY=[R2-SECRET-ACCESS-KEY]
-```
-
-Create the R2 API token in Cloudflare with the smallest scope that supports object read/write for this bucket. The application stores an object key and same-origin `/r2-storage/...` URL in `patient_wound_media`. That route requires the normal application session and redirects to a five-minute signed R2 GET URL. Deleting a wound photo also deletes its R2 object.
-
-The old Forge storage helper remains as a compatibility fallback when no `R2_*` variables are present. A partially configured R2 setup fails fast instead of silently sending new photos to a different storage backend.
 
 ## Database
 
