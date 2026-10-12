@@ -1,0 +1,33 @@
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/atkinson/9Bt23C1KxNDXMspQ1lPyU89-1h6ONRlW45GE5Q.ttf")
+    format("truetype");
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/atkinson/9Bt73C1KxNDXMspQ1lPyU89-1h6ONRlW45G8WbcNcw.ttf")
+    format("truetype");
+}
+
+@theme {
+  --color-clinical-blue: #0369a1;
+  --color-clinical-blue-dark: #075985;
+  --color-clinical-canvas: #f8fafc;
+  --color-clinical-surface: #ffffff;
+  --color-clinical-text: #0f172a;
+  --color-clinical-muted: #475569;
+  --color-clinical-border: #cbd5e1;
+  --color-clinical-critical: #dc2626;
+  --color-clinical-warning: #d97706;
+  --color-clinical-stable: #16a34a;
+  --radius-clinical-card: 12px;
+  --radius-clinical-button: 8px;
+  --font-clinical: "Atkinson Hyperlegible", sans-serif;
+}

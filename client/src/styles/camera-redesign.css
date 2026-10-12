@@ -1,0 +1,2103 @@
+.camera-v2-page {
+  --camera-blue: #0369a1;
+  --camera-blue-dark: #075985;
+  --camera-blue-soft: #e0f2fe;
+  --camera-canvas: #f8fafc;
+  --camera-surface: #ffffff;
+  --camera-text: #0f172a;
+  --camera-muted: #475569;
+  --camera-subtle: #64748b;
+  --camera-border: #cbd5e1;
+  --camera-border-soft: #e2e8f0;
+  --camera-critical: #dc2626;
+  --camera-critical-soft: #fef2f2;
+  --camera-warning: #d97706;
+  --camera-warning-soft: #fffbeb;
+  --camera-stable: #16a34a;
+  --camera-stable-soft: #f0fdf4;
+  --camera-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8px 0 40px;
+  color: var(--camera-text);
+  font-family: "Atkinson Hyperlegible", sans-serif;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.camera-v2-page *,
+.camera-v2-page *::before,
+.camera-v2-page *::after {
+  box-sizing: border-box;
+}
+
+.camera-v2-page button,
+.camera-v2-page input,
+.camera-v2-page select {
+  font: inherit;
+}
+
+.camera-v2-page button {
+  cursor: pointer;
+}
+
+.camera-v2-page button:focus-visible,
+.camera-v2-page a:focus-visible,
+.camera-v2-page input:focus-visible,
+.camera-v2-page select:focus-visible {
+  outline: 4px solid rgba(3, 105, 161, 0.26);
+  outline-offset: 3px;
+}
+
+.camera-v2-page h1,
+.camera-v2-page h2,
+.camera-v2-page p {
+  text-wrap: pretty;
+}
+
+.camera-v2-page h1,
+.camera-v2-page h2,
+.camera-v2-page p {
+  margin-top: 0;
+}
+
+.camera-v2-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 26px;
+}
+
+.camera-v2-back {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 5px;
+  color: var(--camera-blue-dark);
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.camera-v2-back:hover {
+  color: var(--camera-blue);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.camera-v2-back svg {
+  width: 21px;
+  height: 21px;
+}
+
+.camera-v2-eyebrow,
+.camera-v2-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--camera-blue);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.camera-v2-eyebrow {
+  margin-top: 15px;
+}
+
+.camera-v2-eyebrow > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--camera-blue);
+  box-shadow: 0 0 0 4px rgba(3, 105, 161, 0.11);
+}
+
+.camera-v2-header h1 {
+  margin: 8px 0 7px;
+  color: var(--camera-text);
+  font-size: clamp(34px, 4vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.14;
+}
+
+.camera-v2-header p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--camera-muted);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.camera-v2-header-meta {
+  display: grid;
+  flex: 0 0 auto;
+  justify-items: end;
+  gap: 12px;
+}
+
+.camera-v2-protected-badge,
+.camera-v2-product-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.camera-v2-protected-badge {
+  color: var(--camera-stable);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.camera-v2-protected-badge svg {
+  width: 20px;
+  height: 20px;
+}
+
+.camera-v2-product-mark {
+  color: var(--camera-blue-dark);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.camera-v2-product-mark img {
+  width: 42px;
+  height: 34px;
+  border-radius: 7px;
+  object-fit: cover;
+  object-position: left center;
+}
+
+.camera-v2-stepper {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-bottom: 22px;
+  border: 1px solid var(--camera-border);
+  border-radius: 12px;
+  background: var(--camera-surface);
+  box-shadow: var(--camera-shadow);
+  overflow: hidden;
+}
+
+.camera-v2-step {
+  position: relative;
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  gap: 12px;
+  border-right: 1px solid var(--camera-border-soft);
+  padding: 14px 20px;
+}
+
+.camera-v2-step:last-child {
+  border-right: 0;
+}
+
+.camera-v2-step:not(:last-child)::after {
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  z-index: 1;
+  width: 15px;
+  height: 15px;
+  border-top: 1px solid var(--camera-border);
+  border-right: 1px solid var(--camera-border);
+  background: var(--camera-surface);
+  content: "";
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.camera-v2-step-number {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--camera-border);
+  border-radius: 50%;
+  color: var(--camera-subtle);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.camera-v2-step-number svg {
+  width: 20px;
+  height: 20px;
+}
+
+.camera-v2-step-copy {
+  min-width: 0;
+}
+
+.camera-v2-step-copy strong,
+.camera-v2-step-copy small {
+  display: block;
+}
+
+.camera-v2-step-copy strong {
+  color: var(--camera-text);
+  font-size: 18px;
+}
+
+.camera-v2-step-copy small {
+  margin-top: 3px;
+  color: var(--camera-subtle);
+  font-size: 15px;
+}
+
+.camera-v2-step-active {
+  background: var(--camera-blue-soft);
+}
+
+.camera-v2-step-active .camera-v2-step-number {
+  border-color: var(--camera-blue);
+  background: var(--camera-blue);
+  color: white;
+}
+
+.camera-v2-step-active .camera-v2-step-copy strong {
+  color: var(--camera-blue-dark);
+}
+
+.camera-v2-step-complete .camera-v2-step-number {
+  border-color: var(--camera-stable);
+  background: var(--camera-stable-soft);
+  color: var(--camera-stable);
+}
+
+.camera-v2-step-complete .camera-v2-step-copy strong {
+  color: var(--camera-stable);
+}
+
+.camera-v2-panel {
+  border: 1px solid var(--camera-border);
+  border-radius: 12px;
+  background: var(--camera-surface);
+  box-shadow: var(--camera-shadow);
+}
+
+.camera-v2-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid var(--camera-border-soft);
+  padding: 24px 26px 20px;
+}
+
+.camera-v2-panel-header h2 {
+  margin: 7px 0 4px;
+  color: var(--camera-text);
+  font-size: 27px;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.camera-v2-panel-header p {
+  max-width: 620px;
+  margin: 0;
+  color: var(--camera-muted);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.camera-v2-record-count {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #bae6fd;
+  border-radius: 999px;
+  background: #f0f9ff;
+  padding: 0 13px;
+  color: var(--camera-blue-dark);
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.camera-v2-record-count svg {
+  width: 20px;
+  height: 20px;
+}
+
+.camera-v2-selector {
+  overflow: hidden;
+}
+
+.camera-v2-selector-grid {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.43fr) minmax(0, 1fr);
+  gap: 0;
+  min-height: 410px;
+}
+
+.camera-v2-filter-rail {
+  border-right: 1px solid var(--camera-border-soft);
+  background: #f8fafc;
+  padding: 22px 20px;
+}
+
+.camera-v2-search {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--camera-border);
+  border-radius: 8px;
+  background: var(--camera-surface);
+  padding: 0 13px;
+}
+
+.camera-v2-search:focus-within {
+  border-color: var(--camera-blue);
+  box-shadow: 0 0 0 4px rgba(3, 105, 161, 0.14);
+}
+
+.camera-v2-search svg {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  color: var(--camera-blue-dark);
+}
+
+.camera-v2-search input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: var(--camera-text);
+  font-size: 18px;
+}
+
+.camera-v2-search input::placeholder {
+  color: var(--camera-subtle);
+}
+
+.camera-v2-filter-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 16px;
+  border: 1px solid var(--camera-border-soft);
+  border-radius: 8px;
+  background: #eef2f7;
+  padding: 4px;
+}
+
+.camera-v2-filter-row button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--camera-muted);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.camera-v2-filter-row button:hover {
+  background: #e2e8f0;
+  color: var(--camera-blue-dark);
+}
+
+.camera-v2-filter-row button.is-active {
+  background: var(--camera-blue);
+  color: white;
+  box-shadow: 0 3px 8px rgba(3, 105, 161, 0.18);
+}
+
+.camera-v2-selection-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 24px;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  background: #f0f9ff;
+  padding: 14px;
+}
+
+.camera-v2-selection-note > svg {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  color: var(--camera-blue);
+}
+
+.camera-v2-selection-note strong,
+.camera-v2-selection-note span {
+  display: block;
+}
+
+.camera-v2-selection-note strong {
+  color: var(--camera-blue-dark);
+  font-size: 17px;
+}
+
+.camera-v2-selection-note span {
+  margin-top: 3px;
+  color: var(--camera-muted);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.camera-v2-patient-results {
+  min-width: 0;
+  padding: 22px 24px 8px;
+}
+
+.camera-v2-results-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.camera-v2-results-heading > div > span,
+.camera-v2-results-heading > div > strong {
+  display: block;
+}
+
+.camera-v2-results-heading > div > strong {
+  margin-top: 4px;
+  color: var(--camera-text);
+  font-size: 20px;
+}
+
+.camera-v2-results-heading small {
+  color: var(--camera-subtle);
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.camera-v2-selection-preview {
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 8px;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  background: #f0f9ff;
+  padding: 10px 12px;
+}
+
+.camera-v2-selection-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--camera-blue);
+  color: white;
+}
+
+.camera-v2-selection-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.camera-v2-selection-preview > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.camera-v2-selection-preview > div > span,
+.camera-v2-selection-preview strong,
+.camera-v2-selection-preview small {
+  display: block;
+}
+
+.camera-v2-selection-preview > div > span {
+  color: var(--camera-blue);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.camera-v2-selection-preview strong {
+  overflow: hidden;
+  margin-top: 1px;
+  color: var(--camera-text);
+  font-size: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-v2-selection-preview small {
+  overflow: hidden;
+  color: var(--camera-muted);
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-v2-chip {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  padding: 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.camera-v2-chip > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.camera-v2-chip-blue {
+  background: var(--camera-blue-soft);
+  color: var(--camera-blue-dark);
+}
+
+.camera-v2-chip-stable {
+  background: var(--camera-stable-soft);
+  color: var(--camera-stable);
+}
+
+.camera-v2-chip-warning {
+  background: var(--camera-warning-soft);
+  color: var(--camera-warning);
+}
+
+.camera-v2-patient-list {
+  display: grid;
+  max-height: 370px;
+  overflow: auto;
+  border-top: 1px solid var(--camera-border-soft);
+}
+
+.camera-v2-patient-choice {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 78px;
+  align-items: center;
+  gap: 13px;
+  border: 0;
+  border-bottom: 1px solid var(--camera-border-soft);
+  border-left: 4px solid transparent;
+  background: var(--camera-surface);
+  padding: 11px 12px 11px 9px;
+  color: inherit;
+  text-align: left;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.camera-v2-patient-choice:hover,
+.camera-v2-patient-choice.is-selected {
+  border-left-color: var(--camera-blue);
+  background: #f8fbff;
+}
+
+.camera-v2-patient-avatar {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--camera-blue-soft);
+  color: var(--camera-blue-dark);
+}
+
+.camera-v2-patient-avatar svg {
+  width: 23px;
+  height: 23px;
+}
+
+.camera-v2-patient-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.camera-v2-patient-main strong,
+.camera-v2-patient-main small,
+.camera-v2-patient-main em {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-v2-patient-main strong {
+  color: var(--camera-text);
+  font-size: 19px;
+}
+
+.camera-v2-patient-main small,
+.camera-v2-patient-main em {
+  margin-top: 2px;
+  color: var(--camera-muted);
+  font-size: 16px;
+  font-style: normal;
+}
+
+.camera-v2-patient-main em {
+  color: var(--camera-subtle);
+}
+
+.camera-v2-patient-check {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  place-items: center;
+}
+
+.camera-v2-patient-check > span {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--camera-border);
+  border-radius: 50%;
+}
+
+.camera-v2-patient-check svg {
+  width: 24px;
+  height: 24px;
+  color: var(--camera-blue);
+}
+
+.camera-v2-selector-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-top: 1px solid var(--camera-border-soft);
+  background: #f8fafc;
+  padding: 16px 24px;
+}
+
+.camera-v2-selector-footer > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--camera-muted);
+  font-size: 16px;
+}
+
+.camera-v2-selector-footer > span svg {
+  width: 20px;
+  height: 20px;
+  color: var(--camera-blue);
+}
+
+.camera-v2-primary-button,
+.camera-v2-secondary-button {
+  display: inline-flex !important;
+  min-height: 52px !important;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 8px !important;
+  padding: 0 18px !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.camera-v2-primary-button {
+  border: 1px solid var(--camera-blue) !important;
+  background: var(--camera-blue) !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+
+.camera-v2-primary-button:hover {
+  border-color: var(--camera-blue-dark) !important;
+  background: var(--camera-blue-dark) !important;
+}
+
+.camera-v2-primary-button:disabled {
+  border-color: #cbd5e1 !important;
+  background: #e2e8f0 !important;
+  color: #64748b !important;
+}
+
+.camera-v2-secondary-button {
+  border: 1px solid var(--camera-blue) !important;
+  background: var(--camera-surface) !important;
+  color: var(--camera-blue-dark) !important;
+}
+
+.camera-v2-secondary-button:hover {
+  background: var(--camera-blue-soft) !important;
+}
+
+.camera-v2-primary-button svg,
+.camera-v2-secondary-button svg {
+  width: 21px;
+  height: 21px;
+}
+
+.camera-v2-patient-loading {
+  display: grid;
+  gap: 8px;
+  padding: 11px 0;
+}
+
+.camera-v2-patient-loading span {
+  display: block;
+  height: 66px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #f1f5f9, #f8fbff, #f1f5f9);
+  background-size: 200% 100%;
+  animation: camera-v2-shimmer 1.2s linear infinite;
+}
+
+.camera-v2-picker-empty {
+  display: flex;
+  min-height: 230px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--camera-subtle);
+  text-align: center;
+}
+
+.camera-v2-picker-empty svg {
+  width: 34px;
+  height: 34px;
+  color: var(--camera-blue);
+}
+
+.camera-v2-picker-empty.is-error svg {
+  color: var(--camera-critical);
+}
+
+.camera-v2-picker-empty strong {
+  margin-top: 11px;
+  color: var(--camera-text);
+  font-size: 21px;
+}
+
+.camera-v2-picker-empty p {
+  max-width: 360px;
+  margin: 5px 0 0;
+  color: var(--camera-muted);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.camera-v2-selected-patient {
+  display: flex;
+  min-height: 84px;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #bae6fd;
+  border-radius: 12px;
+  background: #f0f9ff;
+  padding: 14px 18px;
+}
+
+.camera-v2-selected-avatar {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--camera-blue);
+  color: white;
+}
+
+.camera-v2-selected-avatar svg {
+  width: 24px;
+  height: 24px;
+}
+
+.camera-v2-selected-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.camera-v2-selected-copy > strong,
+.camera-v2-selected-copy > small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-v2-selected-copy > strong {
+  margin-top: 3px;
+  color: var(--camera-text);
+  font-size: 22px;
+}
+
+.camera-v2-selected-copy > small {
+  color: var(--camera-muted);
+  font-size: 16px;
+}
+
+.camera-v2-change-patient {
+  min-height: 44px;
+  border: 1px solid var(--camera-blue);
+  border-radius: 8px;
+  background: var(--camera-surface);
+  padding: 0 13px;
+  color: var(--camera-blue-dark);
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.camera-v2-change-patient:hover {
+  background: var(--camera-blue-soft);
+}
+
+.camera-v2-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.14fr) minmax(390px, 0.86fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.camera-v2-capture-panel,
+.camera-v2-review-panel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.camera-v2-capture-header {
+  padding-bottom: 18px;
+}
+
+.camera-v2-help-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.camera-v2-help {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid var(--camera-border);
+  border-radius: 8px;
+  background: var(--camera-surface);
+  color: var(--camera-blue-dark);
+}
+
+.camera-v2-help:hover {
+  border-color: var(--camera-blue);
+  background: var(--camera-blue-soft);
+}
+
+.camera-v2-help svg {
+  width: 23px;
+  height: 23px;
+}
+
+.camera-v2-help-popup {
+  position: absolute;
+  z-index: 20;
+  top: 58px;
+  right: 0;
+  display: flex;
+  width: min(350px, calc(100vw - 42px));
+  align-items: flex-start;
+  gap: 14px;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  background: var(--camera-surface);
+  padding: 16px;
+  color: var(--camera-muted);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.camera-v2-help-popup strong {
+  display: block;
+  color: var(--camera-text);
+  font-size: 18px;
+}
+
+.camera-v2-help-popup p {
+  margin: 5px 0 0;
+}
+
+.camera-v2-help-popup > button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: var(--camera-muted);
+}
+
+.camera-v2-help-popup > button:hover {
+  background: var(--camera-blue-soft);
+  color: var(--camera-blue-dark);
+}
+
+.camera-v2-help-popup > button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.camera-v2-viewport {
+  position: relative;
+  display: flex;
+  min-height: 520px;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+  overflow: hidden;
+  border: 1px solid #075985;
+  border-radius: 8px;
+  background: radial-gradient(
+    circle at 50% 38%,
+    #28556e 0%,
+    #12344a 54%,
+    #061d2d 100%
+  );
+}
+
+.camera-v2-viewport.has-preview {
+  background: #071b2a;
+}
+
+.camera-v2-viewport img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  object-fit: contain;
+}
+
+.camera-v2-viewport.is-live {
+  background: #061824;
+}
+
+.camera-v2-live-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  object-fit: cover;
+}
+
+.camera-v2-frame {
+  position: absolute;
+  z-index: 2;
+  inset: 14% 16%;
+  border: 1px solid rgba(186, 230, 253, 0.45);
+  border-radius: 20px;
+}
+
+.camera-v2-frame span {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border-color: #bae6fd;
+}
+
+.camera-v2-frame span:nth-child(1) {
+  top: -1px;
+  left: -1px;
+  border-top: 4px solid;
+  border-left: 4px solid;
+  border-radius: 7px 0 0;
+}
+
+.camera-v2-frame span:nth-child(2) {
+  top: -1px;
+  right: -1px;
+  border-top: 4px solid;
+  border-right: 4px solid;
+  border-radius: 0 7px 0 0;
+}
+
+.camera-v2-frame span:nth-child(3) {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 4px solid;
+  border-left: 4px solid;
+  border-radius: 0 0 0 7px;
+}
+
+.camera-v2-frame span:nth-child(4) {
+  right: -1px;
+  bottom: -1px;
+  border-right: 4px solid;
+  border-bottom: 4px solid;
+  border-radius: 0 0 7px;
+}
+
+.camera-v2-empty {
+  position: relative;
+  z-index: 3;
+  width: min(320px, 72%);
+  color: white;
+  text-align: center;
+}
+
+.camera-v2-lens {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  margin: 0 auto 15px;
+  border: 1px solid rgba(186, 230, 253, 0.36);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #e0f2fe;
+}
+
+.camera-v2-lens svg {
+  width: 32px;
+  height: 32px;
+}
+
+.camera-v2-empty strong {
+  display: block;
+  font-size: 24px;
+}
+
+.camera-v2-empty p {
+  max-width: 310px;
+  margin: 7px auto 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.camera-v2-status,
+.camera-v2-live-label {
+  position: absolute;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(4, 15, 21, 0.64);
+  padding: 9px 13px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 15px;
+  font-weight: 700;
+  backdrop-filter: blur(8px);
+}
+
+.camera-v2-status {
+  right: 16px;
+  bottom: 16px;
+}
+
+.camera-v2-status > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #6ee7b7;
+  box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.16);
+}
+
+.camera-v2-status.is-error > span {
+  background: #fca5a5;
+  box-shadow: 0 0 0 3px rgba(252, 165, 165, 0.16);
+}
+
+.camera-v2-live-label {
+  top: 16px;
+  left: 16px;
+}
+
+.camera-v2-live-label svg {
+  width: 19px;
+  height: 19px;
+}
+
+.camera-v2-preview-overlay {
+  position: absolute;
+  z-index: 4;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(5, 19, 27, 0.82);
+  padding: 9px 10px 9px 12px;
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+.camera-v2-preview-overlay span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-v2-preview-overlay span svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+}
+
+.camera-v2-preview-overlay button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+}
+
+.camera-v2-preview-overlay button:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.camera-v2-preview-overlay button svg {
+  width: 19px;
+  height: 19px;
+}
+
+.camera-v2-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 0 20px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: var(--camera-critical-soft);
+  padding: 11px 12px;
+  color: var(--camera-critical);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.camera-v2-error svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.camera-v2-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 20px;
+}
+
+.camera-v2-actions > * {
+  width: 100%;
+}
+
+.camera-v2-privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 14px 21px 20px;
+  color: var(--camera-subtle);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.camera-v2-privacy svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  color: var(--camera-blue);
+}
+
+.camera-v2-state-pill {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  border-radius: 999px;
+  background: #f1f5f9;
+  padding: 0 12px;
+  color: var(--camera-subtle);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.camera-v2-state-ready {
+  background: var(--camera-stable-soft);
+  color: var(--camera-stable);
+}
+
+.camera-v2-state-analyzing {
+  background: var(--camera-blue-soft);
+  color: var(--camera-blue-dark);
+}
+
+.camera-v2-state-captured {
+  background: var(--camera-warning-soft);
+  color: var(--camera-warning);
+}
+
+.camera-v2-review-placeholder {
+  display: flex;
+  min-height: 218px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+  border: 1px dashed var(--camera-border);
+  border-radius: 8px;
+  background: #f8fafc;
+  color: var(--camera-subtle);
+  padding: 22px;
+  text-align: center;
+}
+
+.camera-v2-review-placeholder svg {
+  width: 42px;
+  height: 42px;
+  color: var(--camera-blue);
+}
+
+.camera-v2-review-placeholder strong {
+  margin-top: 12px;
+  color: var(--camera-text);
+  font-size: 22px;
+}
+
+.camera-v2-review-placeholder p {
+  max-width: 310px;
+  margin: 5px 0 0;
+  color: var(--camera-muted);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.camera-v2-review-ready {
+  border-color: #bbf7d0;
+  background: var(--camera-stable-soft);
+}
+
+.camera-v2-review-ready svg {
+  color: var(--camera-stable);
+}
+
+.camera-v2-review-analyzing {
+  border-color: #bae6fd;
+  background: #f0f9ff;
+}
+
+.camera-v2-review-analyzing svg {
+  color: var(--camera-blue);
+}
+
+.camera-v2-inference {
+  margin: 0 20px 12px;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  background: #f0f9ff;
+  padding: 14px;
+}
+
+.camera-v2-inference > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--camera-blue-dark);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.camera-v2-inference > div small {
+  color: var(--camera-muted);
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.camera-v2-inference > strong {
+  display: block;
+  margin-top: 9px;
+  color: var(--camera-text);
+  font-size: 23px;
+  text-transform: capitalize;
+}
+
+.camera-v2-inference > p {
+  margin: 3px 0 0;
+  color: var(--camera-blue-dark);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.camera-v2-inference > em {
+  display: block;
+  margin-top: 9px;
+  border-top: 1px solid #bae6fd;
+  padding-top: 9px;
+  color: var(--camera-muted);
+  font-size: 15px;
+  font-style: normal;
+  line-height: 1.45;
+}
+
+.camera-v2-assignment {
+  margin: 14px 20px 20px;
+  border: 1px solid var(--camera-border);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 15px;
+}
+
+.camera-v2-assignment-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.camera-v2-assignment-title > svg {
+  width: 23px;
+  height: 23px;
+  color: var(--camera-blue);
+}
+
+.camera-v2-assignment-title > div {
+  display: grid;
+  gap: 2px;
+}
+
+.camera-v2-assignment-title strong {
+  color: var(--camera-text);
+  font-size: 20px;
+}
+
+.camera-v2-assignment > p {
+  margin: 4px 0 12px 33px;
+  color: var(--camera-muted);
+  font-size: 16px;
+}
+
+.camera-v2-assignment label {
+  display: grid;
+  gap: 5px;
+  margin-top: 11px;
+  color: var(--camera-muted);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.camera-v2-assignment select,
+.camera-v2-assignment input {
+  min-width: 0;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--camera-border);
+  border-radius: 8px;
+  background: var(--camera-surface);
+  padding: 0 11px;
+  color: var(--camera-text);
+  font-size: 17px;
+}
+
+.camera-v2-assignment select:disabled,
+.camera-v2-assignment input:disabled {
+  background: #f1f5f9;
+  color: var(--camera-subtle);
+}
+
+.camera-v2-assignment .camera-v2-primary-button {
+  width: 100%;
+  margin-top: 15px;
+}
+
+.camera-v2-assignment > small {
+  display: block;
+  margin-top: 8px;
+  color: var(--camera-subtle);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* WoundInferenceResults keeps its behavior and data model. These scoped styles move its model output into the new system. */
+.camera-v2-panel .replica-camera-overlay-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 14px;
+  margin: -7px 20px 15px;
+  border: 1px solid var(--camera-border);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 12px;
+  color: var(--camera-text);
+}
+
+.camera-v2-panel .replica-camera-overlay-controls legend {
+  grid-column: 1 / -1;
+  padding: 0 4px;
+  color: var(--camera-blue-dark);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.camera-v2-panel .replica-camera-overlay-controls label {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 7px;
+  color: var(--camera-muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.camera-v2-panel .replica-camera-overlay-controls label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--camera-blue);
+}
+
+.camera-v2-panel .replica-camera-overlay-controls label svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: var(--camera-blue);
+}
+
+.camera-v2-panel .replica-camera-opacity {
+  grid-column: 1 / -1;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px !important;
+}
+
+.camera-v2-panel .replica-camera-opacity input[type="range"] {
+  width: 100%;
+  accent-color: var(--camera-blue);
+}
+
+.camera-v2-panel .replica-camera-overlay-legend {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  border-top: 1px solid var(--camera-border-soft);
+  padding-top: 10px;
+  color: var(--camera-subtle);
+  font-size: 14px;
+}
+
+.camera-v2-panel .replica-camera-overlay-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.camera-v2-panel .replica-camera-overlay-legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--camera-blue);
+}
+
+.camera-v2-panel .replica-camera-overlay-legend i.is-box {
+  border: 2px solid #38bdf8;
+  background: transparent;
+}
+
+.camera-v2-panel .replica-camera-overlay-legend i.is-mask {
+  background: rgba(34, 197, 94, 0.72);
+}
+
+.camera-v2-panel .replica-camera-overlay-legend i.is-card {
+  background: var(--camera-warning);
+}
+
+.camera-v2-panel .replica-camera-overlay-hint {
+  grid-column: 1 / -1;
+  color: var(--camera-subtle);
+  font-size: 14px;
+}
+
+.camera-v2-panel .replica-camera-regions {
+  display: grid;
+  gap: 10px;
+  margin: 0 20px 18px;
+}
+
+.camera-v2-panel .replica-camera-regions-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.camera-v2-panel .replica-camera-regions-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.camera-v2-panel .replica-camera-regions-heading span,
+.camera-v2-panel .replica-camera-region-model span,
+.camera-v2-panel .replica-camera-region-header span {
+  color: var(--camera-blue);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.camera-v2-panel .replica-camera-regions-heading h3 {
+  margin: 0;
+  color: var(--camera-text);
+  font-size: 21px;
+}
+
+.camera-v2-panel .replica-camera-regions-heading small {
+  color: var(--camera-muted);
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.camera-v2-panel .replica-camera-taxonomy-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  background: #f0f9ff;
+  padding: 11px 12px;
+  color: var(--camera-blue-dark);
+}
+
+.camera-v2-panel .replica-camera-taxonomy-note > svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.camera-v2-panel .replica-camera-taxonomy-note strong {
+  display: block;
+  color: var(--camera-text);
+  font-size: 16px;
+}
+
+.camera-v2-panel .replica-camera-taxonomy-note p {
+  margin: 3px 0 0;
+  color: var(--camera-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.camera-v2-panel .replica-camera-region-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--camera-border);
+  border-radius: 8px;
+  background: var(--camera-surface);
+  padding: 13px;
+}
+
+.camera-v2-panel .replica-camera-region-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--camera-border-soft);
+  padding-bottom: 9px;
+}
+
+.camera-v2-panel .replica-camera-region-header > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.camera-v2-panel .replica-camera-region-header strong,
+.camera-v2-panel .replica-camera-region-model strong {
+  overflow-wrap: anywhere;
+  color: var(--camera-text);
+  font-size: 17px;
+}
+
+.camera-v2-panel .replica-camera-region-header small,
+.camera-v2-panel .replica-camera-region-model small {
+  color: var(--camera-muted);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.camera-v2-panel .replica-camera-region-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.camera-v2-panel .replica-camera-region-model {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  min-width: 0;
+}
+
+.camera-v2-panel .replica-camera-probabilities {
+  display: grid;
+  gap: 6px;
+  border-top: 1px solid var(--camera-border-soft);
+  padding-top: 10px;
+}
+
+.camera-v2-panel .replica-camera-probability {
+  display: grid;
+  grid-template-columns: minmax(115px, 1fr) minmax(80px, 1.5fr) 36px;
+  align-items: center;
+  gap: 7px;
+  color: var(--camera-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.camera-v2-panel .replica-camera-probability-track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.camera-v2-panel .replica-camera-probability-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--camera-blue);
+}
+
+.camera-v2-panel .replica-camera-probability > strong {
+  color: var(--camera-text);
+  font-size: 13px;
+  text-align: right;
+}
+
+.camera-v2-panel .replica-camera-segmentation-result {
+  border: 1px solid var(--camera-border-soft);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 10px;
+}
+
+.camera-v2-panel .replica-camera-segmentation-result > span,
+.camera-v2-panel .replica-camera-segmentation-result > strong,
+.camera-v2-panel .replica-camera-segmentation-result > small,
+.camera-v2-panel .replica-camera-segmentation-result > em {
+  display: block;
+}
+
+.camera-v2-panel .replica-camera-segmentation-result > span {
+  color: var(--camera-blue);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.camera-v2-panel .replica-camera-segmentation-result > strong {
+  margin-top: 3px;
+  color: var(--camera-text);
+  font-size: 16px;
+}
+
+.camera-v2-panel .replica-camera-segmentation-result > small,
+.camera-v2-panel .replica-camera-segmentation-result > em {
+  margin-top: 3px;
+  color: var(--camera-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.camera-v2-panel .replica-camera-segmentation-result > em {
+  color: var(--camera-warning);
+  font-style: normal;
+}
+
+.camera-v2-panel .replica-camera-review-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 8px;
+  border-radius: 7px;
+  background: var(--camera-stable-soft);
+  padding: 9px 10px;
+  color: var(--camera-stable);
+}
+
+.camera-v2-panel .replica-camera-review-status.is-error {
+  background: var(--camera-warning-soft);
+  color: var(--camera-warning);
+}
+
+.camera-v2-panel .replica-camera-review-status svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+}
+
+.camera-v2-panel .replica-camera-review-status strong {
+  font-size: 15px;
+}
+
+.camera-v2-panel .replica-camera-review-status span,
+.camera-v2-panel .replica-camera-region-card em {
+  color: var(--camera-muted);
+  font-size: 14px;
+}
+
+.camera-v2-panel .replica-camera-region-card em {
+  border-top: 1px solid var(--camera-border-soft);
+  padding-top: 8px;
+  font-style: normal;
+  line-height: 1.4;
+}
+
+.camera-v2-panel .replica-camera-inconclusive {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 5px 9px;
+  margin: 0 20px 14px;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  background: var(--camera-warning-soft);
+  padding: 12px;
+  color: var(--camera-warning);
+}
+
+.camera-v2-panel .replica-camera-inconclusive > svg {
+  grid-row: span 3;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+}
+
+.camera-v2-panel .replica-camera-inconclusive h3 {
+  margin: 0;
+  color: #92400e;
+  font-size: 18px;
+}
+
+.camera-v2-panel .replica-camera-inconclusive p,
+.camera-v2-panel .replica-camera-inconclusive small {
+  margin: 0;
+  color: #78350f;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.camera-v2-viewport .camera-detection-layer {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+.camera-v2-viewport .camera-segmentation-mask {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+.camera-v2-viewport .camera-segmentation-mask img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  object-fit: fill;
+}
+
+.camera-v2-viewport .camera-detection-box {
+  position: absolute;
+  z-index: 2;
+  border: 2px solid #38bdf8;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(3, 105, 161, 0.36);
+}
+
+.camera-v2-viewport .camera-detection-box span {
+  position: absolute;
+  top: -29px;
+  left: -2px;
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  border-radius: 5px 5px 0 0;
+  background: #0369a1;
+  padding: 0 8px;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.camera-v2-page .camera-history-card {
+  margin-top: 22px;
+  border: 1px solid var(--camera-border);
+  border-radius: 12px;
+  background: var(--camera-surface);
+  box-shadow: var(--camera-shadow);
+}
+
+@keyframes camera-v2-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 1120px) {
+  .camera-v2-page {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .camera-v2-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-v2-viewport,
+  .camera-v2-viewport img,
+  .camera-v2-live-video {
+    min-height: 520px;
+  }
+}
+
+@media (max-width: 760px) {
+  .camera-v2-page {
+    padding: 4px 0 30px;
+    font-size: 17px;
+  }
+
+  .camera-v2-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .camera-v2-header h1 {
+    font-size: 34px;
+  }
+
+  .camera-v2-header p {
+    font-size: 18px;
+  }
+
+  .camera-v2-header-meta {
+    width: 100%;
+    align-items: flex-start;
+    justify-items: start;
+  }
+
+  .camera-v2-stepper {
+    grid-template-columns: 1fr;
+    margin-bottom: 18px;
+  }
+
+  .camera-v2-step {
+    min-height: 62px;
+    border-right: 0;
+    border-bottom: 1px solid var(--camera-border-soft);
+    padding: 10px 14px;
+  }
+
+  .camera-v2-step:last-child {
+    border-bottom: 0;
+  }
+
+  .camera-v2-step:not(:last-child)::after {
+    top: auto;
+    right: auto;
+    bottom: -8px;
+    left: 29px;
+    transform: rotate(135deg);
+  }
+
+  .camera-v2-step-number {
+    width: 34px;
+    height: 34px;
+  }
+
+  .camera-v2-step-copy strong {
+    font-size: 17px;
+  }
+
+  .camera-v2-step-copy small {
+    font-size: 14px;
+  }
+
+  .camera-v2-panel-header {
+    padding: 19px 16px 16px;
+  }
+
+  .camera-v2-panel-header h2 {
+    font-size: 24px;
+  }
+
+  .camera-v2-panel-header p {
+    font-size: 17px;
+  }
+
+  .camera-v2-selector-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-v2-filter-rail {
+    border-right: 0;
+    border-bottom: 1px solid var(--camera-border-soft);
+    padding: 16px;
+  }
+
+  .camera-v2-patient-results {
+    padding: 17px 14px 6px;
+  }
+
+  .camera-v2-selector-footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 15px 16px 17px;
+  }
+
+  .camera-v2-selector-footer > span {
+    align-items: flex-start;
+    font-size: 15px;
+  }
+
+  .camera-v2-selector-footer .camera-v2-primary-button {
+    width: 100%;
+  }
+
+  .camera-v2-selected-patient {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 13px;
+  }
+
+  .camera-v2-selected-copy {
+    min-width: calc(100% - 62px);
+  }
+
+  .camera-v2-selected-patient > .camera-v2-chip {
+    margin-left: 58px;
+  }
+
+  .camera-v2-change-patient {
+    margin-left: auto;
+  }
+
+  .camera-v2-viewport,
+  .camera-v2-viewport img,
+  .camera-v2-live-video {
+    min-height: 350px;
+  }
+
+  .camera-v2-viewport {
+    margin: 16px;
+  }
+
+  .camera-v2-frame {
+    inset: 15% 11%;
+  }
+
+  .camera-v2-empty strong {
+    font-size: 21px;
+  }
+
+  .camera-v2-empty p {
+    font-size: 16px;
+  }
+
+  .camera-v2-actions {
+    grid-template-columns: 1fr;
+    margin: 0 16px;
+  }
+
+  .camera-v2-privacy {
+    margin-right: 17px;
+    margin-left: 17px;
+  }
+
+  .camera-v2-review-placeholder {
+    min-height: 180px;
+    margin: 16px;
+  }
+
+  .camera-v2-inference,
+  .camera-v2-panel .replica-camera-inconclusive,
+  .camera-v2-assignment {
+    margin-right: 16px;
+    margin-left: 16px;
+  }
+
+  .camera-v2-panel .replica-camera-overlay-controls {
+    grid-template-columns: 1fr;
+    margin-right: 16px;
+    margin-left: 16px;
+  }
+
+  .camera-v2-panel .replica-camera-opacity {
+    grid-column: auto;
+  }
+
+  .camera-v2-panel .replica-camera-region-summary,
+  .camera-v2-panel .replica-camera-probability {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-v2-panel .replica-camera-probability > strong {
+    text-align: left;
+  }
+
+  .camera-v2-panel .replica-camera-regions {
+    margin-right: 16px;
+    margin-left: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camera-v2-page *,
+  .camera-v2-page *::before,
+  .camera-v2-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
