@@ -1,10 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import {
-  Button as HeroButton,
-  Card as HeroCard,
-  Input as HeroInput,
-} from "@heroui/react";
+import { Button as HeroButton, Card as HeroCard } from "@heroui/react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import {
@@ -12,12 +8,10 @@ import {
   ArrowRight,
   Camera,
   Check,
-  CheckCircle2,
   ChevronLeft,
   CircleHelp,
   Database,
   FileImage,
-  HeartPulse,
   ImagePlus,
   Info,
   Loader2,
@@ -27,7 +21,6 @@ import {
   Sparkles,
   Upload,
   UserRound,
-  Users,
   Video,
   X,
 } from "lucide-react";
@@ -94,8 +87,24 @@ export default function DiagnosticCamera() {
   const [helpOpen, setHelpOpen] = useState(false);
   const inferMutation = trpc.wound.infer.useMutation();
   const patientsQuery = trpc.diabetes.registeredPatientsPage.useQuery(
-    { query: patientSearch, context: patientContext, offset: 0, limit: 50 },
+    { query: patientSearch, context: patientContext, offset: 0, limit: 100 },
     { retry: false }
+  );
+  const allPatientsCountQuery = trpc.diabetes.registeredPatientsPage.useQuery(
+    { query: "", context: "all", offset: 0, limit: 1 },
+    { retry: false, staleTime: 30_000 }
+  );
+  const type1PatientsCountQuery = trpc.diabetes.registeredPatientsPage.useQuery(
+    { query: "", context: "type1", offset: 0, limit: 1 },
+    { retry: false, staleTime: 30_000 }
+  );
+  const type2PatientsCountQuery = trpc.diabetes.registeredPatientsPage.useQuery(
+    { query: "", context: "type2", offset: 0, limit: 1 },
+    { retry: false, staleTime: 30_000 }
+  );
+  const gdmPatientsCountQuery = trpc.diabetes.registeredPatientsPage.useQuery(
+    { query: "", context: "gdm", offset: 0, limit: 1 },
+    { retry: false, staleTime: 30_000 }
   );
   const selectedPatientRecordQuery =
     trpc.diabetes.registeredPatientRecord.useQuery(
@@ -411,6 +420,14 @@ export default function DiagnosticCamera() {
             language={language}
             t={t}
             patients={patients}
+            selectedPatient={selectedPatient}
+            total={patientsQuery.data?.total ?? patients.length}
+            counts={{
+              all: allPatientsCountQuery.data?.total,
+              type1: type1PatientsCountQuery.data?.total,
+              type2: type2PatientsCountQuery.data?.total,
+              gdm: gdmPatientsCountQuery.data?.total,
+            }}
             loading={patientsQuery.isLoading}
             error={patientsQuery.error}
             search={patientSearch}
@@ -422,6 +439,7 @@ export default function DiagnosticCamera() {
               setSelectedPatientId("");
             }}
             onSelect={setSelectedPatientId}
+            onClear={() => setSelectedPatientId("")}
             onConfirm={confirmPatient}
           />
         ) : (
@@ -502,6 +520,9 @@ function PatientSelector({
   language,
   t,
   patients,
+  selectedPatient,
+  total,
+  counts,
   loading,
   error,
   search,
@@ -510,11 +531,15 @@ function PatientSelector({
   onSearch,
   onContext,
   onSelect,
+  onClear,
   onConfirm,
 }: {
   language: "th" | "en";
   t: (key: string) => string;
   patients: Patient[];
+  selectedPatient?: Patient;
+  total: number;
+  counts: Record<PatientContext, number | undefined>;
   loading: boolean;
   error: unknown;
   search: string;
@@ -523,9 +548,10 @@ function PatientSelector({
   onSearch: (value: string) => void;
   onContext: (value: PatientContext) => void;
   onSelect: (value: string) => void;
+  onClear: () => void;
   onConfirm: () => void;
 }) {
-  const labels: Array<{ value: PatientContext; label: string }> = [
+  const filters: Array<{ value: PatientContext; label: string }> = [
     { value: "all", label: language === "th" ? "ทั้งหมด" : "All" },
     { value: "type1", label: "Type 1" },
     { value: "type2", label: "Type 2" },
@@ -537,183 +563,215 @@ function PatientSelector({
       : language === "th"
         ? "ไม่สามารถเชื่อมต่อฐานข้อมูลได้"
         : "The connected database is unavailable";
+  const selectedName = selectedPatient
+    ? selectedPatient.displayName || selectedPatient.patientCode
+    : null;
+  const selectedType = selectedPatient
+    ? diabetesContext(selectedPatient, language)
+    : null;
+  const selectedAge = selectedPatient
+    ? selectedPatient.age === null
+      ? language === "th"
+        ? "ไม่ระบุอายุ"
+        : "age not recorded"
+      : `${selectedPatient.age} ${language === "th" ? "ปี" : "years"}`
+    : null;
   return (
-    <HeroCard
-      variant="default"
-      className="camera-console-card camera-console-case-gate"
+    <section
+      className="camera-console-stitch-selector"
       aria-labelledby="camera-case-gate-heading"
     >
-      <HeroCard.Header className="camera-console-card-header">
-        <div>
-          <span className="camera-console-phase">CASE GATE / 01</span>
+      <header className="camera-console-stitch-selector-header">
+        <div className="camera-console-stitch-selector-heading">
+          <div className="camera-console-stitch-selector-title-row">
+            <span className="camera-console-stitch-selector-icon">
+              <UserRound aria-hidden="true" />
+            </span>
+            <span className="camera-console-stitch-selector-eyebrow">
+              {language === "th" ? "ระบบคัดเลือกผู้ป่วย" : "PATIENT SELECTION"}
+            </span>
+          </div>
           <h2 id="camera-case-gate-heading">
             {language === "th"
-              ? "เลือกผู้ป่วยก่อนเปิดกล้อง"
-              : "Choose the record before opening the camera"}
+              ? "เลือกผู้ป่วยเบาหวาน"
+              : "Choose a diabetes patient"}
           </h2>
           <p>
             {language === "th"
-              ? "ภาพถ่ายและผลจากโมเดลจะคงอยู่กับระเบียนผู้ป่วยที่ยืนยัน"
-              : "The image and model output stay linked to the patient record you confirm."}
+              ? "แตะเพื่อเลือกผู้ป่วยหนึ่งรายสำหรับบันทึกภาพถ่ายและติดตามการดูแล"
+              : "Tap to choose one patient for wound photography and care follow-up."}
           </p>
         </div>
-        <span className="camera-console-record-count">
-          <Users aria-hidden="true" />{" "}
-          {language === "th"
-            ? `${patients.length} รายการ`
-            : `${patients.length} records`}
-        </span>
-      </HeroCard.Header>
-
-      <HeroCard.Content className="camera-console-case-content">
-        <div className="camera-console-case-tools">
-          <div className="camera-console-search-wrap">
-            <Search aria-hidden="true" />
-            <HeroInput
-              aria-label={
-                language === "th" ? "ค้นหาผู้ป่วย" : "Search patients"
-              }
-              className="camera-console-search-input"
-              variant="secondary"
-              fullWidth
-              value={search}
-              onChange={event => onSearch(event.target.value)}
-              placeholder={
-                language === "th"
-                  ? "ค้นหาชื่อ รหัสผู้ป่วย หรือพื้นที่..."
-                  : "Search name, patient code, or location..."
-              }
-            />
-          </div>
-          <div
-            className="camera-console-filter-row"
-            role="tablist"
-            aria-label={
-              language === "th"
-                ? "ตัวกรองบริบทเบาหวาน"
-                : "Diabetes context filter"
-            }
-          >
-            {labels.map(item => (
-              <button
-                type="button"
-                role="tab"
-                aria-selected={context === item.value}
-                key={item.value}
-                className={context === item.value ? "is-active" : ""}
-                onClick={() => onContext(item.value)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-          <div className="camera-console-case-note">
-            <ShieldCheck aria-hidden="true" />
-            <div>
-              <strong>
-                {language === "th"
-                  ? "เชื่อมข้อมูลอย่างปลอดภัย"
-                  : "Keep evidence connected"}
-              </strong>
-              <span>
-                {language === "th"
-                  ? "ยืนยันผู้ป่วยก่อนเริ่มบันทึกภาพ"
-                  : "Confirm the patient before starting capture."}
-              </span>
-            </div>
-          </div>
+        <div className="camera-console-stitch-selector-privacy">
+          <ShieldCheck aria-hidden="true" />
+          <span>
+            {language === "th"
+              ? "แสดงเฉพาะข้อมูลจำเป็น"
+              : "Only necessary data shown"}
+          </span>
         </div>
+      </header>
 
-        <div className="camera-console-case-results">
-          <div className="camera-console-results-heading">
-            <div>
-              <span className="camera-console-phase">MATCHING PATIENTS</span>
-              <strong>
-                {language === "th"
-                  ? "เลือกผู้ป่วยเพื่อเริ่มต้น"
-                  : "Select a record to begin"}
-              </strong>
-            </div>
+      <div className="camera-console-stitch-selector-tools">
+        <label className="camera-console-stitch-selector-search">
+          <Search aria-hidden="true" />
+          <input
+            type="search"
+            aria-label={language === "th" ? "ค้นหาผู้ป่วย" : "Search patients"}
+            value={search}
+            onChange={event => onSearch(event.target.value)}
+            placeholder={
+              language === "th"
+                ? "ค้นหาด้วยชื่อผู้ป่วย..."
+                : "Search by patient name..."
+            }
+          />
+        </label>
+        <div
+          className="camera-console-stitch-selector-filters"
+          role="tablist"
+          aria-label={
+            language === "th" ? "ตัวกรองประเภทเบาหวาน" : "Diabetes type filter"
+          }
+        >
+          {filters.map(item => (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={context === item.value}
+              key={item.value}
+              className={context === item.value ? "is-active" : ""}
+              onClick={() => onContext(item.value)}
+            >
+              {item.label} <span>({counts[item.value] ?? "—"})</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <main className="camera-console-stitch-selector-list-area">
+        <div className="camera-console-stitch-selector-list-meta">
+          <span>
+            {language === "th"
+              ? "แสดงผลตามเงื่อนไขที่เลือก"
+              : "Showing matches for the selected filters"}
+          </span>
+          <span>
+            {language === "th" ? `${total} รายการ` : `${total} records`}
+          </span>
+        </div>
+        {loading && (
+          <div
+            className="camera-console-stitch-selector-loading"
+            aria-label={t("loading")}
+          >
+            <span />
+            <span />
+            <span />
+          </div>
+        )}
+        {!loading && Boolean(error) && (
+          <div
+            className="camera-console-stitch-selector-empty is-error"
+            role="alert"
+          >
+            <AlertTriangle aria-hidden="true" />
+            <strong>
+              {language === "th"
+                ? "โหลดรายชื่อผู้ป่วยไม่สำเร็จ"
+                : "Patients could not be loaded"}
+            </strong>
+            <p>{errorMessage}</p>
             <small>
               {language === "th"
-                ? `พบ ${patients.length} รายการ`
-                : `${patients.length} records found`}
+                ? "ลองรีเฟรชหรือติดต่อผู้ดูแลระบบท้องถิ่น"
+                : "Try refreshing or contact the local administrator."}
             </small>
           </div>
-          {loading && (
-            <div className="camera-console-patient-loading">
-              <span />
-              <span />
-              <span />
-            </div>
-          )}
-          {!loading && Boolean(error) && (
-            <div className="camera-console-empty is-error" role="alert">
-              <AlertTriangle aria-hidden="true" />
-              <strong>
-                {language === "th"
-                  ? "โหลดรายชื่อผู้ป่วยไม่สำเร็จ"
-                  : "Patients could not be loaded"}
-              </strong>
-              <p>{errorMessage}</p>
-              <small>
-                {language === "th"
-                  ? "ลองรีเฟรชหรือติดต่อผู้ดูแลระบบท้องถิ่น"
-                  : "Try refreshing or contact the local administrator."}
-              </small>
-            </div>
-          )}
-          {!loading && !error && !patients.length && (
-            <div className="camera-console-empty">
-              <Search aria-hidden="true" />
-              <strong>
-                {language === "th" ? "ไม่พบผู้ป่วย" : "No patients found"}
-              </strong>
-              <p>
-                {language === "th"
-                  ? "ลองเปลี่ยนคำค้นหาหรือตัวกรอง"
-                  : "Try a different search term or context filter."}
-              </p>
-            </div>
-          )}
-          {!loading && !error && patients.length > 0 && (
-            <div className="camera-console-patient-list">
-              {patients.map(patient => (
-                <PatientChoice
-                  key={patient.id}
-                  patient={patient}
-                  selected={selectedId === String(patient.id)}
-                  language={language}
-                  onSelect={onSelect}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </HeroCard.Content>
+        )}
+        {!loading && !error && !patients.length && (
+          <div className="camera-console-stitch-selector-empty">
+            <Search aria-hidden="true" />
+            <strong>
+              {language === "th"
+                ? "ไม่พบรายชื่อผู้ป่วยที่ตรงกับการค้นหา"
+                : "No patients match your search"}
+            </strong>
+            <p>
+              {language === "th"
+                ? "ลองเปลี่ยนคำค้นหา หรือเลือกตัวกรองประเภทอื่น"
+                : "Try a different search or diabetes type."}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                onSearch("");
+                onContext("all");
+              }}
+            >
+              {language === "th" ? "ล้างตัวกรองทั้งหมด" : "Clear all filters"}
+            </button>
+          </div>
+        )}
+        {!loading && !error && patients.length > 0 && (
+          <fieldset className="camera-console-stitch-selector-patient-list">
+            <legend className="sr-only">
+              {language === "th"
+                ? "เลือกผู้ป่วยหนึ่งราย"
+                : "Select one patient"}
+            </legend>
+            {patients.map(patient => (
+              <PatientChoice
+                key={patient.id}
+                patient={patient}
+                selected={selectedId === String(patient.id)}
+                language={language}
+                onSelect={onSelect}
+              />
+            ))}
+          </fieldset>
+        )}
+      </main>
 
-      <HeroCard.Footer className="camera-console-case-footer">
-        <span>
-          <HeartPulse aria-hidden="true" />{" "}
-          {language === "th"
-            ? "ผู้เชี่ยวชาญต้องตรวจสอบผลลัพธ์ของโมเดล"
-            : "A qualified clinician verifies model suggestions."}
-        </span>
-        <HeroButton
-          variant="primary"
-          size="lg"
-          className="camera-console-primary-action"
-          onPress={onConfirm}
-          isDisabled={!selectedId || loading || Boolean(error)}
+      <footer className="camera-console-stitch-selector-footer">
+        <div
+          className="camera-console-stitch-selector-selection-status"
+          aria-live="polite"
         >
-          <CheckCircle2 aria-hidden="true" />{" "}
-          {language === "th"
-            ? "ยืนยันผู้ป่วยและไปต่อ"
-            : "Confirm patient and continue"}
-          <ArrowRight aria-hidden="true" />
-        </HeroButton>
-      </HeroCard.Footer>
-    </HeroCard>
+          <span className={selectedId ? "is-selected" : ""} />
+          <span>
+            {selectedName ? (
+              <>
+                <strong>{selectedName}</strong> ({selectedType}, {selectedAge})
+              </>
+            ) : language === "th" ? (
+              "ยังไม่ได้เลือกผู้ป่วย"
+            ) : (
+              "No patient selected"
+            )}
+          </span>
+        </div>
+        <div className="camera-console-stitch-selector-footer-actions">
+          <button
+            type="button"
+            className="camera-console-stitch-selector-clear"
+            onClick={onClear}
+            disabled={!selectedId}
+          >
+            {language === "th" ? "ยกเลิกการเลือก" : "Clear selection"}
+          </button>
+          <button
+            type="button"
+            className="camera-console-stitch-selector-confirm"
+            onClick={onConfirm}
+            disabled={!selectedId || loading || Boolean(error)}
+          >
+            <span>{language === "th" ? "ดำเนินการต่อ" : "Continue"}</span>
+            <ArrowRight aria-hidden="true" />
+          </button>
+        </div>
+      </footer>
+    </section>
   );
 }
 
@@ -728,42 +786,36 @@ function PatientChoice({
   language: "th" | "en";
   onSelect: (id: string) => void;
 }) {
+  const name = patient.displayName || patient.patientCode;
+  const type = diabetesContext(patient, language);
   return (
-    <button
-      type="button"
-      className={`camera-console-patient-choice ${selected ? "is-selected" : ""}`}
-      aria-pressed={selected}
-      onClick={() => onSelect(String(patient.id))}
+    <label
+      className={`camera-console-stitch-selector-patient-row ${selected ? "is-selected" : ""}`}
     >
-      <span className="camera-console-patient-avatar">
-        <UserRound aria-hidden="true" />
-      </span>
-      <span className="camera-console-patient-main">
-        <span className="camera-console-patient-line">
-          <strong>{patient.displayName || patient.patientCode}</strong>
-          {patient.displayName && (
-            <small className="camera-console-patient-code">
-              {patient.patientCode}
-            </small>
-          )}
-        </span>
+      <input
+        type="radio"
+        name="cameraSelectedPatient"
+        value={patient.id}
+        checked={selected}
+        onChange={() => onSelect(String(patient.id))}
+        aria-label={language === "th" ? `เลือก ${name}` : `Select ${name}`}
+      />
+      <span className="camera-console-stitch-selector-patient-copy">
+        <strong>{name}</strong>
         <small>
           {patient.age === null
             ? language === "th"
               ? "อายุไม่ระบุ"
               : "Age not recorded"
-            : `${patient.age} ${language === "th" ? "ปี" : "years"}`}{" "}
-          · {diabetesContext(patient, language)}
+            : `${patient.age} ${language === "th" ? "ปี" : "years"}`}
         </small>
-        <em>
-          {patient.registrationLocation} · {patient.observationCount}{" "}
-          {language === "th" ? "การสังเกต" : "observations"}
-        </em>
       </span>
-      <span className="camera-console-patient-check">
-        {selected ? <CheckCircle2 aria-hidden="true" /> : <span />}
+      <span
+        className={`camera-console-stitch-selector-patient-badge is-${diabetesContextKey(patient)}`}
+      >
+        {type}
       </span>
-    </button>
+    </label>
   );
 }
 
@@ -1397,4 +1449,15 @@ function diabetesContext(
   if (patient.type2) return "Type 2";
   if (patient.gdm) return "GDM";
   return language === "th" ? "ไม่ได้บันทึก" : "Not recorded";
+}
+
+function diabetesContextKey(patient: {
+  type1: number;
+  type2: number;
+  gdm: number;
+}) {
+  if (patient.type1) return "type1";
+  if (patient.type2) return "type2";
+  if (patient.gdm) return "gdm";
+  return "none";
 }
