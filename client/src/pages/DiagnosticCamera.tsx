@@ -9,7 +9,6 @@ import {
   Camera,
   Check,
   ChevronDown,
-  ChevronLeft,
   ChevronUp,
   CircleHelp,
   Database,
@@ -27,7 +26,6 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { Link } from "wouter";
 import { toast } from "sonner";
 import DiagnosticPhotoHistory from "@/components/DiagnosticPhotoHistory";
 import {
@@ -148,6 +146,14 @@ export default function DiagnosticCamera() {
       onConfirm={confirmPatient}
     />
   ) : undefined;
+  const cameraStatusLabel =
+    cameraState === "live"
+      ? t("cameraLive")
+      : cameraState === "starting"
+        ? t("cameraStarting")
+        : cameraState === "error"
+          ? t("cameraPermission")
+          : t("cameraReady");
 
   function updateImageLayout() {
     const image = previewImageRef.current;
@@ -410,38 +416,46 @@ export default function DiagnosticCamera() {
   return (
     <DashboardLayout bottomDock={patientSelectionDock}>
       <div className="camera-console">
-        <header className="camera-console-header">
+        <header className="camera-console-header camera-console-hero">
           <div className="camera-console-title-block">
-            <Link href="/" className="camera-console-back">
-              <ChevronLeft aria-hidden="true" /> {t("overview")}
-            </Link>
-            <div className="camera-console-overline">
-              <span>
-                {language === "th" ? "บันทึกภาพแผล RGB" : "RGB WOUND CAPTURE"}
+            <div className="camera-console-hero-overline">
+              <span className="camera-console-hero-overline-label">
+                DIABCARE WOUNDCAM HUB
               </span>
-              <span className="camera-console-secure-chip">
-                <ShieldCheck aria-hidden="true" />
-                {language === "th" ? "ขอบเขตปลอดภัย" : "Protected boundary"}
+              <span aria-hidden="true">•</span>
+              <span>
+                {language === "th"
+                  ? "คลังภาพถ่ายแผลจากกล้องคลินิก"
+                  : "Clinical camera photo archive"}
               </span>
             </div>
             <h1>
-              {language === "th" ? "ศูนย์บันทึกภาพแผล" : "Wound image capture"}
+              {language === "th"
+                ? "ศูนย์บันทึกภาพแผล (Wound Capture & Assessment Hub)"
+                : "Wound Capture & Assessment Hub"}
             </h1>
             <p>
               {language === "th"
-                ? "เลือกผู้ป่วย ถ่ายภาพแผลที่ชัดเจน แล้วตรวจสอบผลก่อนบันทึก"
-                : "Select the patient, take a clear wound image, and review the result before saving."}
+                ? "เลือกผู้ป่วย ถ่ายภาพแผลด้วยกล้อง DiabCare Cam ให้คมชัด แล้วตรวจสอบผล AI วิเคราะห์ก่อนบันทึกเวชระเบียน"
+                : "Select a patient, capture a clear wound image with DiabCare Cam, then review AI-supported results before saving the record."}
             </p>
-          </div>
-          <div className="camera-console-brand">
-            <img src="/assets/diabcare-logo.jpg" alt="" />
-            <div>
-              <strong>DiabCare Cam</strong>
-              <small>
-                {language === "th" ? "การบันทึกทางคลินิก" : "Clinical capture"}
-              </small>
+            <div className="camera-console-hero-statuses">
+              <span className={`camera-console-hero-status is-${cameraState}`}>
+                <span aria-hidden="true" />
+                {cameraStatusLabel}
+              </span>
+              <span className="camera-console-hero-status is-secure">
+                <ShieldCheck aria-hidden="true" />
+                {language === "th"
+                  ? "ข้อมูลผู้ป่วยอยู่ในขอบเขตปลอดภัย"
+                  : "Protected patient workflow"}
+              </span>
             </div>
           </div>
+          <a href="#capture-history" className="camera-console-hero-action">
+            <RefreshCcw aria-hidden="true" />
+            <span>{t("viewCaptureHistory")}</span>
+          </a>
         </header>
 
         {!workflowStarted ? (
@@ -523,7 +537,7 @@ export default function DiagnosticCamera() {
             onMaskOpacityChange={setMaskOpacity}
           />
         )}
-        <div className="camera-console-history">
+        <div className="camera-console-history" id="capture-history">
           <DiagnosticPhotoHistory />
         </div>
       </div>
@@ -862,7 +876,8 @@ function CollapsedPatientBanner({
                 {selectedType}
               </span>
               <span className="camera-console-stitch-selector-collapsed-hn">
-                <span aria-hidden="true" />HN: {patient.patientCode}
+                <span aria-hidden="true" />
+                HN: {patient.patientCode}
               </span>
             </div>
             <h2>{selectedName}</h2>
@@ -889,7 +904,9 @@ function CollapsedPatientBanner({
         <div className="camera-console-stitch-selector-collapsed-actions">
           <button type="button" onClick={onChangePatient}>
             <RefreshCcw aria-hidden="true" />
-            <span>{language === "th" ? "เปลี่ยนผู้ป่วย" : "Change patient"}</span>
+            <span>
+              {language === "th" ? "เปลี่ยนผู้ป่วย" : "Change patient"}
+            </span>
           </button>
           <button
             type="button"
@@ -915,7 +932,9 @@ function CollapsedPatientBanner({
           </span>
         </div>
         <div>
-          <span>{language === "th" ? "ตัวกรองปัจจุบัน: " : "Current filter: "}</span>
+          <span>
+            {language === "th" ? "ตัวกรองปัจจุบัน: " : "Current filter: "}
+          </span>
           <strong>
             {filterLabel} ({total})
           </strong>
@@ -950,9 +969,19 @@ function PatientSelectionFooter({
 }) {
   const dock = variant === "dock";
   return (
-    <footer className={dock ? "bottom-nav-confirmation" : "camera-console-stitch-selector-footer"}>
+    <footer
+      className={
+        dock
+          ? "bottom-nav-confirmation"
+          : "camera-console-stitch-selector-footer"
+      }
+    >
       <div
-        className={dock ? "bottom-nav-confirmation-status" : "camera-console-stitch-selector-selection-status"}
+        className={
+          dock
+            ? "bottom-nav-confirmation-status"
+            : "camera-console-stitch-selector-selection-status"
+        }
         aria-live="polite"
       >
         <span className={selectedId ? "is-selected" : ""} />
@@ -968,10 +997,20 @@ function PatientSelectionFooter({
           )}
         </span>
       </div>
-      <div className={dock ? "bottom-nav-confirmation-actions" : "camera-console-stitch-selector-footer-actions"}>
+      <div
+        className={
+          dock
+            ? "bottom-nav-confirmation-actions"
+            : "camera-console-stitch-selector-footer-actions"
+        }
+      >
         <button
           type="button"
-          className={dock ? "bottom-nav-confirmation-clear" : "camera-console-stitch-selector-clear"}
+          className={
+            dock
+              ? "bottom-nav-confirmation-clear"
+              : "camera-console-stitch-selector-clear"
+          }
           onClick={onClear}
           disabled={!selectedId}
         >
@@ -979,7 +1018,11 @@ function PatientSelectionFooter({
         </button>
         <button
           type="button"
-          className={dock ? "bottom-nav-confirmation-confirm" : "camera-console-stitch-selector-confirm"}
+          className={
+            dock
+              ? "bottom-nav-confirmation-confirm"
+              : "camera-console-stitch-selector-confirm"
+          }
           onClick={onConfirm}
           disabled={!selectedId || loading || hasError}
         >
