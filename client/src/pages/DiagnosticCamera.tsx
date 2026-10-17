@@ -12,7 +12,6 @@ import {
   ChevronUp,
   CircleHelp,
   Database,
-  FileImage,
   ImagePlus,
   Info,
   Loader2,
@@ -22,14 +21,15 @@ import {
   Sparkles,
   Upload,
   UserRound,
-  Video,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { toast } from "sonner";
 import DiagnosticPhotoHistory from "@/components/DiagnosticPhotoHistory";
+import CameraPreviewFrame, {
+  type CameraPreviewMode,
+} from "@/components/CameraPreviewFrame";
 import {
-  DetectionOverlay,
   InconclusiveInferenceState,
   OverlayControls,
   RegionAnalysisList,
@@ -512,6 +512,7 @@ export default function DiagnosticCamera() {
             selectedPatientRecordError={selectedPatientRecordQuery.error}
             state={state}
             cameraState={cameraState}
+            cameraStatusLabel={cameraStatusLabel}
             cameraError={cameraError}
             previewUrl={previewUrl}
             fileName={fileName}
@@ -1097,6 +1098,7 @@ function CaptureWorkspace({
   selectedPatientRecordError,
   state,
   cameraState,
+  cameraStatusLabel,
   cameraError,
   previewUrl,
   fileName,
@@ -1149,6 +1151,7 @@ function CaptureWorkspace({
   selectedPatientRecordError: unknown;
   state: CaptureState;
   cameraState: CameraState;
+  cameraStatusLabel: string;
   cameraError: string;
   previewUrl: string | null;
   fileName: string;
@@ -1206,30 +1209,30 @@ function CaptureWorkspace({
     selectedPatient?.age === null || selectedPatient?.age === undefined
       ? null
       : `${selectedPatient.age} ${language === "th" ? "ปี" : "years"}`;
-  const previewMode =
+  const previewMode: CameraPreviewMode =
     state === "analyzing"
       ? "processing"
       : inferenceResult
         ? "processed"
         : previewUrl
           ? "captured"
-          : "standby";
-  const previewModeLabel =
-    previewMode === "processed"
-      ? language === "th"
-        ? "ทบทวนผลโมเดล"
-        : "MODEL REVIEW"
-      : previewMode === "processing"
-        ? language === "th"
-          ? "กำลังประมวลผล"
-          : "PROCESSING"
-        : previewMode === "captured"
-          ? language === "th"
-            ? "ภาพพร้อมตรวจสอบ"
-            : "FRAME READY"
-          : language === "th"
-            ? "พร้อมจัดกรอบภาพ"
-            : "FRAME GUIDE";
+          : cameraState === "starting"
+            ? "starting"
+            : cameraState === "live"
+              ? "live"
+              : cameraState === "error"
+                ? "error"
+                : "standby";
+  const previewModeLabelByMode: Record<CameraPreviewMode, string> = {
+    standby: language === "th" ? "พร้อมจัดกรอบภาพ" : "FRAME GUIDE",
+    starting: language === "th" ? "กำลังเปิดกล้อง" : "STARTING CAMERA",
+    live: "AI LIVE ASSIST",
+    error: language === "th" ? "กล้องไม่พร้อมใช้งาน" : "CAMERA ERROR",
+    captured: language === "th" ? "ภาพพร้อมตรวจสอบ" : "FRAME READY",
+    processing: language === "th" ? "กำลังประมวลผล" : "PROCESSING",
+    processed: language === "th" ? "ทบทวนผลโมเดล" : "MODEL REVIEW",
+  };
+  const previewModeLabel = previewModeLabelByMode[previewMode];
 
   return (
     <>
@@ -1329,139 +1332,35 @@ function CaptureWorkspace({
             variant="tertiary"
             className="camera-console-card camera-console-evidence-card"
           >
-          <HeroCard.Content className="camera-console-evidence-content">
-            <div className="camera-console-preview-hud">
-              <div className="camera-console-preview-hud-main">
-                <span className="camera-console-preview-live-badge">
-                  <span aria-hidden="true" />
-                  {cameraState === "live"
-                    ? "AI LIVE ASSIST"
-                    : language === "th"
-                      ? "โหมดตรวจสอบภาพ"
-                      : "IMAGE REVIEW MODE"}
-                </span>
-                <span className="camera-console-preview-file">
-                  <FileImage aria-hidden="true" />
-                  {fileName || t("noImageYet")}
-                </span>
-              </div>
-              <span className="camera-console-preview-ready">
-                <span aria-hidden="true" />
-                {cameraState === "error"
-                  ? t("cameraPermission")
-                  : cameraState === "live"
-                    ? t("cameraLive")
-                    : t("cameraReady")}
-              </span>
-            </div>
-            <div
-              ref={viewportRef}
-              className={`camera-console-viewport ${previewUrl ? "has-preview" : ""} is-${previewMode} ${cameraState === "live" ? "is-live" : ""}`}
-            >
-              <div className="camera-console-viewport-guides" aria-hidden="true">
-                <span className="camera-console-viewport-ruler is-horizontal" />
-                <span className="camera-console-viewport-ruler is-vertical" />
-                <span className="camera-console-viewport-reticle" />
-              </div>
-              {previewUrl && (
-                <div
-                  className={`camera-console-preview-state-chip is-${previewMode}`}
-                  role="status"
-                  aria-live="polite"
-                >
-                  <span aria-hidden="true" />
-                  {previewModeLabel}
-                </div>
-              )}
-              {previewUrl ? (
-                <>
-                  <img
-                    ref={previewImageRef}
-                    src={previewUrl}
-                    alt={t("uploadedWoundImage")}
-                    onLoad={onPreviewImageLoad}
-                  />
-                  {inferenceResult && imageLayout && (
-                    <DetectionOverlay
-                      detections={inferenceResult.detections}
-                      regions={inferenceResult.regions}
-                      layout={imageLayout}
-                      language={language}
-                      showDetectorBoxes={showDetectorBoxes}
-                      showWoundMasks={showWoundMasks}
-                      maskOpacity={maskOpacity}
-                    />
-                  )}
-                  <div className="camera-console-preview-overlay">
-                    <span>
-                      <FileImage aria-hidden="true" /> {fileName}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={onReset}
-                      aria-label={t("removeImage")}
-                    >
-                      <X aria-hidden="true" />
-                    </button>
-                  </div>
-                </>
-              ) : cameraState === "live" || cameraState === "starting" ? (
-                <>
-                  <video
-                    ref={videoRef}
-                    className="camera-console-live-video"
-                    autoPlay
-                    muted
-                    playsInline
-                    aria-label={t("cameraLivePreview")}
-                  />
-                  <div className="camera-console-frame">
-                    <span />
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                  <div className="camera-console-live-label">
-                    <Video aria-hidden="true" />{" "}
-                    {cameraState === "starting"
-                      ? t("cameraStarting")
-                      : t("cameraLive")}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="camera-console-frame">
-                    <span />
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                  <div className="camera-console-empty-camera">
-                    <div className="camera-console-lens">
-                      <Camera aria-hidden="true" />
-                    </div>
-                    <strong>
-                      {cameraState === "error"
-                        ? t("cameraPermission")
-                        : t("positionWound")}
-                    </strong>
-                    <p>
-                      {cameraState === "error"
-                        ? cameraError
-                        : t("positionWoundDetail")}
-                    </p>
-                  </div>
-                  <div
-                    className={`camera-console-camera-status ${cameraState === "error" ? "is-error" : ""}`}
-                  >
-                    <span />{" "}
-                    {cameraState === "error"
-                      ? t("cameraPermission")
-                      : t("cameraReady")}
-                  </div>
-                </>
-              )}
-            </div>
+            <HeroCard.Content className="camera-console-evidence-content">
+              <CameraPreviewFrame
+                mode={previewMode}
+                modeLabel={previewModeLabel}
+                statusLabel={cameraStatusLabel}
+                fileName={fileName}
+                fileNameFallback={t("noImageYet")}
+                previewUrl={previewUrl}
+                previewAlt={t("uploadedWoundImage")}
+                removeImageLabel={t("removeImage")}
+                emptyTitle={t("positionWound")}
+                emptyDetail={t("positionWoundDetail")}
+                errorTitle={t("cameraPermission")}
+                errorDetail={cameraError}
+                liveLabel={t("cameraLive")}
+                startingLabel={t("cameraStarting")}
+                livePreviewLabel={t("cameraLivePreview")}
+                viewportRef={viewportRef}
+                previewImageRef={previewImageRef}
+                videoRef={videoRef}
+                onPreviewImageLoad={onPreviewImageLoad}
+                onReset={onReset}
+                inferenceResult={inferenceResult}
+                imageLayout={imageLayout}
+                language={language}
+                showDetectorBoxes={showDetectorBoxes}
+                showWoundMasks={showWoundMasks}
+                maskOpacity={maskOpacity}
+              />
             {inferenceResult && (
               <OverlayControls
                 language={language}
