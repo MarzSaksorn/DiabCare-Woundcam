@@ -1,21 +1,19 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useIsMobile } from "@/hooks/useMobile";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Bell, Camera, FileText, Languages, LayoutDashboard, LogOut, Settings, UserRound, Users } from "lucide-react";
 import { type ReactNode } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import ReplicaLogin from "./ReplicaLogin";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 
 type DashboardLayoutProps = { children: ReactNode; demoMode?: boolean };
-type NavItem = { path: string; label: string; icon: typeof LayoutDashboard };
+type NavItem = { path: string; label: string; icon: typeof LayoutDashboard; badge?: string };
 
 const navItems: NavItem[] = [
   { path: "/", label: "overview", icon: LayoutDashboard },
   { path: "/patients", label: "patients", icon: Users },
-  { path: "/camera", label: "camera", icon: Camera },
+  { path: "/camera", label: "camera", icon: Camera, badge: "HD" },
   { path: "/reports", label: "reports", icon: FileText },
   { path: "/settings", label: "settings", icon: Settings },
 ];
@@ -29,11 +27,13 @@ function isActivePath(path: string, location: string) {
 export default function DashboardLayout({ children, demoMode = false }: DashboardLayoutProps) {
   const { loading, user, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
+  const [location] = useLocation();
 
   if (loading && !demoMode) return <DashboardLayoutSkeleton />;
   if (!user && !demoMode) return <ReplicaLogin />;
 
   const displayUser = user ?? { name: "Local Clinician", email: "local@diabcare.local" };
+  const displayName = displayUser.name || (language === "th" ? "ผู้ใช้งาน" : "Clinician");
   const dateLabel = new Intl.DateTimeFormat(language === "th" ? "th-TH" : "en-US", {
     weekday: "long",
     day: "numeric",
@@ -43,74 +43,124 @@ export default function DashboardLayout({ children, demoMode = false }: Dashboar
 
   return (
     <div className="app-shell" lang={language === "th" ? "th" : "en"}>
-      <header className="app-header">
-        <div className="app-header-inner">
-          <div className="app-header-brand">
-            <img src="/assets/diabcare-logo.jpg" alt="DiabCare WoundCam" />
-            <div>
-              <p className="app-header-title">DiabCare Dashboard</p>
-              <p className="app-header-date">{dateLabel}</p>
+      <ReplicaSidebarNavigation
+        language={language}
+        location={location}
+        t={t}
+        displayName={displayName}
+        email={displayUser.email ?? ""}
+        canLogout={!demoMode}
+        onLogout={() => void logout()}
+      />
+      <div className="app-workspace">
+        <header className="app-header">
+          <div className="app-header-inner">
+            <div className="app-header-brand">
+              <img src="/assets/diabcare-logo.jpg" alt="DiabCare WoundCam" />
+              <div>
+                <p className="app-header-title">DiabCare Dashboard</p>
+                <p className="app-header-date">{dateLabel}</p>
+              </div>
+            </div>
+            <div className="app-header-actions">
+              <button type="button" className="language-toggle" onClick={() => setLanguage(language === "th" ? "en" : "th")} aria-label={t("language")}>
+                <span className={language === "th" ? "is-active" : ""}>TH</span>
+                <span className={language === "en" ? "is-active" : ""}>EN</span>
+              </button>
+              <button type="button" className="icon-action" aria-label={language === "th" ? "การแจ้งเตือน" : "Notifications"}>
+                <Bell aria-hidden="true" />
+                <span className="notification-dot" aria-hidden="true" />
+              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button type="button" className="profile-action" aria-label={displayName}>
+                    <UserRound aria-hidden="true" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem disabled className="flex-col items-start gap-1">
+                    <span className="font-semibold">{displayName}</span>
+                    <span className="text-xs text-slate-400">{displayUser.email}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage(language === "th" ? "en" : "th")} className="cursor-pointer">
+                    <Languages className="mr-2 h-4 w-4" /> {t("language")}
+                  </DropdownMenuItem>
+                  {!demoMode && <DropdownMenuItem onClick={() => void logout()} className="cursor-pointer text-rose-600 focus:text-rose-600"><LogOut className="mr-2 h-4 w-4" /> {t("signOut")}</DropdownMenuItem>}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
-          <div className="app-header-actions">
-            <button type="button" className="language-toggle" onClick={() => setLanguage(language === "th" ? "en" : "th")} aria-label={t("language")}>
-              <span className={language === "th" ? "is-active" : ""}>TH</span>
-              <span className={language === "en" ? "is-active" : ""}>EN</span>
-            </button>
-            <button type="button" className="icon-action" aria-label={language === "th" ? "การแจ้งเตือน" : "Notifications"}>
-              <Bell aria-hidden="true" />
-              <span className="notification-dot" aria-hidden="true" />
-            </button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button type="button" className="profile-action" aria-label={displayUser.name ?? "Profile"}>
-                  <UserRound aria-hidden="true" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem disabled className="flex-col items-start gap-1">
-                  <span className="font-semibold">{displayUser.name}</span>
-                  <span className="text-xs text-slate-400">{displayUser.email}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage(language === "th" ? "en" : "th")} className="cursor-pointer">
-                  <Languages className="mr-2 h-4 w-4" /> {t("language")}
-                </DropdownMenuItem>
-                {!demoMode && <DropdownMenuItem onClick={() => void logout()} className="cursor-pointer text-rose-600 focus:text-rose-600"><LogOut className="mr-2 h-4 w-4" /> {t("signOut")}</DropdownMenuItem>}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </header>
-
-      <main className="mobile-content">{children}</main>
-      <ReplicaBottomNavigation />
+        </header>
+        <main className="mobile-content">{children}</main>
+        <ReplicaBottomNavigation language={language} location={location} t={t} />
+      </div>
     </div>
   );
 }
 
-function ReplicaBottomNavigation() {
-  const [location, setLocation] = useLocation();
-  const { t } = useLanguage();
-  const isMobile = useIsMobile();
-
+function ReplicaSidebarNavigation({ language, location, t, displayName, email, canLogout, onLogout }: {
+  language: "en" | "th";
+  location: string;
+  t: (key: string) => string;
+  displayName: string;
+  email: string;
+  canLogout: boolean;
+  onLogout: () => void;
+}) {
   return (
-    <nav className={`bottom-nav ${isMobile ? "is-mobile" : ""}`} aria-label="Primary navigation">
+    <aside className="landscape-sidebar" aria-label={language === "th" ? "เมนูหลัก" : "Main navigation"}>
+      <div>
+        <div className="landscape-sidebar-brand">
+          <span className="landscape-sidebar-brand-mark"><Camera aria-hidden="true" /></span>
+          <div><strong>DiabCare</strong><span>WoundCam Clinic</span></div>
+        </div>
+        <nav className="landscape-sidebar-nav" aria-label={language === "th" ? "เมนูหลัก" : "Main navigation"}>
+          {navItems.map(({ path, label, icon: Icon, badge }) => {
+            const active = isActivePath(path, location);
+            return (
+              <Link key={path} href={path} className={`landscape-sidebar-nav-item ${active ? "is-active" : ""}`} aria-current={active ? "page" : undefined}>
+                <Icon aria-hidden="true" />
+                <span className="landscape-sidebar-nav-label">{t(label)}</span>
+                {badge && <span className="landscape-sidebar-nav-badge">{badge}</span>}
+                {active && <span className="landscape-sidebar-nav-dot" aria-hidden="true" />}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+      <div className="landscape-sidebar-profile">
+        <div className="landscape-sidebar-profile-main">
+          <span className="landscape-sidebar-avatar">{userInitials(displayName)}<span aria-hidden="true" /></span>
+          <div><strong>{displayName}</strong><small>{email}</small></div>
+        </div>
+        {canLogout && (
+          <button type="button" className="landscape-sidebar-logout" onClick={onLogout} aria-label={language === "th" ? "ออกจากระบบ" : "Sign out"} title={language === "th" ? "ออกจากระบบ" : "Sign out"}>
+            <LogOut aria-hidden="true" />
+          </button>
+        )}
+      </div>
+    </aside>
+  );
+}
+
+function ReplicaBottomNavigation({ language, location, t }: { language: "en" | "th"; location: string; t: (key: string) => string }) {
+  return (
+    <nav className="bottom-nav" aria-label={language === "th" ? "เมนูหลัก" : "Primary navigation"}>
       {navItems.map(({ path, label, icon: Icon }) => {
         const active = isActivePath(path, location);
         const center = path === "/camera";
         return (
-          <button
-            key={path}
-            type="button"
-            className={`bottom-nav-item ${center ? "is-camera" : ""} ${active ? "is-active" : ""}`}
-            onClick={() => setLocation(path)}
-            aria-current={active ? "page" : undefined}
-          >
+          <Link key={path} href={path} className={`bottom-nav-item ${center ? "is-camera" : ""} ${active ? "is-active" : ""}`} aria-current={active ? "page" : undefined}>
             <span className="bottom-nav-icon"><Icon aria-hidden="true" /></span>
             <span>{t(label)}</span>
-          </button>
+          </Link>
         );
       })}
     </nav>
   );
+}
+
+function userInitials(name: string) {
+  const trimmed = name.trim();
+  return trimmed ? trimmed.slice(0, 2) : "?";
 }
