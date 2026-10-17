@@ -1384,6 +1384,7 @@
 /* The inference component keeps its data and accessibility behavior. These styles only change its placement in the console rail. */
 .camera-console .replica-camera-overlay-controls {
   display: grid;
+  min-width: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px 12px;
   margin: 0 0 14px;
@@ -1395,8 +1396,11 @@
 }
 
 .camera-console .replica-camera-overlay-controls legend {
+  display: block;
   grid-column: 1 / -1;
-  padding: 0 4px;
+  width: 100%;
+  margin: 0 0 2px;
+  padding: 0;
   color: var(--console-blue-dark);
   font-size: 13px;
   font-weight: 700;
