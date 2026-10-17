@@ -4825,3 +4825,99 @@
     transition: none;
   }
 }
+
+
+/* Responsive section-width correction */
+.camera-console {
+  container-type: inline-size;
+}
+
+.camera-console .camera-console-stitch-selector,
+.camera-console .camera-console-stitch-selector-collapsed,
+.camera-console .camera-console-history {
+  width: 100%;
+  max-width: none;
+}
+
+.camera-console .camera-console-workspace {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+}
+
+@container (max-width: 1120px) {
+  .camera-console .camera-console-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .camera-console .camera-history-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .camera-console .camera-history-filter-status {
+    grid-column: span 2;
+  }
+}
+
+@container (max-width: 760px) {
+  .camera-console .camera-console-stitch-selector-header,
+  .camera-console .camera-console-stitch-selector-tools,
+  .camera-console .camera-console-stitch-selector-list-area,
+  .camera-console .camera-console-stitch-selector-footer {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .camera-console .camera-console-stitch-selector-tools {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .camera-console .camera-console-stitch-selector-search,
+  .camera-console .camera-console-stitch-selector-filters {
+    flex: none;
+    width: 100%;
+  }
+
+  .camera-console .camera-history-command {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .camera-console .camera-history-refresh {
+    align-self: flex-start;
+  }
+}
+
+@container (max-width: 540px) {
+  .camera-console .camera-console-stitch-selector-header {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .camera-console .camera-console-stitch-selector-privacy {
+    display: none;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer-actions {
+    width: 100%;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer-actions button {
+    flex: 1;
+  }
+
+  .camera-console .camera-history-summary,
+  .camera-console .camera-history-filters,
+  .camera-console .camera-history-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-console .camera-history-summary-card-wide,
+  .camera-console .camera-history-filter-status {
+    grid-column: auto;
+  }
+}
