@@ -1218,12 +1218,12 @@ function CaptureWorkspace({
 
       <div className="camera-console-workspace">
         <section
-          className="camera-console-capture-column"
+          className="camera-console-preview-column"
           aria-labelledby="camera-console-capture-heading"
         >
-          <div className="camera-console-section-heading">
-            <div className="camera-console-section-heading-main">
-              <div className="camera-console-section-title-row">
+          <div className="camera-console-preview-section-heading">
+            <div>
+              <div className="camera-console-preview-title-row">
                 <span className="camera-console-phase">CAPTURE / 02</span>
                 <span aria-hidden="true" />
                 <h2 id="camera-console-capture-heading">
@@ -1273,248 +1273,235 @@ function CaptureWorkspace({
             variant="tertiary"
             className="camera-console-card camera-console-evidence-card"
           >
-            <HeroCard.Content className="camera-console-evidence-content">
-              <div className="camera-console-viewport-hud">
-                <div className="camera-console-viewport-hud-left">
-                  <span className="camera-console-viewport-live-badge">
-                    <span aria-hidden="true" />
-                    {cameraState === "live"
-                      ? language === "th"
-                        ? "AI LIVE ASSIST"
-                        : "AI LIVE ASSIST"
-                      : language === "th"
-                        ? "โหมดตรวจสอบภาพ"
-                        : "IMAGE REVIEW MODE"}
-                  </span>
-                  <span className="camera-console-viewport-file">
-                    <FileImage aria-hidden="true" />
-                    {fileName || t("noImageYet")}
-                  </span>
-                </div>
-                <div className="camera-console-viewport-hud-right">
-                  <span>
-                    {language === "th" ? "การตรวจสอบภายใน" : "LOCAL REVIEW"}
-                  </span>
-                  <span className="camera-console-viewport-ready">
-                    <span aria-hidden="true" />
-                    {cameraState === "error"
-                      ? t("cameraPermission")
-                      : cameraState === "live"
-                        ? t("cameraLive")
-                        : t("cameraReady")}
-                  </span>
-                </div>
+          <HeroCard.Content className="camera-console-evidence-content">
+            <div className="camera-console-preview-hud">
+              <div className="camera-console-preview-hud-main">
+                <span className="camera-console-preview-live-badge">
+                  <span aria-hidden="true" />
+                  {cameraState === "live"
+                    ? "AI LIVE ASSIST"
+                    : language === "th"
+                      ? "โหมดตรวจสอบภาพ"
+                      : "IMAGE REVIEW MODE"}
+                </span>
+                <span className="camera-console-preview-file">
+                  <FileImage aria-hidden="true" />
+                  {fileName || t("noImageYet")}
+                </span>
               </div>
-              <div
-                ref={viewportRef}
-                className={`camera-console-viewport ${previewUrl ? "has-preview" : ""} ${cameraState === "live" ? "is-live" : ""}`}
-              >
-                {previewUrl ? (
-                  <>
-                    <img
-                      ref={previewImageRef}
-                      src={previewUrl}
-                      alt={t("uploadedWoundImage")}
-                      onLoad={onPreviewImageLoad}
+              <span className="camera-console-preview-ready">
+                <span aria-hidden="true" />
+                {cameraState === "error"
+                  ? t("cameraPermission")
+                  : cameraState === "live"
+                    ? t("cameraLive")
+                    : t("cameraReady")}
+              </span>
+            </div>
+            <div
+              ref={viewportRef}
+              className={`camera-console-viewport ${previewUrl ? "has-preview" : ""} ${cameraState === "live" ? "is-live" : ""}`}
+            >
+              {previewUrl ? (
+                <>
+                  <img
+                    ref={previewImageRef}
+                    src={previewUrl}
+                    alt={t("uploadedWoundImage")}
+                    onLoad={onPreviewImageLoad}
+                  />
+                  {inferenceResult && imageLayout && (
+                    <DetectionOverlay
+                      detections={inferenceResult.detections}
+                      regions={inferenceResult.regions}
+                      layout={imageLayout}
+                      language={language}
+                      showDetectorBoxes={showDetectorBoxes}
+                      showWoundMasks={showWoundMasks}
+                      maskOpacity={maskOpacity}
                     />
-                    {inferenceResult && imageLayout && (
-                      <DetectionOverlay
-                        detections={inferenceResult.detections}
-                        regions={inferenceResult.regions}
-                        layout={imageLayout}
-                        language={language}
-                        showDetectorBoxes={showDetectorBoxes}
-                        showWoundMasks={showWoundMasks}
-                        maskOpacity={maskOpacity}
-                      />
-                    )}
-                    <div className="camera-console-preview-overlay">
-                      <span>
-                        <FileImage aria-hidden="true" /> {fileName}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={onReset}
-                        aria-label={t("removeImage")}
-                      >
-                        <X aria-hidden="true" />
-                      </button>
-                    </div>
-                  </>
-                ) : cameraState === "live" || cameraState === "starting" ? (
-                  <>
-                    <video
-                      ref={videoRef}
-                      className="camera-console-live-video"
-                      autoPlay
-                      muted
-                      playsInline
-                      aria-label={t("cameraLivePreview")}
-                    />
-                    <div className="camera-console-frame">
-                      <span />
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                    <div className="camera-console-live-label">
-                      <Video aria-hidden="true" />{" "}
-                      {cameraState === "starting"
-                        ? t("cameraStarting")
-                        : t("cameraLive")}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="camera-console-frame">
-                      <span />
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                    <div className="camera-console-empty-camera">
-                      <div className="camera-console-lens">
-                        <Camera aria-hidden="true" />
-                      </div>
-                      <strong>
-                        {cameraState === "error"
-                          ? t("cameraPermission")
-                          : t("positionWound")}
-                      </strong>
-                      <p>
-                        {cameraState === "error"
-                          ? cameraError
-                          : t("positionWoundDetail")}
-                      </p>
-                    </div>
-                    <div
-                      className={`camera-console-camera-status ${cameraState === "error" ? "is-error" : ""}`}
+                  )}
+                  <div className="camera-console-preview-overlay">
+                    <span>
+                      <FileImage aria-hidden="true" /> {fileName}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={onReset}
+                      aria-label={t("removeImage")}
                     >
-                      <span />{" "}
+                      <X aria-hidden="true" />
+                    </button>
+                  </div>
+                </>
+              ) : cameraState === "live" || cameraState === "starting" ? (
+                <>
+                  <video
+                    ref={videoRef}
+                    className="camera-console-live-video"
+                    autoPlay
+                    muted
+                    playsInline
+                    aria-label={t("cameraLivePreview")}
+                  />
+                  <div className="camera-console-frame">
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className="camera-console-live-label">
+                    <Video aria-hidden="true" />{" "}
+                    {cameraState === "starting"
+                      ? t("cameraStarting")
+                      : t("cameraLive")}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="camera-console-frame">
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className="camera-console-empty-camera">
+                    <div className="camera-console-lens">
+                      <Camera aria-hidden="true" />
+                    </div>
+                    <strong>
                       {cameraState === "error"
                         ? t("cameraPermission")
-                        : t("cameraReady")}
-                    </div>
-                  </>
-                )}
-              </div>
-              {inferenceResult && (
-                <OverlayControls
-                  language={language}
-                  showDetectorBoxes={showDetectorBoxes}
-                  showWoundMasks={showWoundMasks}
-                  maskOpacity={maskOpacity}
-                  hasMasks={inferenceResult.regions.some(
-                    region => region.segmentation.status === "ok"
-                  )}
-                  onShowDetectorBoxesChange={onShowDetectorBoxesChange}
-                  onShowWoundMasksChange={onShowWoundMasksChange}
-                  onMaskOpacityChange={onMaskOpacityChange}
-                />
+                        : t("positionWound")}
+                    </strong>
+                    <p>
+                      {cameraState === "error"
+                        ? cameraError
+                        : t("positionWoundDetail")}
+                    </p>
+                  </div>
+                  <div
+                    className={`camera-console-camera-status ${cameraState === "error" ? "is-error" : ""}`}
+                  >
+                    <span />{" "}
+                    {cameraState === "error"
+                      ? t("cameraPermission")
+                      : t("cameraReady")}
+                  </div>
+                </>
               )}
-              {cameraError && cameraState !== "error" && (
-                <div className="camera-console-error" role="alert">
-                  <Info aria-hidden="true" />
-                  <span>{cameraError}</span>
-                </div>
-              )}
-              <canvas ref={canvasRef} className="sr-only" aria-hidden="true" />
-              <div className="camera-console-actions">
-                <input
-                  ref={inputRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="sr-only"
-                  onChange={event => onFile(event.target.files?.[0])}
-                />
-                {previewUrl ? (
-                  <>
-                    <Button
-                      onClick={onReset}
-                      variant="outline"
-                      className="camera-console-secondary-action"
-                    >
-                      <RefreshCcw aria-hidden="true" /> {t("retake")}
-                    </Button>
-                    <Button
-                      onClick={onReview}
-                      disabled={state === "analyzing"}
-                      className="camera-console-primary-action"
-                    >
-                      {state === "analyzing" ? (
-                        <>
-                          <Loader2
-                            className="animate-spin"
-                            aria-hidden="true"
-                          />{" "}
-                          {t("preparing")}
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles aria-hidden="true" /> {t("reviewImage")}
-                        </>
-                      )}
-                    </Button>
-                  </>
-                ) : cameraState === "live" ? (
-                  <>
-                    <HeroButton
-                      variant="primary"
-                      size="lg"
-                      className="camera-console-primary-action"
-                      onPress={onCapture}
-                    >
-                      <Camera aria-hidden="true" /> {t("capturePhoto")}
-                    </HeroButton>
-                    <Button
-                      onClick={onStopCamera}
-                      variant="outline"
-                      className="camera-console-secondary-action"
-                    >
-                      <X aria-hidden="true" /> {t("stopCamera")}
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <HeroButton
-                      variant="primary"
-                      size="lg"
-                      className="camera-console-primary-action"
-                      onPress={onStartCamera}
-                      isDisabled={cameraState === "starting"}
-                    >
-                      {cameraState === "starting" ? (
-                        <>
-                          <Loader2
-                            className="animate-spin"
-                            aria-hidden="true"
-                          />{" "}
-                          {t("cameraStarting")}
-                        </>
-                      ) : (
-                        <>
-                          <Camera aria-hidden="true" /> {t("openCamera")}
-                        </>
-                      )}
-                    </HeroButton>
-                    <Button
-                      onClick={() => inputRef.current?.click()}
-                      variant="outline"
-                      className="camera-console-secondary-action"
-                      aria-label={t("uploadImage")}
-                    >
-                      <Upload aria-hidden="true" /> {t("uploadImage")}
-                    </Button>
-                  </>
+            </div>
+            {inferenceResult && (
+              <OverlayControls
+                language={language}
+                showDetectorBoxes={showDetectorBoxes}
+                showWoundMasks={showWoundMasks}
+                maskOpacity={maskOpacity}
+                hasMasks={inferenceResult.regions.some(
+                  region => region.segmentation.status === "ok"
                 )}
+                onShowDetectorBoxesChange={onShowDetectorBoxesChange}
+                onShowWoundMasksChange={onShowWoundMasksChange}
+                onMaskOpacityChange={onMaskOpacityChange}
+              />
+            )}
+            {cameraError && cameraState !== "error" && (
+              <div className="camera-console-error" role="alert">
+                <Info aria-hidden="true" />
+                <span>{cameraError}</span>
               </div>
-              <p className="camera-console-privacy">
-                <ShieldCheck aria-hidden="true" /> {t("imagePrivacy")}
-              </p>
-            </HeroCard.Content>
-          </HeroCard>
-          <div className="camera-console-clinical-note">
+            )}
+            <canvas ref={canvasRef} className="sr-only" aria-hidden="true" />
+            <div className="camera-console-actions">
+              <input
+                ref={inputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="sr-only"
+                onChange={event => onFile(event.target.files?.[0])}
+              />
+              {previewUrl ? (
+                <>
+                  <Button
+                    onClick={onReset}
+                    variant="outline"
+                    className="camera-console-secondary-action"
+                  >
+                    <RefreshCcw aria-hidden="true" /> {t("retake")}
+                  </Button>
+                  <Button
+                    onClick={onReview}
+                    disabled={state === "analyzing"}
+                    className="camera-console-primary-action"
+                  >
+                    {state === "analyzing" ? (
+                      <>
+                        <Loader2 className="animate-spin" aria-hidden="true" />{" "}
+                        {t("preparing")}
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles aria-hidden="true" /> {t("reviewImage")}
+                      </>
+                    )}
+                  </Button>
+                </>
+              ) : cameraState === "live" ? (
+                <>
+                  <HeroButton
+                    variant="primary"
+                    size="lg"
+                    className="camera-console-primary-action"
+                    onPress={onCapture}
+                  >
+                    <Camera aria-hidden="true" /> {t("capturePhoto")}
+                  </HeroButton>
+                  <Button
+                    onClick={onStopCamera}
+                    variant="outline"
+                    className="camera-console-secondary-action"
+                  >
+                    <X aria-hidden="true" /> {t("stopCamera")}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <HeroButton
+                    variant="primary"
+                    size="lg"
+                    className="camera-console-primary-action"
+                    onPress={onStartCamera}
+                    isDisabled={cameraState === "starting"}
+                  >
+                    {cameraState === "starting" ? (
+                      <>
+                        <Loader2 className="animate-spin" aria-hidden="true" />{" "}
+                        {t("cameraStarting")}
+                      </>
+                    ) : (
+                      <>
+                        <Camera aria-hidden="true" /> {t("openCamera")}
+                      </>
+                    )}
+                  </HeroButton>
+                  <Button
+                    onClick={() => inputRef.current?.click()}
+                    variant="outline"
+                    className="camera-console-secondary-action"
+                    aria-label={t("uploadImage")}
+                  >
+                    <Upload aria-hidden="true" /> {t("uploadImage")}
+                  </Button>
+                </>
+              )}
+            </div>
+            <p className="camera-console-privacy">
+              <ShieldCheck aria-hidden="true" /> {t("imagePrivacy")}
+            </p>
+          </HeroCard.Content>
+        </HeroCard>
+          <div className="camera-console-preview-clinical-note">
             <Info aria-hidden="true" />
             <span>
               <strong>
@@ -1527,43 +1514,40 @@ function CaptureWorkspace({
           </div>
         </section>
 
-        <section
-          className="camera-console-review-column"
+        <aside
+          className="camera-console-review-rail"
           aria-labelledby="camera-console-review-heading"
         >
-          <div className="camera-console-section-heading">
-            <div className="camera-console-section-heading-main">
-              <div className="camera-console-section-title-row">
+          <HeroCard
+            variant="default"
+            className="camera-console-card camera-console-review-card"
+          >
+            <HeroCard.Header className="camera-console-card-header camera-console-review-header">
+              <div>
                 <span className="camera-console-phase">REVIEW / 03</span>
-                <span aria-hidden="true" />
                 <h2 id="camera-console-review-heading">
                   {language === "th"
                     ? "ตรวจสอบก่อนบันทึก"
                     : "Review before save"}
                 </h2>
+                <p>
+                  {language === "th"
+                    ? "ผลลัพธ์ช่วยตัดสินใจเท่านั้น บุคลากรต้องยืนยัน"
+                    : "Decision support only. A qualified clinician verifies the result."}
+                </p>
               </div>
-              <p>
-                {language === "th"
-                  ? "ผลลัพธ์ช่วยตัดสินใจเท่านั้น บุคลากรต้องยืนยัน"
-                  : "Decision support only. A qualified clinician verifies the result."}
-              </p>
-            </div>
-            <span
-              className={`camera-console-review-section-status camera-console-review-${reviewState}`}
-            >
-              {reviewState === "ready"
-                ? t("ready")
-                : reviewState === "analyzing"
-                  ? t("preparingReview")
-                  : reviewState === "captured"
-                    ? t("imageReady")
-                    : t("waiting")}
-            </span>
-          </div>
-          <HeroCard
-            variant="default"
-            className="camera-console-card camera-console-review-card"
-          >
+              <span
+                className={`camera-console-review-state camera-console-review-${reviewState}`}
+              >
+                {reviewState === "ready"
+                  ? t("ready")
+                  : reviewState === "analyzing"
+                    ? t("preparingReview")
+                    : reviewState === "captured"
+                      ? t("imageReady")
+                      : t("waiting")}
+              </span>
+            </HeroCard.Header>
             <HeroCard.Content className="camera-console-review-content">
               <div
                 className={`camera-console-review-empty camera-console-review-empty-${reviewState}`}
@@ -1654,7 +1638,7 @@ function CaptureWorkspace({
               )}
             </HeroCard.Content>
           </HeroCard>
-        </section>
+        </aside>
       </div>
     </>
   );

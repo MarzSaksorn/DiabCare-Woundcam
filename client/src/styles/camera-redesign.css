@@ -4923,16 +4923,15 @@
 }
 
 
-/* Stitch v11 diagnostic body */
-.camera-console .camera-console-capture-column,
-.camera-console .camera-console-review-column {
+/* Stitch camera preview zone only */
+.camera-console .camera-console-preview-column {
   display: flex;
   min-width: 0;
   flex-direction: column;
   gap: 12px;
 }
 
-.camera-console .camera-console-section-heading {
+.camera-console .camera-console-preview-section-heading {
   display: flex;
   min-width: 0;
   align-items: flex-start;
@@ -4941,18 +4940,18 @@
   padding: 0 1px 2px;
 }
 
-.camera-console .camera-console-section-heading-main {
+.camera-console .camera-console-preview-section-heading > div:first-child {
   min-width: 0;
 }
 
-.camera-console .camera-console-section-title-row {
+.camera-console .camera-console-preview-title-row {
   display: flex;
   min-width: 0;
   align-items: center;
   gap: 8px;
 }
 
-.camera-console .camera-console-section-title-row > span[aria-hidden="true"] {
+.camera-console .camera-console-preview-title-row > span[aria-hidden="true"] {
   width: 6px;
   height: 6px;
   flex: 0 0 auto;
@@ -4960,7 +4959,7 @@
   background: #cbd5e1;
 }
 
-.camera-console .camera-console-section-title-row h2 {
+.camera-console .camera-console-preview-title-row h2 {
   min-width: 0;
   margin: 0;
   overflow: hidden;
@@ -4974,7 +4973,7 @@
   white-space: nowrap;
 }
 
-.camera-console .camera-console-section-heading-main > p {
+.camera-console .camera-console-preview-section-heading p {
   margin: 3px 0 0;
   color: #64748b;
   font-family: "Sarabun", sans-serif;
@@ -4982,7 +4981,7 @@
   line-height: 1.45;
 }
 
-.camera-console .camera-console-section-heading .camera-console-phase {
+.camera-console .camera-console-preview-section-heading .camera-console-phase {
   flex: 0 0 auto;
   color: #94a3b8;
   font-family: "JetBrains Mono", monospace;
@@ -4990,7 +4989,7 @@
   letter-spacing: 0.08em;
 }
 
-.camera-console .camera-console-capture-column .camera-console-help {
+.camera-console .camera-console-preview-column .camera-console-help {
   width: 38px;
   height: 38px;
   border-color: #cbd5e1;
@@ -4999,29 +4998,25 @@
   color: #64748b;
 }
 
-.camera-console .camera-console-capture-column .camera-console-help:hover {
+.camera-console .camera-console-preview-column .camera-console-help:hover {
   border-color: #93c5fd;
   background: #eff6ff;
   color: #0a4fbe;
 }
 
-.camera-console .camera-console-evidence-card,
-.camera-console .camera-console-review-card {
+.camera-console .camera-console-preview-column .camera-console-evidence-card {
   width: 100%;
   min-width: 0;
   margin: 0;
-}
-
-.camera-console .camera-console-evidence-card {
   overflow: hidden;
   border-radius: 10px !important;
 }
 
-.camera-console .camera-console-evidence-content {
+.camera-console .camera-console-preview-column .camera-console-evidence-content {
   padding: 0 16px 16px !important;
 }
 
-.camera-console .camera-console-viewport-hud {
+.camera-console .camera-console-preview-hud {
   display: flex;
   min-width: 0;
   align-items: center;
@@ -5037,22 +5032,15 @@
   line-height: 1.35;
 }
 
-.camera-console .camera-console-viewport-hud-left,
-.camera-console .camera-console-viewport-hud-right {
+.camera-console .camera-console-preview-hud-main {
   display: flex;
   min-width: 0;
   align-items: center;
   gap: 10px;
 }
 
-.camera-console .camera-console-viewport-hud-right {
-  flex: 0 0 auto;
-  color: #94a3b8;
-  text-align: right;
-}
-
-.camera-console .camera-console-viewport-live-badge,
-.camera-console .camera-console-viewport-ready {
+.camera-console .camera-console-preview-live-badge,
+.camera-console .camera-console-preview-ready {
   display: inline-flex;
   min-height: 24px;
   align-items: center;
@@ -5065,15 +5053,15 @@
   white-space: nowrap;
 }
 
-.camera-console .camera-console-viewport-live-badge > span,
-.camera-console .camera-console-viewport-ready > span {
+.camera-console .camera-console-preview-live-badge > span,
+.camera-console .camera-console-preview-ready > span {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: #60a5fa;
 }
 
-.camera-console .camera-console-viewport-file {
+.camera-console .camera-console-preview-file {
   display: inline-flex;
   min-width: 0;
   align-items: center;
@@ -5084,35 +5072,36 @@
   white-space: nowrap;
 }
 
-.camera-console .camera-console-viewport-file svg {
+.camera-console .camera-console-preview-file svg {
   width: 14px;
   height: 14px;
   flex: 0 0 auto;
   color: #94a3b8;
 }
 
-.camera-console .camera-console-viewport-ready {
+.camera-console .camera-console-preview-ready {
+  flex: 0 0 auto;
   border-color: rgba(52, 211, 153, 0.3);
   background: rgba(16, 185, 129, 0.12);
   color: #6ee7b7;
 }
 
-.camera-console .camera-console-viewport-ready > span {
+.camera-console .camera-console-preview-ready > span {
   background: #34d399;
 }
 
-.camera-console .camera-console-viewport {
+.camera-console .camera-console-preview-column .camera-console-viewport {
   aspect-ratio: 4 / 3;
   min-height: 0;
   border-radius: 0;
 }
 
-.camera-console .camera-console-viewport img,
-.camera-console .camera-console-live-video {
+.camera-console .camera-console-preview-column .camera-console-viewport img,
+.camera-console .camera-console-preview-column .camera-console-live-video {
   min-height: 0;
 }
 
-.camera-console .camera-console-clinical-note {
+.camera-console .camera-console-preview-clinical-note {
   display: flex;
   min-width: 0;
   align-items: flex-start;
@@ -5127,7 +5116,7 @@
   line-height: 1.5;
 }
 
-.camera-console .camera-console-clinical-note > svg {
+.camera-console .camera-console-preview-clinical-note > svg {
   width: 16px;
   height: 16px;
   flex: 0 0 auto;
@@ -5135,149 +5124,33 @@
   color: #2563eb;
 }
 
-.camera-console .camera-console-clinical-note strong {
+.camera-console .camera-console-preview-clinical-note strong {
   font-weight: 700;
 }
 
-.camera-console .camera-console-review-column .camera-console-section-heading {
-  align-items: center;
-}
-
-.camera-console .camera-console-review-section-status {
-  display: inline-flex;
-  min-height: 26px;
-  flex: 0 0 auto;
-  align-items: center;
-  border: 1px solid #bbf7d0;
-  border-radius: 5px;
-  background: #ecfdf5;
-  padding: 0 8px;
-  color: #047857;
-  font-family: "Sarabun", sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.camera-console .camera-console-review-section-status.camera-console-review-waiting {
-  border-color: #e2e8f0;
-  background: #f8fafc;
-  color: #64748b;
-}
-
-.camera-console .camera-console-review-section-status.camera-console-review-analyzing {
-  border-color: #bae6fd;
-  background: #ecfeff;
-  color: #0e7490;
-}
-
-.camera-console .camera-console-review-section-status.camera-console-review-captured {
-  border-color: #fde68a;
-  background: #fffbeb;
-  color: #b45309;
-}
-
-.camera-console .camera-console-review-card {
-  overflow: hidden;
-  border-radius: 10px !important;
-}
-
-.camera-console .camera-console-review-content {
-  padding: 16px !important;
-}
-
-.camera-console .camera-console-review-empty {
-  min-height: 138px;
-  margin: 0 0 12px;
-  border-style: solid;
-  border-color: #dbeafe;
-  border-radius: 8px;
-  background: #f8fbff;
-  padding: 16px;
-}
-
-.camera-console .camera-console-review-empty svg {
-  width: 34px;
-  height: 34px;
-}
-
-.camera-console .camera-console-review-empty strong {
-  margin-top: 8px;
-  font-family: "Prompt", "Sarabun", sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.camera-console .camera-console-review-empty p {
-  max-width: 420px;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.camera-console .camera-console-inference {
-  border-color: #bfdbfe;
-  border-radius: 9px;
-  background: linear-gradient(110deg, #eff6ff, #eef2ff);
-  padding: 14px;
-}
-
-.camera-console .camera-console-inference > strong {
-  font-family: "Prompt", "Sarabun", sans-serif;
-  font-size: 21px;
-}
-
-.camera-console .camera-console-assignment {
-  border-radius: 9px;
-  background: #ffffff;
-  padding: 14px;
-}
-
-@container (min-width: 860px) {
-  .camera-console .camera-console-workspace {
-    grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
-  }
-}
-
-@container (max-width: 859px) {
-  .camera-console .camera-console-workspace {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 @container (max-width: 640px) {
-  .camera-console .camera-console-section-heading,
-  .camera-console .camera-console-review-column .camera-console-section-heading {
+  .camera-console .camera-console-preview-section-heading {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .camera-console .camera-console-section-title-row h2 {
+  .camera-console .camera-console-preview-title-row h2 {
     white-space: normal;
   }
 
-  .camera-console .camera-console-review-section-status {
-    align-self: flex-start;
-  }
-
-  .camera-console .camera-console-viewport-hud {
+  .camera-console .camera-console-preview-hud {
     align-items: flex-start;
     flex-direction: column;
     gap: 7px;
   }
 
-  .camera-console .camera-console-viewport-hud-right {
-    width: 100%;
-    justify-content: space-between;
-    text-align: left;
-  }
-
-  .camera-console .camera-console-actions {
-    grid-template-columns: 1fr;
+  .camera-console .camera-console-preview-ready {
+    align-self: flex-start;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .camera-console .camera-console-viewport-live-badge > span {
+  .camera-console .camera-console-preview-live-badge > span {
     animation: none;
   }
 }
