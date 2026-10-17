@@ -111,8 +111,10 @@ function ReplicaSidebarNavigation({ language, location, t, displayName, email, c
     <aside className="landscape-sidebar" aria-label={language === "th" ? "เมนูหลัก" : "Main navigation"}>
       <div>
         <div className="landscape-sidebar-brand">
-          <span className="landscape-sidebar-brand-mark"><Camera aria-hidden="true" /></span>
-          <div><strong>DiabCare</strong><span>WoundCam Clinic</span></div>
+          <span className="landscape-sidebar-brand-mark">
+            <img src="/assets/diabcare-mark.jpg" alt="DiabCare Logo" />
+          </span>
+          <div className="landscape-sidebar-brand-copy"><strong>DiabCare</strong><span>WoundCam</span></div>
         </div>
         <nav className="landscape-sidebar-nav" aria-label={language === "th" ? "เมนูหลัก" : "Main navigation"}>
           {navItems.map(({ path, label, icon: Icon, badge }) => {

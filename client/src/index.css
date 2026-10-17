@@ -1026,27 +1026,27 @@ button { cursor: pointer; }
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   border-bottom: 1px solid #e2e8f0;
   padding-bottom: 20px;
 }
 
 .landscape-sidebar-brand-mark {
   display: inline-flex;
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  background: #0a4fbe;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(10, 79, 190, 0.18);
+  overflow: hidden;
+  border-radius: 0;
+  background: transparent;
 }
 
-.landscape-sidebar-brand-mark svg {
-  width: 20px;
-  height: 20px;
+.landscape-sidebar-brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .landscape-sidebar-brand > div,
@@ -1066,17 +1066,25 @@ button { cursor: pointer; }
 
 .landscape-sidebar-brand strong {
   color: #16345c;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.025em;
   line-height: 1.1;
 }
 
-.landscape-sidebar-brand > div > span {
+.landscape-sidebar-brand-copy {
+  display: flex !important;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.landscape-sidebar-brand-copy > span {
   margin-top: 2px;
-  color: #64748b;
-  font-size: 12px;
-  font-weight: 500;
+  color: #0a4fbe;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
   line-height: 1;
 }
 
@@ -1275,23 +1283,14 @@ button { cursor: pointer; }
     display: flex;
   }
 
-  .app-header {
-    height: 56px;
-    flex-basis: 56px;
-  }
-
+  .app-header,
   .app-header-brand {
     display: none;
   }
 
-  .app-header-inner {
-    width: 100%;
-    justify-content: flex-end;
-    padding: 0 28px;
-  }
-
   .mobile-content {
-    padding: 24px 32px 40px;
+    min-height: 100dvh;
+    padding: 40px 32px;
   }
 
   .bottom-nav {
