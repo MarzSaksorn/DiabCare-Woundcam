@@ -7,12 +7,10 @@ import {
   AlertTriangle,
   ArrowRight,
   Camera,
-  Check,
   ChevronDown,
   ChevronUp,
   CircleHelp,
   Database,
-  ImagePlus,
   Info,
   Loader2,
   RefreshCcw,
@@ -425,48 +423,6 @@ export default function DiagnosticCamera() {
   return (
     <DashboardLayout bottomDock={patientSelectionDock}>
       <div className="camera-console">
-        <header className="camera-console-header camera-console-hero">
-          <div className="camera-console-title-block">
-            <div className="camera-console-hero-overline">
-              <span className="camera-console-hero-overline-label">
-                DIABCARE WOUNDCAM HUB
-              </span>
-              <span aria-hidden="true">•</span>
-              <span>
-                {language === "th"
-                  ? "คลังภาพถ่ายแผลจากกล้องคลินิก"
-                  : "Clinical camera photo archive"}
-              </span>
-            </div>
-            <h1>
-              {language === "th"
-                ? "ศูนย์บันทึกภาพแผล (Wound Capture & Assessment Hub)"
-                : "Wound Capture & Assessment Hub"}
-            </h1>
-            <p>
-              {language === "th"
-                ? "เลือกผู้ป่วย ถ่ายภาพแผลด้วยกล้อง DiabCare Cam ให้คมชัด แล้วตรวจสอบผล AI วิเคราะห์ก่อนบันทึกเวชระเบียน"
-                : "Select a patient, capture a clear wound image with DiabCare Cam, then review AI-supported results before saving the record."}
-            </p>
-            <div className="camera-console-hero-statuses">
-              <span className={`camera-console-hero-status is-${cameraState}`}>
-                <span aria-hidden="true" />
-                {cameraStatusLabel}
-              </span>
-              <span className="camera-console-hero-status is-secure">
-                <ShieldCheck aria-hidden="true" />
-                {language === "th"
-                  ? "ข้อมูลผู้ป่วยอยู่ในขอบเขตปลอดภัย"
-                  : "Protected patient workflow"}
-              </span>
-            </div>
-          </div>
-          <a href="#capture-history" className="camera-console-hero-action">
-            <RefreshCcw aria-hidden="true" />
-            <span>{t("viewCaptureHistory")}</span>
-          </a>
-        </header>
-
         {!workflowStarted ? (
           <PatientSelector
             language={language}
@@ -1186,14 +1142,6 @@ function CaptureWorkspace({
   onShowWoundMasksChange: (value: boolean) => void;
   onMaskOpacityChange: (value: number) => void;
 }) {
-  const reviewState =
-    state === "ready"
-      ? "ready"
-      : state === "analyzing"
-        ? "analyzing"
-        : previewUrl
-          ? "captured"
-          : "waiting";
   const patientName =
     selectedPatientRecord?.displayName ||
     selectedPatient?.displayName ||
@@ -1228,7 +1176,7 @@ function CaptureWorkspace({
     starting: language === "th" ? "กำลังเปิดกล้อง" : "STARTING CAMERA",
     live: "AI LIVE ASSIST",
     error: language === "th" ? "กล้องไม่พร้อมใช้งาน" : "CAMERA ERROR",
-    captured: language === "th" ? "ภาพพร้อมตรวจสอบ" : "FRAME READY",
+    captured: language === "th" ? "บันทึกภาพแล้ว" : "CAPTURED FRAME",
     processing: language === "th" ? "กำลังประมวลผล" : "PROCESSING",
     processed: language === "th" ? "ทบทวนผลโมเดล" : "MODEL REVIEW",
   };
@@ -1506,43 +1454,8 @@ function CaptureWorkspace({
                     : "Decision support only. A qualified clinician verifies the result."}
                 </p>
               </div>
-              <span
-                className={`camera-console-review-state camera-console-review-${reviewState}`}
-              >
-                {reviewState === "ready"
-                  ? t("ready")
-                  : reviewState === "analyzing"
-                    ? t("preparingReview")
-                    : reviewState === "captured"
-                      ? t("imageReady")
-                      : t("waiting")}
-              </span>
             </HeroCard.Header>
             <HeroCard.Content className="camera-console-review-content">
-              <div
-                className={`camera-console-review-empty camera-console-review-empty-${reviewState}`}
-                aria-live="polite"
-              >
-                {state === "idle" ? (
-                  <>
-                    <ImagePlus aria-hidden="true" />
-                    <strong>{t("noImageYet")}</strong>
-                    <p>{t("noImageYetDetail")}</p>
-                  </>
-                ) : state === "analyzing" ? (
-                  <>
-                    <Loader2 className="animate-spin" aria-hidden="true" />
-                    <strong>{t("preparingReview")}</strong>
-                    <p>{t("preparingReviewDetail")}</p>
-                  </>
-                ) : (
-                  <>
-                    <Check aria-hidden="true" />
-                    <strong>{t("imageReady")}</strong>
-                    <p>{t("imageReadyDetail")}</p>
-                  </>
-                )}
-              </div>
               {inferenceResult && (
                 <div
                   className="camera-console-inference"
