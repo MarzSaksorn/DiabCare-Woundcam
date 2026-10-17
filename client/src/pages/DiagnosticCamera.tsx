@@ -83,7 +83,7 @@ export default function DiagnosticCamera() {
   const [assignedPatientId, setAssignedPatientId] = useState("");
   const [woundAssessmentId, setWoundAssessmentId] = useState("");
   const [capturedAt, setCapturedAt] = useState("");
-  const [workflowStarted, setWorkflowStarted] = useState(false);
+  const [patientSelectorOpen, setPatientSelectorOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const inferMutation = trpc.wound.infer.useMutation();
   const patientsQuery = trpc.diabetes.registeredPatientsPage.useQuery(
@@ -132,7 +132,7 @@ export default function DiagnosticCamera() {
         : "age not recorded"
       : `${selectedPatient.age} ${language === "th" ? "ปี" : "years"}`
     : null;
-  const patientSelectionDock = !workflowStarted ? (
+  const patientSelectionDock = patientSelectorOpen ? (
     <PatientSelectionFooter
       variant="dock"
       language={language}
@@ -190,6 +190,15 @@ export default function DiagnosticCamera() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [helpOpen]);
+
+  useEffect(() => {
+    if (!patientSelectorOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPatientSelectorOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [patientSelectorOpen]);
 
   function stopCamera() {
     streamRef.current?.getTracks().forEach(track => track.stop());
@@ -356,7 +365,7 @@ export default function DiagnosticCamera() {
     resetCapture();
     setSelectedPatientId("");
     setAssignedPatientId("");
-    setWorkflowStarted(false);
+    setPatientSelectorOpen(true);
   }
 
   async function beginReview() {
@@ -384,7 +393,7 @@ export default function DiagnosticCamera() {
   function confirmPatient() {
     if (!selectedPatientId) return;
     setAssignedPatientId(selectedPatientId);
-    setWorkflowStarted(true);
+    setPatientSelectorOpen(false);
     setState("idle");
   }
 
@@ -458,85 +467,110 @@ export default function DiagnosticCamera() {
           </a>
         </header>
 
-        {!workflowStarted ? (
-          <PatientSelector
-            language={language}
-            t={t}
-            patients={patients}
-            selectedPatient={selectedPatient}
-            total={patientsQuery.data?.total ?? patients.length}
-            counts={{
-              all: allPatientsCountQuery.data?.total,
-              type1: type1PatientsCountQuery.data?.total,
-              type2: type2PatientsCountQuery.data?.total,
-              gdm: gdmPatientsCountQuery.data?.total,
+        {patientSelectorOpen && (
+          <div
+            className="camera-console-patient-selector-overlay"
+            role="presentation"
+            onMouseDown={event => {
+              if (event.target === event.currentTarget)
+                setPatientSelectorOpen(false);
             }}
-            loading={patientsQuery.isLoading}
-            error={patientsQuery.error}
-            search={patientSearch}
-            context={patientContext}
-            selectedId={selectedPatientId}
-            onSearch={setPatientSearch}
-            onContext={next => {
-              setPatientContext(next);
-              setSelectedPatientId("");
-            }}
-            onSelect={setSelectedPatientId}
-            onClear={() => setSelectedPatientId("")}
-            onConfirm={confirmPatient}
-          />
-        ) : (
-          <CaptureWorkspace
-            language={language}
-            t={t}
-            selectedPatient={selectedPatient}
-            selectedPatientRecord={
-              selectedPatientRecordQuery.data
-                ? {
-                    ...selectedPatientRecordQuery.data.patient,
-                    woundAssessments:
-                      selectedPatientRecordQuery.data.woundAssessments,
-                  }
-                : undefined
-            }
-            selectedPatientRecordLoading={selectedPatientRecordQuery.isLoading}
-            state={state}
-            cameraState={cameraState}
-            cameraError={cameraError}
-            previewUrl={previewUrl}
-            fileName={fileName}
-            inferenceResult={inferenceResult}
-            imageLayout={imageLayout}
-            helpOpen={helpOpen}
-            capturedAt={capturedAt}
-            woundAssessmentId={woundAssessmentId}
-            inputRef={inputRef}
-            previewImageRef={previewImageRef}
-            videoRef={videoRef}
-            canvasRef={canvasRef}
-            viewportRef={viewportRef}
-            onPreviewImageLoad={updateImageLayout}
-            onHelp={() => setHelpOpen(open => !open)}
-            onCloseHelp={() => setHelpOpen(false)}
-            onStartCamera={startCamera}
-            onCapture={captureFrame}
-            onStopCamera={stopCamera}
-            onFile={handleFile}
-            onReset={resetCapture}
-            onReview={beginReview}
-            onChangePatient={changePatient}
-            onCapturedAt={setCapturedAt}
-            onWoundAssessment={setWoundAssessmentId}
-            onSave={saveToPatient}
-            saving={savePhotoMutation.isPending}
-            showDetectorBoxes={showDetectorBoxes}
-            showWoundMasks={showWoundMasks}
-            maskOpacity={maskOpacity}
-            onShowDetectorBoxesChange={setShowDetectorBoxes}
-            onShowWoundMasksChange={setShowWoundMasks}
-            onMaskOpacityChange={setMaskOpacity}
-          />
+          >
+            <div
+              className="camera-console-patient-selector-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-label={
+                language === "th" ? "เลือกผู้ป่วย" : "Select patient"
+              }
+            >
+              <button
+                type="button"
+                className="camera-console-patient-selector-close"
+                aria-label={language === "th" ? "ปิด" : "Close"}
+                onClick={() => setPatientSelectorOpen(false)}
+              >
+                <X aria-hidden="true" />
+              </button>
+              <PatientSelector
+                language={language}
+                t={t}
+                patients={patients}
+                selectedPatient={selectedPatient}
+                total={patientsQuery.data?.total ?? patients.length}
+                counts={{
+                  all: allPatientsCountQuery.data?.total,
+                  type1: type1PatientsCountQuery.data?.total,
+                  type2: type2PatientsCountQuery.data?.total,
+                  gdm: gdmPatientsCountQuery.data?.total,
+                }}
+                loading={patientsQuery.isLoading}
+                error={patientsQuery.error}
+                search={patientSearch}
+                context={patientContext}
+                selectedId={selectedPatientId}
+                onSearch={setPatientSearch}
+                onContext={next => {
+                  setPatientContext(next);
+                  setSelectedPatientId("");
+                }}
+                onSelect={setSelectedPatientId}
+                onClear={() => setSelectedPatientId("")}
+                onConfirm={confirmPatient}
+              />
+            </div>
+          </div>
         )}
+        <CaptureWorkspace
+          language={language}
+          t={t}
+          selectedPatient={selectedPatient}
+          selectedPatientRecord={
+            selectedPatientRecordQuery.data
+              ? {
+                  ...selectedPatientRecordQuery.data.patient,
+                  woundAssessments:
+                    selectedPatientRecordQuery.data.woundAssessments,
+                }
+              : undefined
+          }
+          selectedPatientRecordLoading={selectedPatientRecordQuery.isLoading}
+          state={state}
+          cameraState={cameraState}
+          cameraError={cameraError}
+          previewUrl={previewUrl}
+          fileName={fileName}
+          inferenceResult={inferenceResult}
+          imageLayout={imageLayout}
+          helpOpen={helpOpen}
+          capturedAt={capturedAt}
+          woundAssessmentId={woundAssessmentId}
+          inputRef={inputRef}
+          previewImageRef={previewImageRef}
+          videoRef={videoRef}
+          canvasRef={canvasRef}
+          viewportRef={viewportRef}
+          onPreviewImageLoad={updateImageLayout}
+          onHelp={() => setHelpOpen(open => !open)}
+          onCloseHelp={() => setHelpOpen(false)}
+          onStartCamera={startCamera}
+          onCapture={captureFrame}
+          onStopCamera={stopCamera}
+          onFile={handleFile}
+          onReset={resetCapture}
+          onReview={beginReview}
+          onChangePatient={changePatient}
+          onCapturedAt={setCapturedAt}
+          onWoundAssessment={setWoundAssessmentId}
+          onSave={saveToPatient}
+          saving={savePhotoMutation.isPending}
+          showDetectorBoxes={showDetectorBoxes}
+          showWoundMasks={showWoundMasks}
+          maskOpacity={maskOpacity}
+          onShowDetectorBoxesChange={setShowDetectorBoxes}
+          onShowWoundMasksChange={setShowWoundMasks}
+          onMaskOpacityChange={setMaskOpacity}
+        />
         <div className="camera-console-history" id="capture-history">
           <DiagnosticPhotoHistory />
         </div>
@@ -1195,24 +1229,39 @@ function CaptureWorkspace({
             {selectedPatientRecord?.displayName ||
               selectedPatient?.displayName ||
               selectedPatientRecord?.patientCode ||
-              selectedPatient?.patientCode}
+              selectedPatient?.patientCode ||
+              (language === "th" ? "ยังไม่ได้เลือกผู้ป่วย" : "No patient selected")}
           </strong>
           <small>
-            {selectedPatientRecord?.patientCode || selectedPatient?.patientCode}{" "}
-            ·{" "}
-            {selectedPatientRecord?.registrationLocation ||
-              selectedPatient?.registrationLocation}
+            {selectedPatientRecord?.patientCode || selectedPatient?.patientCode
+              ? `${selectedPatientRecord?.patientCode || selectedPatient?.patientCode} · ${selectedPatientRecord?.registrationLocation || selectedPatient?.registrationLocation || ""}`
+              : language === "th"
+                ? "เลือกผู้ป่วยก่อนบันทึกภาพเข้าระเบียน"
+                : "Choose a patient before saving to the record"}
           </small>
         </div>
         <span className="camera-console-live-tag">
-          <span /> Ready for capture
+          <span />
+          {selectedPatient || selectedPatientRecord
+            ? language === "th"
+              ? "พร้อมถ่ายภาพ"
+              : "Ready for capture"
+            : language === "th"
+              ? "ยังไม่ได้เลือกผู้ป่วย"
+              : "No patient selected"}
         </span>
         <button
           type="button"
           className="camera-console-change-case"
           onClick={onChangePatient}
         >
-          {language === "th" ? "เปลี่ยนผู้ป่วย" : "Change patient"}
+          {selectedPatient || selectedPatientRecord
+            ? language === "th"
+              ? "เปลี่ยนผู้ป่วย"
+              : "Change patient"
+            : language === "th"
+              ? "เลือกผู้ป่วย"
+              : "Select patient"}
         </button>
       </section>
 
