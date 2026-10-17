@@ -119,6 +119,33 @@ export default function DiagnosticCamera() {
   const selectedPatient = patients.find(
     patient => patient.id === Number(selectedPatientId)
   );
+  const selectedName = selectedPatient
+    ? selectedPatient.displayName || selectedPatient.patientCode
+    : null;
+  const selectedType = selectedPatient
+    ? diabetesContext(selectedPatient, language)
+    : null;
+  const selectedAge = selectedPatient
+    ? selectedPatient.age === null
+      ? language === "th"
+        ? "ไม่ระบุอายุ"
+        : "age not recorded"
+      : `${selectedPatient.age} ${language === "th" ? "ปี" : "years"}`
+    : null;
+  const patientSelectionDock = !workflowStarted ? (
+    <PatientSelectionFooter
+      variant="dock"
+      language={language}
+      selectedId={selectedPatientId}
+      selectedName={selectedName}
+      selectedType={selectedType}
+      selectedAge={selectedAge}
+      loading={patientsQuery.isLoading}
+      hasError={Boolean(patientsQuery.error)}
+      onClear={() => setSelectedPatientId("")}
+      onConfirm={confirmPatient}
+    />
+  ) : undefined;
 
   function updateImageLayout() {
     const image = previewImageRef.current;
@@ -379,7 +406,7 @@ export default function DiagnosticCamera() {
     });
   }
   return (
-    <DashboardLayout>
+    <DashboardLayout bottomDock={patientSelectionDock}>
       <div className="camera-console">
         <header className="camera-console-header">
           <div className="camera-console-title-block">
@@ -733,45 +760,85 @@ function PatientSelector({
         )}
       </main>
 
-      <footer className="camera-console-stitch-selector-footer">
-        <div
-          className="camera-console-stitch-selector-selection-status"
-          aria-live="polite"
-        >
-          <span className={selectedId ? "is-selected" : ""} />
-          <span>
-            {selectedName ? (
-              <>
-                <strong>{selectedName}</strong> ({selectedType}, {selectedAge})
-              </>
-            ) : language === "th" ? (
-              "ยังไม่ได้เลือกผู้ป่วย"
-            ) : (
-              "No patient selected"
-            )}
-          </span>
-        </div>
-        <div className="camera-console-stitch-selector-footer-actions">
-          <button
-            type="button"
-            className="camera-console-stitch-selector-clear"
-            onClick={onClear}
-            disabled={!selectedId}
-          >
-            {language === "th" ? "ยกเลิกการเลือก" : "Clear selection"}
-          </button>
-          <button
-            type="button"
-            className="camera-console-stitch-selector-confirm"
-            onClick={onConfirm}
-            disabled={!selectedId || loading || Boolean(error)}
-          >
-            <span>{language === "th" ? "ดำเนินการต่อ" : "Continue"}</span>
-            <ArrowRight aria-hidden="true" />
-          </button>
-        </div>
-      </footer>
+      <PatientSelectionFooter
+        variant="inline"
+        language={language}
+        selectedId={selectedId}
+        selectedName={selectedName}
+        selectedType={selectedType}
+        selectedAge={selectedAge}
+        loading={loading}
+        hasError={Boolean(error)}
+        onClear={onClear}
+        onConfirm={onConfirm}
+      />
     </section>
+  );
+}
+
+function PatientSelectionFooter({
+  variant,
+  language,
+  selectedId,
+  selectedName,
+  selectedType,
+  selectedAge,
+  loading,
+  hasError,
+  onClear,
+  onConfirm,
+}: {
+  variant: "inline" | "dock";
+  language: "th" | "en";
+  selectedId: string;
+  selectedName: string | null;
+  selectedType: string | null;
+  selectedAge: string | null;
+  loading: boolean;
+  hasError: boolean;
+  onClear: () => void;
+  onConfirm: () => void;
+}) {
+  const dock = variant === "dock";
+  return (
+    <footer className={dock ? "bottom-nav-confirmation" : "camera-console-stitch-selector-footer"}>
+      <div
+        className={dock ? "bottom-nav-confirmation-status" : "camera-console-stitch-selector-selection-status"}
+        aria-live="polite"
+      >
+        <span className={selectedId ? "is-selected" : ""} />
+        <span>
+          {selectedName ? (
+            <>
+              <strong>{selectedName}</strong> ({selectedType}, {selectedAge})
+            </>
+          ) : language === "th" ? (
+            "ยังไม่ได้เลือกผู้ป่วย"
+          ) : (
+            "No patient selected"
+          )}
+        </span>
+      </div>
+      <div className={dock ? "bottom-nav-confirmation-actions" : "camera-console-stitch-selector-footer-actions"}>
+        <button
+          type="button"
+          className={dock ? "bottom-nav-confirmation-clear" : "camera-console-stitch-selector-clear"}
+          onClick={onClear}
+          disabled={!selectedId}
+        >
+          {language === "th" ? "ยกเลิกการเลือก" : "Clear selection"}
+        </button>
+        <button
+          type="button"
+          className={dock ? "bottom-nav-confirmation-confirm" : "camera-console-stitch-selector-confirm"}
+          onClick={onConfirm}
+          disabled={!selectedId || loading || hasError}
+        >
+          <span>{language === "th" ? "ดำเนินการต่อ" : "Continue"}</span>
+          <ArrowRight aria-hidden="true" />
+        </button>
+      </div>
+    </footer>
   );
 }
 

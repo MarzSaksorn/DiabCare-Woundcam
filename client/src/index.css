@@ -1551,3 +1551,210 @@ button { cursor: pointer; }
     transition: none;
   }
 }
+
+/* Stitch v5 floating bottom dock */
+.bottom-nav-dock {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 50;
+  width: auto;
+  max-width: 576px;
+  margin: 0 auto;
+  overflow: visible;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 34px rgba(10, 79, 190, 0.14), 0 3px 10px rgba(15, 23, 42, 0.08);
+  pointer-events: auto;
+  backdrop-filter: blur(16px);
+}
+
+.bottom-nav-dock .bottom-nav {
+  position: static;
+  height: 64px;
+  border-top: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.bottom-nav-dock .bottom-nav-item {
+  height: 64px;
+}
+
+.bottom-nav-dock .bottom-nav-item.is-camera {
+  height: 88px;
+  margin-top: -24px;
+}
+
+@media (orientation: landscape) {
+  .bottom-nav-dock {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .bottom-nav-dock {
+    right: 12px;
+    left: 12px;
+  }
+}
+
+/* Connected v5 selection confirmation row */
+.bottom-nav-confirmation {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  background: rgba(248, 250, 252, 0.74);
+  padding: 8px 16px;
+}
+
+.bottom-nav-confirmation-status {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.bottom-nav-confirmation-status > span:first-child {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.bottom-nav-confirmation-status > span:first-child.is-selected {
+  background: #16a34a;
+}
+
+.bottom-nav-confirmation-status > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bottom-nav-confirmation-status strong {
+  color: #16345c;
+  font-weight: 700;
+}
+
+.bottom-nav-confirmation-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.bottom-nav-confirmation-actions button {
+  min-height: 40px;
+  border-radius: 12px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.bottom-nav-confirmation-clear {
+  border: 0;
+  background: transparent;
+  color: #64748b;
+}
+
+.bottom-nav-confirmation-clear:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #16345c;
+}
+
+.bottom-nav-confirmation-clear:disabled {
+  display: none;
+}
+
+.bottom-nav-confirmation-confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  background: #cbd5e1;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
+.bottom-nav-confirmation-confirm:not(:disabled) {
+  border-color: #0a4fbe;
+  background: #0a4fbe;
+  box-shadow: 0 2px 6px rgba(10, 79, 190, 0.2);
+  cursor: pointer;
+}
+
+.bottom-nav-confirmation-confirm:hover:not(:disabled) {
+  border-color: #08429e;
+  background: #08429e;
+}
+
+.bottom-nav-confirmation-confirm:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.bottom-nav-confirmation-confirm svg {
+  width: 16px;
+  height: 16px;
+}
+
+.bottom-nav-confirmation-actions button:focus-visible {
+  outline: 3px solid rgba(21, 104, 232, 0.24);
+  outline-offset: 2px;
+}
+
+@media (orientation: portrait) {
+  .app-shell.has-bottom-confirmation .mobile-content {
+    padding-bottom: 160px;
+  }
+
+  .app-shell.has-bottom-confirmation .camera-console-stitch-selector > .camera-console-stitch-selector-footer {
+    display: none;
+  }
+
+  .app-shell.has-bottom-confirmation .bottom-nav-dock {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 420px) {
+  .bottom-nav-confirmation {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .bottom-nav-confirmation-status {
+    font-size: 11px;
+  }
+
+  .bottom-nav-confirmation-confirm {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav-confirmation-actions button {
+    transition: none;
+  }
+}

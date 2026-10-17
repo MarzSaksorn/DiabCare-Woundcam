@@ -7,7 +7,7 @@ import { Link, useLocation } from "wouter";
 import ReplicaLogin from "./ReplicaLogin";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 
-type DashboardLayoutProps = { children: ReactNode; demoMode?: boolean };
+type DashboardLayoutProps = { children: ReactNode; demoMode?: boolean; bottomDock?: ReactNode };
 type NavItem = { path: string; label: string; icon: typeof LayoutDashboard; badge?: string };
 
 const navItems: NavItem[] = [
@@ -24,7 +24,7 @@ function isActivePath(path: string, location: string) {
   return location === path || location.startsWith(`${path}/`);
 }
 
-export default function DashboardLayout({ children, demoMode = false }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, demoMode = false, bottomDock }: DashboardLayoutProps) {
   const { loading, user, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const [location] = useLocation();
@@ -42,7 +42,7 @@ export default function DashboardLayout({ children, demoMode = false }: Dashboar
   }).format(new Date());
 
   return (
-    <div className="app-shell" lang={language === "th" ? "th" : "en"}>
+    <div className={`app-shell ${bottomDock ? "has-bottom-confirmation" : ""}`} lang={language === "th" ? "th" : "en"}>
       <ReplicaSidebarNavigation
         language={language}
         location={location}
@@ -92,7 +92,7 @@ export default function DashboardLayout({ children, demoMode = false }: Dashboar
           </div>
         </header>
         <main className="mobile-content">{children}</main>
-        <ReplicaBottomNavigation language={language} location={location} t={t} />
+        <ReplicaBottomNavigation language={language} location={location} t={t} confirmation={bottomDock} />
       </div>
     </div>
   );
@@ -166,28 +166,31 @@ function ReplicaSidebarNavigation({ language, location, t, displayName, email, c
   );
 }
 
-function ReplicaBottomNavigation({ language, location, t }: { language: "en" | "th"; location: string; t: (key: string) => string }) {
+function ReplicaBottomNavigation({ language, location, t, confirmation }: { language: "en" | "th"; location: string; t: (key: string) => string; confirmation?: ReactNode }) {
   return (
-    <nav className="bottom-nav" aria-label={language === "th" ? "แถบนำทางหลัก" : "Primary navigation"}>
-      {navItems.map(({ path, label, icon: Icon, badge }) => {
-        const active = isActivePath(path, location);
-        const center = path === "/camera";
-        return (
-          <Link key={path} href={path} className={`bottom-nav-item ${center ? "is-camera" : ""} ${active ? "is-active" : ""}`} aria-current={active ? "page" : undefined}>
-            {!center && active && <span className="bottom-nav-active-indicator" aria-hidden="true" />}
-            {center ? (
-              <span className="bottom-nav-camera-wrap">
+    <div className="bottom-nav-dock">
+      {confirmation}
+      <nav className="bottom-nav" aria-label={language === "th" ? "แถบนำทางหลัก" : "Primary navigation"}>
+        {navItems.map(({ path, label, icon: Icon, badge }) => {
+          const active = isActivePath(path, location);
+          const center = path === "/camera";
+          return (
+            <Link key={path} href={path} className={`bottom-nav-item ${center ? "is-camera" : ""} ${active ? "is-active" : ""}`} aria-current={active ? "page" : undefined}>
+              {!center && active && <span className="bottom-nav-active-indicator" aria-hidden="true" />}
+              {center ? (
+                <span className="bottom-nav-camera-wrap">
+                  <span className="bottom-nav-icon"><Icon aria-hidden="true" /></span>
+                  {badge && <span className="bottom-nav-badge">{badge}</span>}
+                </span>
+              ) : (
                 <span className="bottom-nav-icon"><Icon aria-hidden="true" /></span>
-                {badge && <span className="bottom-nav-badge">{badge}</span>}
-              </span>
-            ) : (
-              <span className="bottom-nav-icon"><Icon aria-hidden="true" /></span>
-            )}
-            <span>{t(label)}</span>
-          </Link>
-        );
-      })}
-    </nav>
+              )}
+              <span>{t(label)}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
   );
 }
 
