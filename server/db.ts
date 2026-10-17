@@ -541,14 +541,28 @@ export async function getRegisteredPatientRecord(patientId: number) {
   return { patient, medications, woundAssessments, media, auditEvents, importedObservations };
 }
 
-export async function getWoundPhotoHistory(input: { patientId?: number; from?: Date; to?: Date; limit: number; offset: number }) {
+export async function getWoundPhotoHistory(input: { query?: string; patientId?: number; from?: Date; to?: Date; limit: number; offset: number }) {
   const db = await getDb();
   if (!db) return { photos: [], total: 0, hasMore: false };
-  const filters = [isNull(patientWoundMedia.hiddenAt), input.patientId ? eq(patientWoundMedia.patientId, input.patientId) : undefined, input.from ? gte(patientWoundMedia.capturedAt, input.from) : undefined, input.to ? lte(patientWoundMedia.capturedAt, input.to) : undefined].filter(Boolean);
+  const search = input.query?.trim();
+  const filters = [
+    isNull(patientWoundMedia.hiddenAt),
+    input.patientId ? eq(patientWoundMedia.patientId, input.patientId) : undefined,
+    input.from ? gte(patientWoundMedia.capturedAt, input.from) : undefined,
+    input.to ? lte(patientWoundMedia.capturedAt, input.to) : undefined,
+    search
+      ? or(
+          ilike(registeredPatients.patientCode, `%${search}%`),
+          ilike(registeredPatients.displayName, `%${search}%`),
+          ilike(patientWoundMedia.caption, `%${search}%`),
+          ilike(patientWoundMedia.fileName, `%${search}%`),
+        )
+      : undefined,
+  ].filter(Boolean);
   const where = filters.length ? and(...filters) : undefined;
   const [photos, totalRows] = await Promise.all([
     db.select({ id: patientWoundMedia.id, patientId: patientWoundMedia.patientId, patientCode: registeredPatients.patientCode, displayName: registeredPatients.displayName, registrationLocation: registeredPatients.registrationLocation, woundAssessmentId: patientWoundMedia.woundAssessmentId, storageUrl: patientWoundMedia.storageUrl, fileName: patientWoundMedia.fileName, mimeType: patientWoundMedia.mimeType, fileSizeBytes: patientWoundMedia.fileSizeBytes, caption: patientWoundMedia.caption, capturedOn: patientWoundMedia.capturedOn, capturedAt: patientWoundMedia.capturedAt, hiddenAt: patientWoundMedia.hiddenAt, createdAt: patientWoundMedia.createdAt }).from(patientWoundMedia).innerJoin(registeredPatients, eq(patientWoundMedia.patientId, registeredPatients.id)).where(where).orderBy(desc(patientWoundMedia.capturedAt), desc(patientWoundMedia.createdAt)).limit(input.limit).offset(input.offset),
-    db.select({ count: sql<number>`count(*)` }).from(patientWoundMedia).where(where),
+    db.select({ count: sql<number>`count(*)` }).from(patientWoundMedia).innerJoin(registeredPatients, eq(patientWoundMedia.patientId, registeredPatients.id)).where(where),
   ]);
   const total = Number(totalRows[0]?.count ?? 0);
   return { photos, total, hasMore: input.offset + photos.length < total };
