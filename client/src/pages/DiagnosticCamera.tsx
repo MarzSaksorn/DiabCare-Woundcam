@@ -364,6 +364,7 @@ export default function DiagnosticCamera() {
       setCameraError(t("captureError"));
       return;
     }
+    setInferenceResult(null);
     setState("analyzing");
     setCameraError("");
     try {
@@ -1205,6 +1206,30 @@ function CaptureWorkspace({
     selectedPatient?.age === null || selectedPatient?.age === undefined
       ? null
       : `${selectedPatient.age} ${language === "th" ? "ปี" : "years"}`;
+  const previewMode =
+    state === "analyzing"
+      ? "processing"
+      : inferenceResult
+        ? "processed"
+        : previewUrl
+          ? "captured"
+          : "standby";
+  const previewModeLabel =
+    previewMode === "processed"
+      ? language === "th"
+        ? "ทบทวนผลโมเดล"
+        : "MODEL REVIEW"
+      : previewMode === "processing"
+        ? language === "th"
+          ? "กำลังประมวลผล"
+          : "PROCESSING"
+        : previewMode === "captured"
+          ? language === "th"
+            ? "ภาพพร้อมตรวจสอบ"
+            : "FRAME READY"
+          : language === "th"
+            ? "พร้อมจัดกรอบภาพ"
+            : "FRAME GUIDE";
 
   return (
     <>
@@ -1331,13 +1356,21 @@ function CaptureWorkspace({
             </div>
             <div
               ref={viewportRef}
-              className={`camera-console-viewport ${previewUrl ? "has-preview" : ""} ${cameraState === "live" ? "is-live" : ""}`}
+              className={`camera-console-viewport ${previewUrl ? "has-preview" : ""} is-${previewMode} ${cameraState === "live" ? "is-live" : ""}`}
             >
-              {!previewUrl && (
-                <div className="camera-console-viewport-guides" aria-hidden="true">
-                  <span className="camera-console-viewport-ruler is-horizontal" />
-                  <span className="camera-console-viewport-ruler is-vertical" />
-                  <span className="camera-console-viewport-reticle" />
+              <div className="camera-console-viewport-guides" aria-hidden="true">
+                <span className="camera-console-viewport-ruler is-horizontal" />
+                <span className="camera-console-viewport-ruler is-vertical" />
+                <span className="camera-console-viewport-reticle" />
+              </div>
+              {previewUrl && (
+                <div
+                  className={`camera-console-preview-state-chip is-${previewMode}`}
+                  role="status"
+                  aria-live="polite"
+                >
+                  <span aria-hidden="true" />
+                  {previewModeLabel}
                 </div>
               )}
               {previewUrl ? (
