@@ -162,6 +162,7 @@ describe("wound inference result presentation", () => {
     );
     expect(markup).toContain('type="checkbox"');
     expect(markup).toContain('type="range"');
+    expect(markup).toContain("camera-overlay-controls-heading");
     expect(markup).toContain("แสดงกรอบตัวตรวจจับ");
     expect(markup).toContain("แสดงหน้ากากพื้นที่แผล");
     expect(markup).toContain("คำอธิบายชั้นข้อมูล");

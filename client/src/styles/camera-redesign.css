@@ -1208,13 +1208,14 @@
   color: var(--console-text);
 }
 
-.camera-console .replica-camera-overlay-controls legend {
+.camera-console .replica-camera-overlay-controls h3 {
   display: block;
   grid-column: 1 / -1;
   width: 100%;
   margin: 0 0 2px;
   padding: 0;
   color: var(--console-blue-dark);
+  font-family: "Prompt", "Sarabun", sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
