@@ -316,10 +316,6 @@
   margin-bottom: 16px;
 }
 
-.home-stitch-card-heading.is-actions-only {
-  justify-content: flex-end;
-}
-
 .home-stitch-card-heading h2 {
   margin: 5px 0 0;
   color: #0b1c30;
@@ -373,13 +369,11 @@
   height: 15px;
 }
 
-.home-stitch-patient-list,
 .home-stitch-capture-list {
   display: grid;
   gap: 8px;
 }
 
-.home-stitch-patient-row,
 .home-stitch-capture-row {
   display: flex;
   min-width: 0;
@@ -395,14 +389,12 @@
   transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
 }
 
-.home-stitch-patient-row:hover,
 .home-stitch-capture-row:hover {
   border-color: #b2cdfe;
   background: #eff4ff;
   transform: translateX(2px);
 }
 
-.home-stitch-patient-avatar,
 .home-stitch-capture-icon {
   display: grid;
   width: 36px;
@@ -414,19 +406,16 @@
   color: #0a4fbe;
 }
 
-.home-stitch-patient-avatar svg,
 .home-stitch-capture-icon svg {
   width: 18px;
   height: 18px;
 }
 
-.home-stitch-patient-copy,
 .home-stitch-capture-copy {
   min-width: 0;
   flex: 1;
 }
 
-.home-stitch-patient-copy strong,
 .home-stitch-capture-copy strong {
   display: block;
   overflow: hidden;
@@ -437,7 +426,6 @@
   white-space: nowrap;
 }
 
-.home-stitch-patient-copy small,
 .home-stitch-capture-copy small {
   display: block;
   overflow: hidden;
@@ -448,7 +436,6 @@
   white-space: nowrap;
 }
 
-.home-stitch-patient-row time,
 .home-stitch-capture-row time {
   flex: 0 0 auto;
   color: #445f8a;
@@ -456,7 +443,6 @@
   font-weight: 600;
 }
 
-.home-stitch-patient-row > svg,
 .home-stitch-capture-row > svg {
   width: 16px;
   height: 16px;
@@ -464,12 +450,12 @@
   color: #737785;
 }
 
-.home-stitch-latest-card {
+.home-stitch-queue-card {
   min-height: 284px;
 }
 
-.home-stitch-queue-card {
-  min-height: 284px;
+.home-stitch-queue-card.is-full-width {
+  grid-column: 1 / -1;
 }
 
 .home-stitch-periods {
@@ -718,7 +704,6 @@
     align-self: flex-start;
   }
 
-  .home-stitch-patient-row time,
   .home-stitch-capture-row time {
     display: none;
   }
@@ -726,7 +711,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .home-stitch-button,
-  .home-stitch-patient-row,
   .home-stitch-capture-row {
     transition: none;
   }

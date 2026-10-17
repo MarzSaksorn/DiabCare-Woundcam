@@ -12,7 +12,6 @@ import {
   FileText,
   HeartPulse,
   ImageIcon,
-  Plus,
   ShieldCheck,
   Timer,
   TriangleAlert,
@@ -124,7 +123,6 @@ export default function Home() {
     language === "th" ? "th-TH" : "en-US",
     { dateStyle: "medium" }
   ).format(new Date());
-  const latestPatients = summary?.recentPatients ?? [];
   const recentPhotos = summary?.recentPhotos ?? [];
 
   return (
@@ -245,62 +243,7 @@ export default function Home() {
         </section>
 
         <section className="home-stitch-focus-grid" aria-label={language === "th" ? "จุดติดตามหลัก" : "Clinical focus"}>
-          <article className="home-stitch-card home-stitch-latest-card">
-            <div className="home-stitch-card-heading is-actions-only">
-              <Link href="/patients" className="home-stitch-inline-link">
-                {language === "th" ? "ดูทั้งหมด" : "View all"}
-                <ArrowRight aria-hidden="true" />
-              </Link>
-            </div>
-            {dashboard.isLoading && <LoadingRows />}
-            {dashboard.isError && (
-              <UnavailableState message={unavailable} detail={unavailableDetail} />
-            )}
-            {!dashboard.isLoading && !dashboard.isError && latestPatients.length === 0 && (
-              <EmptyState
-                icon={Users}
-                title={language === "th" ? "ยังไม่มีระเบียนผู้ป่วย" : "No registered patients yet"}
-                detail={
-                  language === "th"
-                    ? "ระเบียนที่สร้างผ่านระบบจะปรากฏที่นี่"
-                    : "Records created through the connected app will appear here."
-                }
-                action={
-                  <Link href="/patients/new" className="home-stitch-empty-link">
-                    <Plus aria-hidden="true" />
-                    {language === "th" ? "สร้างระเบียนผู้ป่วย" : "Create a patient record"}
-                  </Link>
-                }
-              />
-            )}
-            {!dashboard.isLoading && !dashboard.isError && latestPatients.length > 0 && (
-              <div className="home-stitch-patient-list">
-                {latestPatients.slice(0, 4).map(patient => (
-                  <Link
-                    href={`/patients/registered/${patient.id}`}
-                    className="home-stitch-patient-row"
-                    key={patient.id}
-                  >
-                    <span className="home-stitch-patient-avatar">
-                      <Users aria-hidden="true" />
-                    </span>
-                    <span className="home-stitch-patient-copy">
-                      <strong>{patient.displayName || patient.patientCode}</strong>
-                      <small>
-                        {patient.patientCode} · {patient.registrationLocation}
-                      </small>
-                    </span>
-                    <time dateTime={patient.updatedAt.toISOString()}>
-                      {formatDate(patient.updatedAt, language)}
-                    </time>
-                    <ArrowRight aria-hidden="true" />
-                  </Link>
-                ))}
-              </div>
-            )}
-          </article>
-
-          <article className="home-stitch-card home-stitch-queue-card">
+          <article className="home-stitch-card home-stitch-queue-card is-full-width">
             <div className="home-stitch-card-heading">
               <div>
                 <span className="home-stitch-section-kicker">
