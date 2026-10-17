@@ -23,8 +23,8 @@
   margin: 0 auto;
   padding: 2px 0 36px;
   color: var(--console-text);
-  font-family: "Atkinson Hyperlegible", sans-serif;
-  font-size: 18px;
+  font-family: "Sarabun", sans-serif;
+  font-size: 14px;
   line-height: 1.4;
 }
 
@@ -748,6 +748,11 @@
   font-size: 15px;
 }
 
+.camera-console-case-copy .camera-console-patient-code {
+  font-family: "JetBrains Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
 .camera-console-live-tag {
   display: inline-flex;
   min-height: 32px;
@@ -1338,6 +1343,33 @@
   margin: 4px 0 12px 31px;
   color: var(--console-muted);
   font-size: 15px;
+}
+
+.camera-console-assignment-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  padding: 9px 10px;
+  color: #1e3a8a;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.camera-console-assignment-message.is-error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.camera-console-assignment-message svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin-top: 1px;
 }
 
 .camera-console-assignment label {
@@ -4844,7 +4876,7 @@
 }
 
 .camera-console .camera-console-workspace {
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
 }
 
 @container (max-width: 1120px) {
@@ -5098,6 +5130,91 @@
   aspect-ratio: 4 / 3;
   min-height: 0;
   border-radius: 0;
+}
+
+.camera-console .camera-console-viewport-guides {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(125, 211, 252, 0.18) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 20px 20px, 40px 40px, 40px 40px;
+}
+
+.camera-console .camera-console-viewport-ruler {
+  position: absolute;
+  display: block;
+  opacity: 0.72;
+}
+
+.camera-console .camera-console-viewport-ruler.is-horizontal {
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  background: repeating-linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.32),
+    rgba(255, 255, 255, 0.32) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+.camera-console .camera-console-viewport-ruler.is-vertical {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 12px;
+  border-right: 1px solid rgba(255, 255, 255, 0.22);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.32),
+    rgba(255, 255, 255, 0.32) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+.camera-console .camera-console-viewport-reticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 64px;
+  height: 64px;
+  border: 1px dashed rgba(125, 211, 252, 0.52);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.camera-console .camera-console-viewport-reticle::before,
+.camera-console .camera-console-viewport-reticle::after {
+  position: absolute;
+  display: block;
+  background: rgba(125, 211, 252, 0.36);
+  content: "";
+}
+
+.camera-console .camera-console-viewport-reticle::before {
+  top: 50%;
+  right: -18px;
+  left: -18px;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.camera-console .camera-console-viewport-reticle::after {
+  top: -18px;
+  bottom: -18px;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
 }
 
 .camera-console .camera-console-preview-column .camera-console-viewport img,

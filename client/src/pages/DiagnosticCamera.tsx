@@ -393,6 +393,14 @@ export default function DiagnosticCamera() {
       toast.error(t("selectPatientForPhoto"));
       return;
     }
+    if (!inferenceResult || state !== "ready") {
+      toast.error(
+        language === "th"
+          ? "โปรดตรวจสอบภาพก่อนบันทึก"
+          : "Review the image before saving"
+      );
+      return;
+    }
     if (!capturedAt) {
       toast.error(t("selectPhotoDateTime"));
       return;
@@ -500,6 +508,7 @@ export default function DiagnosticCamera() {
                 : undefined
             }
             selectedPatientRecordLoading={selectedPatientRecordQuery.isLoading}
+            selectedPatientRecordError={selectedPatientRecordQuery.error}
             state={state}
             cameraState={cameraState}
             cameraError={cameraError}
@@ -1084,6 +1093,7 @@ function CaptureWorkspace({
   selectedPatient,
   selectedPatientRecord,
   selectedPatientRecordLoading,
+  selectedPatientRecordError,
   state,
   cameraState,
   cameraError,
@@ -1135,6 +1145,7 @@ function CaptureWorkspace({
     }>;
   };
   selectedPatientRecordLoading: boolean;
+  selectedPatientRecordError: unknown;
   state: CaptureState;
   cameraState: CameraState;
   cameraError: string;
@@ -1179,6 +1190,21 @@ function CaptureWorkspace({
         : previewUrl
           ? "captured"
           : "waiting";
+  const patientName =
+    selectedPatientRecord?.displayName ||
+    selectedPatient?.displayName ||
+    selectedPatientRecord?.patientCode ||
+    selectedPatient?.patientCode ||
+    (language === "th" ? "ผู้ป่วยที่เลือก" : "Selected patient");
+  const patientCode =
+    selectedPatientRecord?.patientCode || selectedPatient?.patientCode || "—";
+  const patientType = selectedPatient
+    ? diabetesContext(selectedPatient, language)
+    : null;
+  const patientAge =
+    selectedPatient?.age === null || selectedPatient?.age === undefined
+      ? null
+      : `${selectedPatient.age} ${language === "th" ? "ปี" : "years"}`;
 
   return (
     <>
@@ -1190,22 +1216,27 @@ function CaptureWorkspace({
           <UserRound aria-hidden="true" />
         </div>
         <div className="camera-console-case-copy">
-          <span className="camera-console-phase">ACTIVE CASE</span>
-          <strong>
-            {selectedPatientRecord?.displayName ||
-              selectedPatient?.displayName ||
-              selectedPatientRecord?.patientCode ||
-              selectedPatient?.patientCode}
-          </strong>
+          <span className="camera-console-phase">
+            {language === "th" ? "ผู้ป่วยปัจจุบัน" : "ACTIVE CASE"}
+          </span>
+          <strong>{patientName}</strong>
           <small>
-            {selectedPatientRecord?.patientCode || selectedPatient?.patientCode}{" "}
-            ·{" "}
-            {selectedPatientRecord?.registrationLocation ||
-              selectedPatient?.registrationLocation}
+            <span className="camera-console-patient-code">{patientCode}</span>
+            {(selectedPatientRecord?.registrationLocation ||
+              selectedPatient?.registrationLocation) && (
+              <>
+                {" · "}
+                {selectedPatientRecord?.registrationLocation ||
+                  selectedPatient?.registrationLocation}
+              </>
+            )}
+            {patientType && <> · {patientType}</>}
+            {patientAge && <> · {patientAge}</>}
           </small>
         </div>
         <span className="camera-console-live-tag">
-          <span /> Ready for capture
+          <span />
+          {language === "th" ? "พร้อมถ่ายภาพ" : "Ready for capture"}
         </span>
         <button
           type="button"
@@ -1228,8 +1259,8 @@ function CaptureWorkspace({
                 <span aria-hidden="true" />
                 <h2 id="camera-console-capture-heading">
                   {language === "th"
-                    ? "ถ่ายภาพแผลและตรวจจับอัตโนมัติ"
-                    : "Capture and detect automatically"}
+                    ? "ถ่ายภาพแผลและตรวจจับอัตโนมัติ (Live AI Detection)"
+                    : "Capture and detect automatically (Live AI assist)"}
                 </h2>
               </div>
               <p>
@@ -1302,6 +1333,13 @@ function CaptureWorkspace({
               ref={viewportRef}
               className={`camera-console-viewport ${previewUrl ? "has-preview" : ""} ${cameraState === "live" ? "is-live" : ""}`}
             >
+              {!previewUrl && (
+                <div className="camera-console-viewport-guides" aria-hidden="true">
+                  <span className="camera-console-viewport-ruler is-horizontal" />
+                  <span className="camera-console-viewport-ruler is-vertical" />
+                  <span className="camera-console-viewport-reticle" />
+                </div>
+              )}
               {previewUrl ? (
                 <>
                   <img
@@ -1628,6 +1666,8 @@ function CaptureWorkspace({
                   t={t}
                   patient={selectedPatientRecord}
                   loading={selectedPatientRecordLoading}
+                  error={selectedPatientRecordError}
+                  reviewed={state === "ready" && Boolean(inferenceResult)}
                   woundAssessmentId={woundAssessmentId}
                   capturedAt={capturedAt}
                   onWoundAssessment={onWoundAssessment}
@@ -1649,6 +1689,8 @@ function PhotoAssignment({
   t,
   patient,
   loading,
+  error,
+  reviewed,
   woundAssessmentId,
   capturedAt,
   onWoundAssessment,
@@ -1670,6 +1712,8 @@ function PhotoAssignment({
     }>;
   };
   loading: boolean;
+  error: unknown;
+  reviewed: boolean;
   woundAssessmentId: string;
   capturedAt: string;
   onWoundAssessment: (value: string) => void;
@@ -1678,6 +1722,12 @@ function PhotoAssignment({
   saving: boolean;
 }) {
   const assessments = patient?.woundAssessments ?? [];
+  const recordErrorMessage =
+    error && typeof error === "object" && "message" in error
+      ? String(error.message)
+      : language === "th"
+        ? "ไม่สามารถโหลดข้อมูลผู้ป่วยที่เลือกได้"
+        : "The selected patient record could not be loaded.";
   return (
     <div className="camera-console-assignment">
       <div className="camera-console-assignment-title">
@@ -1696,12 +1746,27 @@ function PhotoAssignment({
         {patient?.displayName ||
           (language === "th" ? "ผู้ป่วยที่เลือก" : "Selected patient")}
       </p>
+      {error ? (
+        <div className="camera-console-assignment-message is-error" role="alert">
+          <AlertTriangle aria-hidden="true" />
+          <span>{recordErrorMessage}</span>
+        </div>
+      ) : !reviewed ? (
+        <div className="camera-console-assignment-message" role="status">
+          <Info aria-hidden="true" />
+          <span>
+            {language === "th"
+              ? "ตรวจสอบภาพและผลสนับสนุนก่อนบันทึกเข้าระเบียน"
+              : "Review the image and decision support before saving to the record."}
+          </span>
+        </div>
+      ) : null}
       <label>
         <span>{t("woundAssessment")}</span>
         <select
           value={woundAssessmentId}
           onChange={event => onWoundAssessment(event.target.value)}
-          disabled={saving || loading}
+          disabled={saving || loading || Boolean(error)}
         >
           <option value="">
             {loading ? t("loadingAssessments") : t("noSpecificAssessment")}
@@ -1720,12 +1785,12 @@ function PhotoAssignment({
           type="datetime-local"
           value={capturedAt}
           onChange={event => onCapturedAt(event.target.value)}
-          disabled={saving}
+          disabled={saving || Boolean(error)}
         />
       </label>
       <Button
         onClick={onSave}
-        disabled={saving || !capturedAt}
+        disabled={saving || loading || Boolean(error) || !capturedAt || !reviewed}
         className="camera-console-primary-action"
       >
         {saving ? (
@@ -1739,7 +1804,13 @@ function PhotoAssignment({
           </>
         )}
       </Button>
-      <small>{t("photoAssignmentNote")}</small>
+      <small>
+        {reviewed
+          ? t("photoAssignmentNote")
+          : language === "th"
+            ? "ปุ่มบันทึกจะเปิดใช้หลังตรวจสอบภาพเสร็จ"
+            : "Saving is enabled after image review is complete."}
+      </small>
     </div>
   );
 }
