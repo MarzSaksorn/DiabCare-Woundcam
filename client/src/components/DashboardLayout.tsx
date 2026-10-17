@@ -1,8 +1,8 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Bell, Camera, FileText, Languages, LayoutDashboard, LogOut, Settings, UserRound, Users } from "lucide-react";
-import { type ReactNode } from "react";
+import { Bell, Camera, ChevronsLeft, FileText, Languages, LayoutDashboard, LogOut, Settings, UserRound, Users } from "lucide-react";
+import { type ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
 import ReplicaLogin from "./ReplicaLogin";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
@@ -107,14 +107,35 @@ function ReplicaSidebarNavigation({ language, location, t, displayName, email, c
   canLogout: boolean;
   onLogout: () => void;
 }) {
+  const [collapsed, setCollapsed] = useState(false);
+  const collapseLabel = collapsed
+    ? language === "th"
+      ? "ขยายแถบเมนู"
+      : "Expand sidebar"
+    : language === "th"
+      ? "ยุบแถบเมนู"
+      : "Collapse sidebar";
+
   return (
-    <aside className="landscape-sidebar" aria-label={language === "th" ? "เมนูหลัก" : "Main navigation"}>
+    <aside className={`landscape-sidebar ${collapsed ? "is-collapsed" : ""}`} aria-label={language === "th" ? "เมนูหลัก" : "Main navigation"}>
       <div>
         <div className="landscape-sidebar-brand">
-          <span className="landscape-sidebar-brand-mark">
-            <img src="/assets/diabcare-mark.jpg" alt="DiabCare Logo" />
-          </span>
-          <div className="landscape-sidebar-brand-copy"><strong>DiabCare</strong><span>WoundCam</span></div>
+          <div className="landscape-sidebar-brand-main">
+            <span className="landscape-sidebar-brand-mark">
+              <img src="/assets/diabcare-mark.jpg" alt="DiabCare Logo" />
+            </span>
+            <div className="landscape-sidebar-brand-copy"><strong>DiabCare</strong><span>WoundCam</span></div>
+          </div>
+          <button
+            type="button"
+            className="landscape-sidebar-collapse"
+            onClick={() => setCollapsed(value => !value)}
+            aria-expanded={!collapsed}
+            aria-label={collapseLabel}
+            title={collapseLabel}
+          >
+            <ChevronsLeft aria-hidden="true" />
+          </button>
         </div>
         <nav className="landscape-sidebar-nav" aria-label={language === "th" ? "เมนูหลัก" : "Main navigation"}>
           {navItems.map(({ path, label, icon: Icon, badge }) => {

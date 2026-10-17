@@ -1020,15 +1020,28 @@ button { cursor: pointer; }
   color: #16345c;
   font-family: "Sarabun", "Inter", sans-serif;
   user-select: none;
+  transition:
+    width 180ms ease,
+    min-width 180ms ease,
+    flex-basis 180ms ease,
+    padding 180ms ease;
 }
 
 .landscape-sidebar-brand {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
   border-bottom: 1px solid #e2e8f0;
   padding-bottom: 20px;
+}
+
+.landscape-sidebar-brand-main {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
 }
 
 .landscape-sidebar-brand-mark {
@@ -1074,18 +1087,97 @@ button { cursor: pointer; }
 
 .landscape-sidebar-brand-copy {
   display: flex !important;
-  align-items: baseline;
-  gap: 6px;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
   white-space: nowrap;
 }
 
 .landscape-sidebar-brand-copy > span {
-  margin-top: 2px;
+  margin-top: 0;
   color: #0a4fbe;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: -0.025em;
-  line-height: 1;
+  line-height: 1.1;
+}
+
+.landscape-sidebar-collapse {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #16345c;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.landscape-sidebar-collapse:hover {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #0a4fbe;
+}
+
+.landscape-sidebar-collapse:focus-visible {
+  outline: 3px solid rgba(21, 104, 232, 0.28);
+  outline-offset: 2px;
+}
+
+.landscape-sidebar-collapse svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 180ms ease;
+}
+
+.landscape-sidebar.is-collapsed {
+  width: 80px;
+  min-width: 80px;
+  flex-basis: 80px;
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
+.landscape-sidebar.is-collapsed .landscape-sidebar-brand {
+  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.landscape-sidebar.is-collapsed .landscape-sidebar-brand-main {
+  justify-content: center;
+}
+
+.landscape-sidebar.is-collapsed .landscape-sidebar-brand-copy,
+.landscape-sidebar.is-collapsed .landscape-sidebar-nav-label,
+.landscape-sidebar.is-collapsed .landscape-sidebar-nav-badge,
+.landscape-sidebar.is-collapsed .landscape-sidebar-nav-dot,
+.landscape-sidebar.is-collapsed .landscape-sidebar-profile-main > div {
+  display: none !important;
+}
+
+.landscape-sidebar.is-collapsed .landscape-sidebar-nav-item {
+  justify-content: center;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.landscape-sidebar.is-collapsed .landscape-sidebar-profile {
+  flex-direction: column;
+  justify-content: center;
+}
+
+.landscape-sidebar.is-collapsed .landscape-sidebar-collapse svg {
+  transform: rotate(180deg);
 }
 
 .landscape-sidebar-nav {
@@ -1299,7 +1391,10 @@ button { cursor: pointer; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .landscape-sidebar,
   .landscape-sidebar-nav-item,
+  .landscape-sidebar-collapse,
+  .landscape-sidebar-collapse svg,
   .landscape-sidebar-logout {
     transition: none;
   }
