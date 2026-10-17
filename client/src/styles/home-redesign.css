@@ -316,6 +316,10 @@
   margin-bottom: 16px;
 }
 
+.home-stitch-card-heading.is-actions-only {
+  justify-content: flex-end;
+}
+
 .home-stitch-card-heading h2 {
   margin: 5px 0 0;
   color: #0b1c30;

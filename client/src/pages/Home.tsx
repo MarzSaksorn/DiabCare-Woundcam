@@ -246,17 +246,7 @@ export default function Home() {
 
         <section className="home-stitch-focus-grid" aria-label={language === "th" ? "จุดติดตามหลัก" : "Clinical focus"}>
           <article className="home-stitch-card home-stitch-latest-card">
-            <div className="home-stitch-card-heading">
-              <div>
-                <span className="home-stitch-section-kicker">
-                  {language === "th" ? "การติดตามล่าสุด" : "LATEST CLINICAL ACTIVITY"}
-                </span>
-                <h2>
-                  {language === "th"
-                    ? "ระเบียนผู้ป่วยที่อัปเดตล่าสุด"
-                    : "Recently updated records"}
-                </h2>
-              </div>
+            <div className="home-stitch-card-heading is-actions-only">
               <Link href="/patients" className="home-stitch-inline-link">
                 {language === "th" ? "ดูทั้งหมด" : "View all"}
                 <ArrowRight aria-hidden="true" />
