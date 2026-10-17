@@ -1,0 +1,733 @@
+.home-stitch {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 20px 24px 48px;
+  color: #0b1c30;
+  font-family: "Sarabun", sans-serif;
+}
+
+.home-stitch,
+.home-stitch * {
+  box-sizing: border-box;
+}
+
+.home-stitch h1,
+.home-stitch h2,
+.home-stitch h3,
+.home-stitch p {
+  text-wrap: pretty;
+}
+
+.home-stitch h1,
+.home-stitch h2,
+.home-stitch h3,
+.home-stitch p {
+  margin-top: 0;
+}
+
+.home-stitch a:focus-visible,
+.home-stitch button:focus-visible {
+  outline: 3px solid rgba(47, 185, 246, 0.65);
+  outline-offset: 3px;
+}
+
+.home-stitch-welcome {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(142, 213, 255, 0.24), transparent 33%),
+    #ffffff;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(22, 52, 92, 0.04);
+}
+
+.home-stitch-welcome::after {
+  position: absolute;
+  top: -84px;
+  right: -36px;
+  width: 210px;
+  height: 210px;
+  border: 1px solid rgba(10, 79, 190, 0.08);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.home-stitch-welcome-copy {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.home-stitch-eyebrow,
+.home-stitch-section-kicker {
+  color: #0a4fbe;
+  font-family: "Sarabun", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.home-stitch-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.home-stitch-eyebrow > span:first-child {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #0a4fbe;
+  box-shadow: 0 0 0 4px rgba(10, 79, 190, 0.1);
+}
+
+.home-stitch-eyebrow-divider,
+.home-stitch-eyebrow-muted {
+  color: #737785;
+}
+
+.home-stitch-welcome h1 {
+  max-width: 830px;
+  margin: 8px 0 7px;
+  color: #0b1c30;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.22;
+}
+
+.home-stitch-welcome h1 span {
+  display: block;
+}
+
+.home-stitch-date {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #434653;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.home-stitch-date svg {
+  width: 17px;
+  height: 17px;
+  color: #445f8a;
+}
+
+.home-stitch-welcome-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  max-width: 440px;
+}
+
+.home-stitch-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.home-stitch-button:hover {
+  transform: translateY(-1px);
+}
+
+.home-stitch-button svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.home-stitch-button.is-primary {
+  background: #0a4fbe;
+  color: #ffffff;
+}
+
+.home-stitch-button.is-primary:hover {
+  background: #003991;
+}
+
+.home-stitch-button.is-secondary {
+  border-color: #d3e4fe;
+  background: #eff4ff;
+  color: #003991;
+}
+
+.home-stitch-button.is-secondary:hover,
+.home-stitch-button.is-tertiary:hover {
+  background: #e5eeff;
+}
+
+.home-stitch-button.is-tertiary {
+  border-color: #e2e8f0;
+  background: #ffffff;
+  color: #445f8a;
+}
+
+.home-stitch-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.home-stitch-metric,
+.home-stitch-card,
+.home-stitch-safety {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(22, 52, 92, 0.04);
+}
+
+.home-stitch-metric {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  padding: 17px;
+}
+
+.home-stitch-metric::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: #0a4fbe;
+  content: "";
+}
+
+.home-stitch-metric.is-cyan::before {
+  background: #2fb9f6;
+}
+
+.home-stitch-metric.is-amber::before {
+  background: #d97706;
+}
+
+.home-stitch-metric.is-green::before {
+  background: #16a34a;
+}
+
+.home-stitch-metric-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  color: #445f8a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.home-stitch-metric-heading svg {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  color: #0a4fbe;
+}
+
+.home-stitch-metric.is-cyan .home-stitch-metric-heading svg {
+  color: #007ca8;
+}
+
+.home-stitch-metric.is-amber .home-stitch-metric-heading svg {
+  color: #d97706;
+}
+
+.home-stitch-metric.is-green .home-stitch-metric-heading svg {
+  color: #16a34a;
+}
+
+.home-stitch-metric-value {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.home-stitch-metric-value strong {
+  color: #0b1c30;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: clamp(27px, 3vw, 36px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.home-stitch-metric-value strong.is-unavailable {
+  color: #737785;
+}
+
+.home-stitch-metric p {
+  min-height: 19px;
+  margin: 9px 0 0;
+  color: #737785;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.home-stitch-focus-grid,
+.home-stitch-lower-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(320px, 5fr);
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.home-stitch-card {
+  min-width: 0;
+  padding: 20px;
+}
+
+.home-stitch-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.home-stitch-card-heading h2 {
+  margin: 5px 0 0;
+  color: #0b1c30;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.home-stitch-card-heading > svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  color: #0a4fbe;
+}
+
+.home-stitch-card-heading.is-stackable {
+  align-items: flex-end;
+}
+
+.home-stitch-card-heading.is-stackable p {
+  max-width: 590px;
+  margin: 7px 0 0;
+  color: #737785;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.home-stitch-inline-link,
+.home-stitch-empty-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #0a4fbe;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.home-stitch-inline-link:hover,
+.home-stitch-empty-link:hover {
+  color: #003991;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.home-stitch-inline-link svg,
+.home-stitch-empty-link svg {
+  width: 15px;
+  height: 15px;
+}
+
+.home-stitch-patient-list,
+.home-stitch-capture-list {
+  display: grid;
+  gap: 8px;
+}
+
+.home-stitch-patient-row,
+.home-stitch-capture-row {
+  display: flex;
+  min-width: 0;
+  min-height: 56px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #eef2f8;
+  border-radius: 7px;
+  background: #f8f9ff;
+  padding: 9px 10px;
+  color: inherit;
+  text-decoration: none;
+  transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.home-stitch-patient-row:hover,
+.home-stitch-capture-row:hover {
+  border-color: #b2cdfe;
+  background: #eff4ff;
+  transform: translateX(2px);
+}
+
+.home-stitch-patient-avatar,
+.home-stitch-capture-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+  background: #dce9ff;
+  color: #0a4fbe;
+}
+
+.home-stitch-patient-avatar svg,
+.home-stitch-capture-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.home-stitch-patient-copy,
+.home-stitch-capture-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.home-stitch-patient-copy strong,
+.home-stitch-capture-copy strong {
+  display: block;
+  overflow: hidden;
+  color: #0b1c30;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-stitch-patient-copy small,
+.home-stitch-capture-copy small {
+  display: block;
+  overflow: hidden;
+  margin-top: 3px;
+  color: #737785;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-stitch-patient-row time,
+.home-stitch-capture-row time {
+  flex: 0 0 auto;
+  color: #445f8a;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.home-stitch-patient-row > svg,
+.home-stitch-capture-row > svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: #737785;
+}
+
+.home-stitch-latest-card {
+  min-height: 284px;
+}
+
+.home-stitch-queue-card {
+  min-height: 284px;
+}
+
+.home-stitch-periods {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 2px;
+  border-radius: 6px;
+  background: #eff4ff;
+  padding: 3px;
+}
+
+.home-stitch-periods button {
+  min-height: 28px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  padding: 0 8px;
+  color: #445f8a;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.home-stitch-periods button.is-active {
+  background: #ffffff;
+  color: #0a4fbe;
+  box-shadow: 0 1px 3px rgba(22, 52, 92, 0.08);
+}
+
+.home-stitch-trend-card {
+  min-height: 300px;
+}
+
+.home-stitch-trend-empty,
+.home-stitch-schedule-empty {
+  display: flex;
+  min-height: 188px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #c3c6d5;
+  border-radius: 8px;
+  background: #f8f9ff;
+  padding: 22px;
+  text-align: center;
+}
+
+.home-stitch-trend-empty svg,
+.home-stitch-schedule-empty svg {
+  width: 30px;
+  height: 30px;
+  color: #737785;
+}
+
+.home-stitch-trend-empty strong,
+.home-stitch-schedule-empty strong {
+  max-width: 390px;
+  margin-top: 10px;
+  color: #0b1c30;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.home-stitch-trend-empty p,
+.home-stitch-schedule-empty p {
+  max-width: 400px;
+  margin: 6px 0 0;
+  color: #737785;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.home-stitch-schedule-card {
+  min-height: 300px;
+}
+
+.home-stitch-captures-card {
+  margin-top: 18px;
+}
+
+.home-stitch-safety {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 18px;
+  background: #eff4ff;
+  padding: 14px 16px;
+  color: #003991;
+}
+
+.home-stitch-safety > svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  color: #0a4fbe;
+}
+
+.home-stitch-safety strong {
+  display: block;
+  font-size: 13px;
+}
+
+.home-stitch-safety p {
+  margin: 3px 0 0;
+  color: #445f8a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.home-stitch-source-note {
+  margin: 12px 2px 0;
+  color: #737785;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.home-stitch-empty {
+  display: flex;
+  min-height: 174px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  color: #737785;
+  text-align: center;
+}
+
+.home-stitch-empty > svg {
+  width: 28px;
+  height: 28px;
+  color: #737785;
+}
+
+.home-stitch-empty strong {
+  margin-top: 9px;
+  color: #0b1c30;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.home-stitch-empty p {
+  max-width: 360px;
+  margin: 5px 0 0;
+  color: #737785;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.home-stitch-empty-link {
+  margin-top: 13px;
+}
+
+.home-stitch-empty.is-error > svg {
+  color: #ba1a1a;
+}
+
+.home-stitch-empty.is-error strong {
+  color: #93000a;
+}
+
+.home-stitch-loading {
+  display: grid;
+  gap: 8px;
+  padding: 7px 0;
+}
+
+.home-stitch-loading span {
+  display: block;
+  height: 58px;
+  border-radius: 7px;
+  background: linear-gradient(90deg, #eff4ff 25%, #f8f9ff 50%, #eff4ff 75%);
+  background-size: 200% 100%;
+  animation: home-stitch-shimmer 1.2s linear infinite;
+}
+
+.home-stitch-loading.is-compact span {
+  height: 42px;
+}
+
+@keyframes home-stitch-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 1120px) {
+  .home-stitch-focus-grid,
+  .home-stitch-lower-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .home-stitch-welcome {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-stitch-welcome-actions {
+    justify-content: flex-start;
+    max-width: none;
+  }
+
+  .home-stitch-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .home-stitch {
+    padding: 14px 14px 32px;
+  }
+
+  .home-stitch-welcome {
+    padding: 18px;
+  }
+
+  .home-stitch-welcome h1 {
+    font-size: 26px;
+  }
+
+  .home-stitch-welcome-actions {
+    width: 100%;
+  }
+
+  .home-stitch-button {
+    flex: 1 1 140px;
+  }
+
+  .home-stitch-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .home-stitch-card {
+    padding: 16px;
+  }
+
+  .home-stitch-card-heading,
+  .home-stitch-card-heading.is-stackable {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .home-stitch-inline-link {
+    align-self: flex-start;
+  }
+
+  .home-stitch-patient-row time,
+  .home-stitch-capture-row time {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-stitch-button,
+  .home-stitch-patient-row,
+  .home-stitch-capture-row {
+    transition: none;
+  }
+
+  .home-stitch-loading span {
+    animation: none;
+  }
+}
