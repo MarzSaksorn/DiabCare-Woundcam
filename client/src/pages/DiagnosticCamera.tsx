@@ -8,7 +8,9 @@ import {
   ArrowRight,
   Camera,
   Check,
+  ChevronDown,
   ChevronLeft,
+  ChevronUp,
   CircleHelp,
   Database,
   FileImage,
@@ -578,6 +580,7 @@ function PatientSelector({
   onClear: () => void;
   onConfirm: () => void;
 }) {
+  const [collapsed, setCollapsed] = useState(false);
   const filters: Array<{ value: PatientContext; label: string }> = [
     { value: "all", label: language === "th" ? "ทั้งหมด" : "All" },
     { value: "type1", label: "Type 1" },
@@ -603,6 +606,28 @@ function PatientSelector({
         : "age not recorded"
       : `${selectedPatient.age} ${language === "th" ? "ปี" : "years"}`
     : null;
+  const isCompact = collapsed && Boolean(selectedPatient);
+
+  useEffect(() => {
+    if (!selectedPatient) setCollapsed(false);
+  }, [selectedPatient]);
+
+  if (isCompact && selectedPatient) {
+    return (
+      <CollapsedPatientBanner
+        language={language}
+        patient={selectedPatient}
+        selectedName={selectedName}
+        selectedType={selectedType}
+        selectedAge={selectedAge}
+        total={total}
+        context={context}
+        onChangePatient={() => setCollapsed(false)}
+        onExpand={() => setCollapsed(false)}
+      />
+    );
+  }
+
   return (
     <section
       className="camera-console-stitch-selector"
@@ -629,14 +654,21 @@ function PatientSelector({
               : "Tap to choose one patient for wound photography and care follow-up."}
           </p>
         </div>
-        <div className="camera-console-stitch-selector-privacy">
-          <ShieldCheck aria-hidden="true" />
-          <span>
-            {language === "th"
-              ? "แสดงเฉพาะข้อมูลจำเป็น"
-              : "Only necessary data shown"}
-          </span>
-        </div>
+        <button
+          type="button"
+          className="camera-console-stitch-selector-collapse"
+          onClick={() => setCollapsed(true)}
+          disabled={!selectedPatient}
+          aria-expanded={!isCompact}
+          title={
+            language === "th"
+              ? "พับเก็บรายการเลือกผู้ป่วย"
+              : "Collapse patient list"
+          }
+        >
+          <span>{language === "th" ? "พับเก็บรายการ" : "Collapse list"}</span>
+          <ChevronUp aria-hidden="true" />
+        </button>
       </header>
 
       <div className="camera-console-stitch-selector-tools">
@@ -772,6 +804,123 @@ function PatientSelector({
         onClear={onClear}
         onConfirm={onConfirm}
       />
+    </section>
+  );
+}
+
+function CollapsedPatientBanner({
+  language,
+  patient,
+  selectedName,
+  selectedType,
+  selectedAge,
+  total,
+  context,
+  onChangePatient,
+  onExpand,
+}: {
+  language: "th" | "en";
+  patient: Patient;
+  selectedName: string | null;
+  selectedType: string | null;
+  selectedAge: string | null;
+  total: number;
+  context: PatientContext;
+  onChangePatient: () => void;
+  onExpand: () => void;
+}) {
+  const filterLabel =
+    context === "all"
+      ? language === "th"
+        ? "ทั้งหมด"
+        : "All"
+      : context === "type1"
+        ? "Type 1"
+        : context === "type2"
+          ? "Type 2"
+          : "GDM";
+
+  return (
+    <section
+      className="camera-console-stitch-selector camera-console-stitch-selector-collapsed"
+      aria-label={language === "th" ? "ผู้ป่วยที่เลือก" : "Selected patient"}
+    >
+      <div className="camera-console-stitch-selector-collapsed-main">
+        <div className="camera-console-stitch-selector-collapsed-patient">
+          <span className="camera-console-stitch-selector-collapsed-avatar">
+            <UserRound aria-hidden="true" />
+            <span aria-hidden="true" />
+          </span>
+          <div className="camera-console-stitch-selector-collapsed-copy">
+            <div className="camera-console-stitch-selector-collapsed-badges">
+              <span className="camera-console-stitch-selector-collapsed-eyebrow">
+                {language === "th" ? "ผู้ป่วยที่เลือก" : "SELECTED PATIENT"}
+              </span>
+              <span
+                className={`camera-console-stitch-selector-patient-badge is-${diabetesContextKey(patient)}`}
+              >
+                {selectedType}
+              </span>
+              <span className="camera-console-stitch-selector-collapsed-hn">
+                <span aria-hidden="true" />HN: {patient.patientCode}
+              </span>
+            </div>
+            <h2>{selectedName}</h2>
+            <div className="camera-console-stitch-selector-collapsed-details">
+              <span>{selectedAge}</span>
+              {patient.registrationLocation && (
+                <>
+                  <span aria-hidden="true">•</span>
+                  <span>
+                    {language === "th" ? "ลงทะเบียน: " : "Registered: "}
+                    {patient.registrationLocation}
+                  </span>
+                </>
+              )}
+              <span aria-hidden="true">•</span>
+              <span className="is-accent">
+                {language === "th"
+                  ? "ติดตามแผลเบาหวาน"
+                  : "Diabetic wound follow-up"}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="camera-console-stitch-selector-collapsed-actions">
+          <button type="button" onClick={onChangePatient}>
+            <RefreshCcw aria-hidden="true" />
+            <span>{language === "th" ? "เปลี่ยนผู้ป่วย" : "Change patient"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={onExpand}
+            className="is-primary"
+            aria-expanded={false}
+          >
+            <ChevronDown aria-hidden="true" />
+            <span>
+              {language === "th" ? "ขยายรายการ" : "Expand list"} ({total}{" "}
+              {language === "th" ? "รายการ" : "records"})
+            </span>
+          </button>
+        </div>
+      </div>
+      <div className="camera-console-stitch-selector-collapsed-meta">
+        <div>
+          <ShieldCheck aria-hidden="true" />
+          <span>
+            {language === "th"
+              ? "แสดงเฉพาะข้อมูลจำเป็น"
+              : "Only necessary patient data shown"}
+          </span>
+        </div>
+        <div>
+          <span>{language === "th" ? "ตัวกรองปัจจุบัน: " : "Current filter: "}</span>
+          <strong>
+            {filterLabel} ({total})
+          </strong>
+        </div>
+      </div>
     </section>
   );
 }
