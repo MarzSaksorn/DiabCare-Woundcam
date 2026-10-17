@@ -168,13 +168,21 @@ function ReplicaSidebarNavigation({ language, location, t, displayName, email, c
 
 function ReplicaBottomNavigation({ language, location, t }: { language: "en" | "th"; location: string; t: (key: string) => string }) {
   return (
-    <nav className="bottom-nav" aria-label={language === "th" ? "เมนูหลัก" : "Primary navigation"}>
-      {navItems.map(({ path, label, icon: Icon }) => {
+    <nav className="bottom-nav" aria-label={language === "th" ? "แถบนำทางหลัก" : "Primary navigation"}>
+      {navItems.map(({ path, label, icon: Icon, badge }) => {
         const active = isActivePath(path, location);
         const center = path === "/camera";
         return (
           <Link key={path} href={path} className={`bottom-nav-item ${center ? "is-camera" : ""} ${active ? "is-active" : ""}`} aria-current={active ? "page" : undefined}>
-            <span className="bottom-nav-icon"><Icon aria-hidden="true" /></span>
+            {!center && active && <span className="bottom-nav-active-indicator" aria-hidden="true" />}
+            {center ? (
+              <span className="bottom-nav-camera-wrap">
+                <span className="bottom-nav-icon"><Icon aria-hidden="true" /></span>
+                {badge && <span className="bottom-nav-badge">{badge}</span>}
+              </span>
+            ) : (
+              <span className="bottom-nav-icon"><Icon aria-hidden="true" /></span>
+            )}
             <span>{t(label)}</span>
           </Link>
         );
