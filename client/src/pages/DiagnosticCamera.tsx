@@ -423,6 +423,47 @@ export default function DiagnosticCamera() {
   return (
     <DashboardLayout bottomDock={patientSelectionDock}>
       <div className="camera-console">
+        <header className="camera-console-header camera-console-hero">
+          <div className="camera-console-title-block">
+            <div className="camera-console-hero-overline">
+              <span className="camera-console-hero-overline-label">
+                DIABCARE WOUNDCAM HUB
+              </span>
+              <span aria-hidden="true">•</span>
+              <span>
+                {language === "th"
+                  ? "คลังภาพถ่ายแผลจากกล้องคลินิก"
+                  : "Clinical camera photo archive"}
+              </span>
+            </div>
+            <h1>
+              {language === "th"
+                ? "ศูนย์บันทึกภาพแผล (Wound Capture & Assessment Hub)"
+                : "Wound Capture & Assessment Hub"}
+            </h1>
+            <p>
+              {language === "th"
+                ? "เลือกผู้ป่วย ถ่ายภาพแผลด้วยกล้อง DiabCare Cam ให้คมชัด แล้วตรวจสอบผล AI วิเคราะห์ก่อนบันทึกเวชระเบียน"
+                : "Select a patient, capture a clear wound image with DiabCare Cam, then review AI-supported results before saving the record."}
+            </p>
+            <div className="camera-console-hero-statuses">
+              <span className={`camera-console-hero-status is-${cameraState}`}>
+                <span aria-hidden="true" />
+                {cameraStatusLabel}
+              </span>
+              <span className="camera-console-hero-status is-secure">
+                <ShieldCheck aria-hidden="true" />
+                {language === "th"
+                  ? "ข้อมูลผู้ป่วยอยู่ในขอบเขตปลอดภัย"
+                  : "Protected patient workflow"}
+              </span>
+            </div>
+          </div>
+          <a href="#capture-history" className="camera-console-hero-action">
+            <RefreshCcw aria-hidden="true" />
+            <span>{t("viewCaptureHistory")}</span>
+          </a>
+        </header>
         {!workflowStarted ? (
           <PatientSelector
             language={language}
