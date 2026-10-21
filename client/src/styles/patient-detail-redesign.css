@@ -1,0 +1,643 @@
+.patient-detail-stitch {
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+  color: #0b1c30;
+  font-family: "Sarabun", sans-serif;
+}
+
+.patient-detail-stitch,
+.patient-detail-stitch * {
+  box-sizing: border-box;
+}
+
+.patient-detail-stitch a:focus-visible,
+.patient-detail-stitch button:focus-visible {
+  outline: 3px solid rgba(47, 185, 246, 0.7);
+  outline-offset: 3px;
+}
+
+.patient-detail-stitch .replica-detail-topbar {
+  min-height: 32px;
+  margin-bottom: 10px;
+  color: #737785;
+  font-size: 12px;
+}
+
+.patient-detail-stitch .replica-detail-topbar > span {
+  gap: 6px;
+  color: #737785;
+  font-weight: 600;
+}
+
+.patient-detail-stitch .replica-detail-topbar > span svg {
+  width: 15px;
+  height: 15px;
+  color: #0a4fbe;
+}
+
+.patient-detail-stitch .replica-detail-back {
+  min-height: 32px;
+  align-items: center;
+  gap: 7px;
+  color: #445f8a;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.patient-detail-stitch .replica-detail-back:hover {
+  color: #0a4fbe;
+}
+
+.patient-detail-stitch .replica-detail-back svg {
+  width: 17px;
+  height: 17px;
+}
+
+.patient-detail-stitch .replica-detail-hero {
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(22, 52, 92, 0.04);
+}
+
+.patient-detail-stitch .replica-detail-identity {
+  min-height: 104px;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.patient-detail-stitch .replica-detail-avatar {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: 2px solid #b2cdfe;
+  border-radius: 50%;
+  background: #eff4ff;
+  color: #0a4fbe;
+}
+
+.patient-detail-stitch .replica-detail-avatar svg {
+  width: 27px;
+  height: 27px;
+}
+
+.patient-detail-stitch .replica-detail-avatar > span {
+  position: absolute;
+  right: -1px;
+  bottom: 1px;
+  width: 15px;
+  height: 15px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #16a34a;
+}
+
+.patient-detail-stitch .replica-detail-identity > div:nth-child(2) {
+  min-width: 0;
+}
+
+.patient-detail-stitch .replica-detail-title-row {
+  align-items: center;
+  gap: 10px;
+}
+
+.patient-detail-stitch .replica-detail-title-row h1 {
+  margin: 0;
+  color: #16345c;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: clamp(21px, 2.4vw, 28px);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+}
+
+.patient-detail-stitch .replica-detail-identity p {
+  margin: 6px 0 0;
+  color: #445f8a;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.patient-detail-stitch .replica-detail-status {
+  min-height: 28px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #f4c7c2;
+  border-radius: 999px;
+  padding: 4px 10px;
+  color: #ba1a1a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.patient-detail-stitch .replica-detail-status > span {
+  width: 7px;
+  height: 7px;
+  background: currentColor;
+}
+
+.patient-detail-stitch .replica-detail-status.is-clinical {
+  border-color: #b7e4c7;
+  background: #ecfdf5;
+  color: #15803d;
+}
+
+.patient-detail-stitch .replica-detail-status.is-imported {
+  border-color: #f0d8a4;
+  background: #fff7e7;
+  color: #9a6b13;
+}
+
+.patient-detail-stitch .replica-detail-actions {
+  gap: 8px;
+}
+
+.patient-detail-stitch .replica-detail-actions .replica-primary-button,
+.patient-detail-stitch .replica-detail-actions .replica-secondary-button {
+  min-height: 44px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.patient-detail-stitch .replica-detail-actions .replica-primary-button {
+  background: #0a4fbe;
+  padding: 0 16px;
+  box-shadow: none;
+}
+
+.patient-detail-stitch .replica-detail-actions .replica-primary-button:hover {
+  background: #003991;
+}
+
+.patient-detail-stitch .replica-detail-actions .replica-secondary-button {
+  border-color: #e2e8f0;
+  color: #445f8a;
+}
+
+.patient-detail-stitch .replica-detail-action-bar {
+  display: none;
+}
+
+.patient-detail-stitch .replica-detail-stack {
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.patient-detail-stitch .replica-detail-section {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(22, 52, 92, 0.04);
+}
+
+.patient-detail-stitch .replica-detail-section-heading {
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eef2f7;
+  padding-bottom: 12px;
+}
+
+.patient-detail-stitch .replica-detail-section-heading > div > span {
+  color: #0a4fbe;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.patient-detail-stitch .replica-detail-section-heading h2 {
+  margin: 4px 0 0;
+  color: #16345c;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.35;
+}
+
+.patient-detail-stitch .replica-detail-section-heading > svg {
+  width: 19px;
+  height: 19px;
+  color: #0a4fbe;
+}
+
+.patient-detail-stitch .replica-detail-info-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px 26px;
+}
+
+.patient-detail-stitch .replica-detail-info {
+  min-height: 54px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.patient-detail-stitch .replica-detail-info span,
+.patient-detail-stitch .replica-detail-note-grid > div span,
+.patient-detail-stitch .replica-detail-list-item span,
+.patient-detail-stitch .replica-detail-wound-metrics span,
+.patient-detail-stitch .replica-detail-observation span {
+  color: #737785;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.patient-detail-stitch .replica-detail-info strong {
+  margin-top: 5px;
+  color: #0b1c30;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.patient-detail-stitch .replica-detail-note-grid {
+  gap: 12px 18px;
+  margin-top: 16px;
+}
+
+.patient-detail-stitch .replica-detail-note-grid > div {
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #f8f9ff;
+  padding: 12px 13px;
+}
+
+.patient-detail-stitch .replica-detail-note-grid > div strong {
+  margin-top: 5px;
+  color: #434653;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.patient-detail-stitch .replica-detail-muted {
+  margin: 14px 0 0;
+  color: #737785;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.patient-detail-stitch .replica-detail-empty {
+  min-height: 68px;
+  gap: 10px;
+  border: 1px dashed #b2cdfe;
+  border-radius: 7px;
+  background: #f8f9ff;
+  padding: 14px;
+  color: #737785;
+  font-size: 12px;
+}
+
+.patient-detail-stitch .replica-detail-empty svg {
+  width: 18px;
+  height: 18px;
+  color: #0a4fbe;
+}
+
+.patient-detail-stitch .replica-detail-two-column {
+  gap: 18px;
+}
+
+.patient-detail-stitch .replica-detail-two-column h3,
+.patient-detail-stitch .replica-detail-media h3 {
+  margin: 0 0 10px;
+  color: #16345c;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.patient-detail-stitch .replica-detail-list,
+.patient-detail-stitch .replica-detail-medications {
+  gap: 8px;
+}
+
+.patient-detail-stitch .replica-detail-list-item,
+.patient-detail-stitch .replica-detail-medications > div {
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #f8f9ff;
+  padding: 11px 12px;
+}
+
+.patient-detail-stitch .replica-detail-list-item strong {
+  color: #434653;
+  font-size: 12px;
+}
+
+.patient-detail-stitch .replica-detail-medications strong {
+  color: #16345c;
+  font-size: 12px;
+}
+
+.patient-detail-stitch .replica-detail-medications span {
+  color: #737785;
+  font-size: 11px;
+}
+
+.patient-detail-stitch .replica-detail-wounds {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.patient-detail-stitch .replica-detail-wound-card {
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #2fb9f6;
+  border-radius: 7px;
+  background: #f8f9ff;
+  padding: 14px;
+}
+
+.patient-detail-stitch .replica-detail-wound-top span {
+  color: #737785;
+  font-size: 11px;
+}
+
+.patient-detail-stitch .replica-detail-wound-top strong {
+  border: 1px solid #b2cdfe;
+  background: #eff4ff;
+  color: #0a4fbe;
+  font-size: 10px;
+}
+
+.patient-detail-stitch .replica-detail-wound-card h3 {
+  margin: 10px 0 2px;
+  color: #16345c;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 14px;
+}
+
+.patient-detail-stitch .replica-detail-wound-card > p {
+  color: #737785;
+  font-size: 12px;
+}
+
+.patient-detail-stitch .replica-detail-wound-metrics {
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.patient-detail-stitch .replica-detail-wound-metrics > div {
+  border: 1px solid #e2e8f0;
+  border-radius: 5px;
+  background: #ffffff;
+  padding: 9px;
+}
+
+.patient-detail-stitch .replica-detail-wound-metrics strong {
+  margin-top: 4px;
+  color: #0b1c30;
+  font-size: 12px;
+}
+
+.patient-detail-stitch .replica-detail-treatment {
+  border-top-color: #d3e4fe;
+  color: #434653 !important;
+  font-size: 12px !important;
+}
+
+.patient-detail-stitch .replica-detail-media {
+  border-top-color: #e2e8f0;
+}
+
+.patient-detail-stitch .replica-detail-chart {
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #f8f9ff;
+  padding: 14px;
+}
+
+.patient-detail-stitch .replica-detail-chart-head {
+  color: #737785;
+  font-size: 12px;
+}
+
+.patient-detail-stitch .replica-detail-chart-head strong {
+  color: #0a4fbe;
+  font-size: 14px;
+}
+
+.patient-detail-stitch .replica-detail-chart svg {
+  height: 210px;
+  margin-top: 12px;
+}
+
+.patient-detail-stitch .replica-detail-chart-foot {
+  border-top-color: #e2e8f0;
+  color: #737785;
+  font-size: 10px;
+}
+
+.patient-detail-stitch .replica-detail-observation-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.patient-detail-stitch .replica-detail-observation {
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #f8f9ff;
+  padding: 12px;
+}
+
+.patient-detail-stitch .replica-detail-observation strong {
+  margin-top: 7px;
+  color: #0b1c30;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 19px;
+}
+
+.patient-detail-stitch .replica-detail-observation small {
+  color: #737785;
+  font-size: 9px;
+}
+
+.patient-detail-stitch .replica-detail-alert {
+  border: 1px solid #f0d8a4;
+  border-radius: 7px;
+  background: #fff7e7;
+  padding: 13px;
+  color: #9a6b13;
+}
+
+.patient-detail-stitch .replica-detail-alert strong {
+  color: #7d5710;
+  font-size: 12px;
+}
+
+.patient-detail-stitch .replica-detail-alert p {
+  color: #8a6b29;
+  font-size: 11px;
+}
+
+.patient-detail-stitch .replica-detail-kpis {
+  gap: 10px;
+}
+
+.patient-detail-stitch .replica-detail-mini-stat {
+  border: 1px solid #d3e4fe;
+  border-radius: 7px;
+  background: #eff4ff;
+  padding: 13px;
+}
+
+.patient-detail-stitch .replica-detail-mini-stat.is-muted {
+  background: #f8f9ff;
+}
+
+.patient-detail-stitch .replica-detail-mini-stat span {
+  color: #445f8a;
+  font-size: 10px;
+}
+
+.patient-detail-stitch .replica-detail-mini-stat strong {
+  color: #0a4fbe;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 18px;
+}
+
+.patient-detail-stitch .replica-detail-disclaimer {
+  gap: 10px;
+  margin: 16px 0 84px;
+  border: 1px solid #d3e4fe;
+  border-radius: 8px;
+  background: #eff4ff;
+  padding: 13px 15px;
+  color: #003991;
+}
+
+.patient-detail-stitch .replica-detail-disclaimer > svg {
+  width: 18px;
+  height: 18px;
+  color: #0a4fbe;
+}
+
+.patient-detail-stitch .replica-detail-disclaimer p {
+  margin: 0;
+  color: #445f8a;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.patient-detail-stitch .replica-detail-disclaimer strong {
+  color: #003991;
+}
+
+.patient-detail-stitch .replica-detail-error {
+  min-height: 320px;
+  border: 1px solid #ffdad6;
+  border-radius: 12px;
+  background: #fff7f6;
+  box-shadow: 0 1px 3px rgba(22, 52, 92, 0.04);
+}
+
+.patient-detail-stitch .replica-detail-error > svg {
+  color: #ba1a1a;
+}
+
+.patient-detail-stitch .replica-detail-error h1 {
+  color: #93000a;
+  font-family: "Prompt", "Sarabun", sans-serif;
+}
+
+.patient-detail-stitch .replica-detail-error p {
+  color: #ba1a1a;
+}
+
+.patient-detail-stitch .replica-detail-loading {
+  gap: 16px;
+  margin-top: 0;
+}
+
+.patient-detail-stitch .replica-detail-loading span {
+  height: 170px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eff4ff, #f8f9ff, #eff4ff);
+  background-size: 200% 100%;
+}
+
+@media (max-width: 900px) {
+  .patient-detail-stitch .replica-detail-identity {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .patient-detail-stitch .replica-detail-actions {
+    width: 100%;
+    margin-left: 80px;
+  }
+
+  .patient-detail-stitch .replica-detail-actions > * {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .patient-detail-stitch .replica-detail-info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .patient-detail-stitch {
+    padding: 12px 14px 32px;
+  }
+
+  .patient-detail-stitch .replica-detail-topbar > span {
+    display: none;
+  }
+
+  .patient-detail-stitch .replica-detail-identity {
+    padding: 17px;
+  }
+
+  .patient-detail-stitch .replica-detail-avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .patient-detail-stitch .replica-detail-actions {
+    margin-left: 0;
+    flex-wrap: wrap;
+  }
+
+  .patient-detail-stitch .replica-detail-actions > * {
+    min-width: 100%;
+  }
+
+  .patient-detail-stitch .replica-detail-section {
+    padding: 17px;
+  }
+
+  .patient-detail-stitch .replica-detail-section-heading h2 {
+    font-size: 16px;
+  }
+
+  .patient-detail-stitch .replica-detail-info-grid,
+  .patient-detail-stitch .replica-detail-note-grid,
+  .patient-detail-stitch .replica-detail-observation-grid,
+  .patient-detail-stitch .replica-detail-kpis,
+  .patient-detail-stitch .replica-detail-wounds {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-detail-stitch .replica-detail-chart svg {
+    height: 170px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .patient-detail-stitch .replica-detail-loading span {
+    animation: none;
+  }
+}
