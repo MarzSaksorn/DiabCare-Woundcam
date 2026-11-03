@@ -86,18 +86,21 @@ Copy `env.example` to the ignored local `.env` file, then replace the Supabase a
 
 ```bash
 cp env.example .env
-# Edit .env. Set SITE_ADDRESS to a DNS name you control and configure the
-# required application and Supabase values.
+# Edit .env and set SUPABASE_DATABASE_URL to the Supabase Session pooler URL.
 docker compose up --build -d
 docker compose ps
-docker compose logs -f
+docker compose logs -f diabcare-woundcam
 ```
 
-The Compose stack places Caddy in front of the application. Only Caddy publishes host ports `80` and `443`; the app listens on the private Compose network and is not directly exposed. Caddy obtains and renews a TLS certificate for `SITE_ADDRESS`, redirects HTTP requests to HTTPS, and forwards HTTPS traffic to the application. Keep the named `caddy_data` volume so certificate and ACME state survive container recreation.
+The service is bound to `127.0.0.1:3000` by default rather than exposed to the LAN. For phone camera access, run it behind [Tailscale Serve](https://tailscale.com/docs/features/tailscale-serve), which terminates HTTPS using your tailnet DNS name:
 
-Before starting the stack, point the hostname in `SITE_ADDRESS` to this server with DNS, allow inbound TCP ports `80` and `443` through the host and cloud firewalls, and make sure those ports are not already in use. Caddy needs public reachability on port `80` or `443` for certificate issuance and renewal. After startup, check that `http://<SITE_ADDRESS>` redirects to `https://<SITE_ADDRESS>` and that the HTTPS endpoint presents a valid certificate. Do not use a placeholder hostname or expose the app container port directly.
+```bash
+docker compose up --build -d
+tailscale serve 3000
+tailscale serve status
+```
 
-The HTTPS origin is required because mobile browsers generally do not allow `getUserMedia()` from an ordinary LAN HTTP address. For a shared or production deployment, set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `.env`; recreate the container after changing them. For an isolated local demo without Supabase Auth, `LOCAL_AUTH_BYPASS=true` is development-only and must never be used in production. Never commit `.env`, database credentials, Supabase secret keys, or patient data.
+Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve requires HTTPS to be enabled for the tailnet and keeps the service available only to authorized tailnet devices. The HTTPS origin is required because mobile browsers generally do not allow `getUserMedia()` from an ordinary LAN HTTP address. For a shared or production deployment, set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `.env`; recreate the container after changing them. For an isolated local demo without Supabase Auth, `LOCAL_AUTH_BYPASS=true` is development-only and must never be used in production. Never commit `.env`, database credentials, Supabase secret keys, or patient data.
 
 ### Cloudflare R2 image storage
 

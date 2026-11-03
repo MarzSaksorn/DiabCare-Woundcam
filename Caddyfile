@@ -1,8 +1,0 @@
-{
-	admin off
-}
-
-{$SITE_ADDRESS} {
-	encode zstd gzip
-	reverse_proxy diabcare-woundcam:3000
-}

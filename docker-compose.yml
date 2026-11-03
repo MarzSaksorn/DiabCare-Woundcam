@@ -4,8 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     image: diabcare-woundcam:local
-    expose:
-      - "3000"
+    ports:
+      # Keep the app off the LAN; Tailscale Serve provides the HTTPS endpoint.
+      - "127.0.0.1:${DIABCARE_PORT:-3000}:3000"
     env_file:
       - path: .env
         required: false
@@ -17,35 +18,8 @@ services:
     restart: unless-stopped
     init: true
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:' + (process.env.PORT || 3000)).then((r) => process.exit(r.status < 500 ? 0 : 1)).catch(() => process.exit(1))",
-        ]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:' + (process.env.PORT || 3000)).then((r) => process.exit(r.status < 500 ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
       timeout: 5s
       start_period: 20s
       retries: 3
-
-  caddy:
-    image: caddy:2-alpine
-    environment:
-      SITE_ADDRESS: ${SITE_ADDRESS:?Set SITE_ADDRESS in .env to a DNS name you control}
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      diabcare-woundcam:
-        condition: service_healthy
-    restart: unless-stopped
-
-volumes:
-  caddy_data:
-  caddy_config:
