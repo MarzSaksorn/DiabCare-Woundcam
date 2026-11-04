@@ -11,12 +11,14 @@ RUN apt-get update \
 
 COPY package.json pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml ./
+# pnpm 10.15.1 honors onlyBuiltDependencies in pnpm-workspace.yaml; 10.4 silently skips native builds.
 COPY patches ./patches
-RUN npm install --global corepack@latest \
-  && corepack pnpm install --frozen-lockfile
+RUN npm install --global pnpm@10.15.1 \
+  && pnpm install --frozen-lockfile \
+  && node --input-type=commonjs -e "require('better-sqlite3')(':memory:').prepare('SELECT 1').get()"
 
 COPY . .
-RUN corepack pnpm build
+RUN pnpm build
 RUN mkdir -p dist/models \
   && cp server/models/diabetes-wound-detector.onnx server/models/diabetes-wound-detector.labels.json dist/models/ \
   && cp server/models/azh-classifier.onnx server/models/azh-classifier.labels.json dist/models/ \
@@ -31,6 +33,7 @@ RUN mkdir -p /data && chown node:node /data
 
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
+RUN node --input-type=commonjs -e "require('better-sqlite3')(':memory:').prepare('SELECT 1').get()"
 COPY --from=builder /app/dist ./dist
 
 USER node
