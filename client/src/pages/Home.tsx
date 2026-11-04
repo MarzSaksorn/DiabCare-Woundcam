@@ -3,6 +3,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDate, formatNumber } from "@/lib/locale";
 import { trpc } from "@/lib/trpc";
+import { isPublicDemoMode } from "@/lib/public-demo";
 import {
   ArrowRight,
   CalendarDays,
@@ -159,7 +160,9 @@ export default function Home() {
               <CalendarDays aria-hidden="true" />
               {dateLabel}
               <span aria-hidden="true">•</span>
-              {language === "th"
+              {isPublicDemoMode
+                ? language === "th" ? "ข้อมูลสังเคราะห์สำหรับโหมดสาธิต" : "Synthetic public-demo data"
+                : language === "th"
                 ? "ข้อมูลจริงจากระเบียนที่เชื่อมต่อ"
                 : "Live data from connected clinical records"}
             </p>
@@ -169,10 +172,10 @@ export default function Home() {
               <Camera aria-hidden="true" />
               {language === "th" ? "ถ่ายภาพแผลใหม่" : "Capture new wound"}
             </Link>
-            <Link href="/patients/new" className="home-stitch-button is-secondary">
+            {!isPublicDemoMode && <Link href="/patients/new" className="home-stitch-button is-secondary">
               <UserPlus aria-hidden="true" />
               {language === "th" ? "ลงทะเบียนผู้ป่วยใหม่" : "Register patient"}
-            </Link>
+            </Link>}
             <Link
               href="/reports"
               className="home-stitch-button is-tertiary"

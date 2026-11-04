@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Button as HeroButton, Card as HeroCard } from "@heroui/react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
+import { isPublicDemoMode } from "@/lib/public-demo";
 import {
   AlertTriangle,
   ArrowRight,
@@ -57,6 +58,7 @@ function canRequestCamera() {
 
 export default function DiagnosticCamera() {
   const { language, t } = useLanguage();
+  const publicDemo = isPublicDemoMode;
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -358,6 +360,7 @@ export default function DiagnosticCamera() {
   }
 
   async function beginReview() {
+    if (publicDemo) return;
     if (!imageDataUrl) {
       setCameraError(t("captureError"));
       return;
@@ -388,6 +391,7 @@ export default function DiagnosticCamera() {
   }
 
   function saveToPatient() {
+    if (publicDemo) return;
     if (!imageDataUrl || !assignedPatientId) {
       toast.error(t("selectPatientForPhoto"));
       return;
@@ -453,6 +457,7 @@ export default function DiagnosticCamera() {
         ) : (
           <CaptureWorkspace
             language={language}
+            readOnly={publicDemo}
             t={t}
             selectedPatient={selectedPatient}
             selectedPatientRecord={
@@ -1047,6 +1052,7 @@ function PatientChoice({
 
 function CaptureWorkspace({
   language,
+  readOnly,
   t,
   selectedPatient,
   selectedPatientRecord,
@@ -1090,6 +1096,7 @@ function CaptureWorkspace({
   onMaskOpacityChange,
 }: {
   language: "th" | "en";
+  readOnly: boolean;
   t: (key: string) => string;
   selectedPatient?: Patient;
   selectedPatientRecord?: {
@@ -1350,7 +1357,7 @@ function CaptureWorkspace({
                   </Button>
                   <Button
                     onClick={onReview}
-                    disabled={state === "analyzing"}
+                    disabled={state === "analyzing" || readOnly}
                     className="camera-console-primary-action"
                   >
                     {state === "analyzing" ? (
@@ -1508,6 +1515,7 @@ function CaptureWorkspace({
               {previewUrl && (
                 <PhotoAssignment
                   language={language}
+                  readOnly={readOnly}
                   t={t}
                   patient={selectedPatientRecord}
                   loading={selectedPatientRecordLoading}
@@ -1531,6 +1539,7 @@ function CaptureWorkspace({
 
 function PhotoAssignment({
   language,
+  readOnly,
   t,
   patient,
   loading,
@@ -1544,6 +1553,7 @@ function PhotoAssignment({
   saving,
 }: {
   language: "th" | "en";
+  readOnly: boolean;
   t: (key: string) => string;
   patient?: {
     patientCode: string;
@@ -1580,7 +1590,9 @@ function PhotoAssignment({
         <div>
           <span className="camera-console-phase">RECORD LINK</span>
           <strong>
-            {language === "th"
+            {readOnly
+              ? language === "th" ? "โหมดสาธิตแบบอ่านอย่างเดียว" : "Read-only demo mode"
+              : language === "th"
               ? "บันทึกเข้าระเบียนผู้ป่วย"
               : "Save to patient record"}
           </strong>
@@ -1591,7 +1603,12 @@ function PhotoAssignment({
         {patient?.displayName ||
           (language === "th" ? "ผู้ป่วยที่เลือก" : "Selected patient")}
       </p>
-      {error ? (
+      {readOnly ? (
+        <div className="camera-console-assignment-message" role="status">
+          <Info aria-hidden="true" />
+          <span>{language === "th" ? "ปิดการวิเคราะห์และบันทึกภาพในเดโมสาธารณะ" : "Image analysis and saving are disabled in this public demo."}</span>
+        </div>
+      ) : error ? (
         <div className="camera-console-assignment-message is-error" role="alert">
           <AlertTriangle aria-hidden="true" />
           <span>{recordErrorMessage}</span>
@@ -1611,7 +1628,7 @@ function PhotoAssignment({
         <select
           value={woundAssessmentId}
           onChange={event => onWoundAssessment(event.target.value)}
-          disabled={saving || loading || Boolean(error)}
+          disabled={readOnly || saving || loading || Boolean(error)}
         >
           <option value="">
             {loading ? t("loadingAssessments") : t("noSpecificAssessment")}
@@ -1630,12 +1647,12 @@ function PhotoAssignment({
           type="datetime-local"
           value={capturedAt}
           onChange={event => onCapturedAt(event.target.value)}
-          disabled={saving || Boolean(error)}
+          disabled={readOnly || saving || Boolean(error)}
         />
       </label>
       <Button
         onClick={onSave}
-        disabled={saving || loading || Boolean(error) || !capturedAt || !reviewed}
+        disabled={readOnly || saving || loading || Boolean(error) || !capturedAt || !reviewed}
         className="camera-console-primary-action"
       >
         {saving ? (
@@ -1650,7 +1667,9 @@ function PhotoAssignment({
         )}
       </Button>
       <small>
-        {reviewed
+        {readOnly
+          ? language === "th" ? "ใช้ภาพสังเคราะห์ในโหมดสาธิตเท่านั้น" : "Use synthetic imagery only in this demo."
+          : reviewed
           ? t("photoAssignmentNote")
           : language === "th"
             ? "ปุ่มบันทึกจะเปิดใช้หลังตรวจสอบภาพเสร็จ"

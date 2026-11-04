@@ -1,4 +1,6 @@
 export const ENV = {
+  publicDemoMode: process.env.PUBLIC_DEMO_MODE === "true",
+  sqliteDatabasePath: process.env.SQLITE_DB_PATH ?? "/data/diabcare-demo.sqlite",
   supabaseUrl: process.env.SUPABASE_URL ?? "",
   supabasePublishableKey:
     process.env.SUPABASE_PUBLISHABLE_KEY ??
@@ -24,6 +26,32 @@ export const ENV = {
 export function assertProductionConfiguration(
   env: NodeJS.ProcessEnv = process.env
 ) {
+  if (env.PUBLIC_DEMO_MODE === "true") {
+    if (env.NODE_ENV !== "production") {
+      throw new Error("PUBLIC_DEMO_MODE=true requires NODE_ENV=production");
+    }
+    if (!env.SQLITE_DB_PATH?.trim()) {
+      throw new Error("PUBLIC_DEMO_MODE=true requires an explicit SQLITE_DB_PATH");
+    }
+    const forbiddenConnections = [
+      "DATABASE_URL",
+      "SUPABASE_DATABASE_URL",
+      "SUPABASE_URL",
+      "SUPABASE_PUBLISHABLE_KEY",
+      "SUPABASE_ANON_KEY",
+      "SUPABASE_KEY",
+    ];
+    const configured = forbiddenConnections.filter((key) => env[key]?.trim());
+    if (configured.length) {
+      throw new Error(
+        `Public demo must not receive Supabase/PostgreSQL credentials: ${configured.join(", ")}`
+      );
+    }
+    if (env.LOCAL_AUTH_BYPASS === "true" || env.DISABLE_LOGIN_PAGE === "true") {
+      throw new Error("Public demo uses its own read-only identity; legacy auth bypass flags are forbidden");
+    }
+  }
+
   if (
     env.NODE_ENV === "production" &&
     (env.LOCAL_AUTH_BYPASS === "true" || env.DISABLE_LOGIN_PAGE === "true")

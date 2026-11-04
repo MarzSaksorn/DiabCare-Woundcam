@@ -1,5 +1,4 @@
 import { trpc } from "@/lib/trpc";
-import { getSupabaseClient } from "@/lib/supabase";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { createRoot } from "react-dom/client";
@@ -15,7 +14,9 @@ const trpcClient = trpc.createClient({
       url: "/api/trpc",
       transformer: superjson,
       async headers() {
+        if (import.meta.env.VITE_PUBLIC_DEMO_MODE === "true") return {};
         try {
+          const { getSupabaseClient } = await import("@/lib/supabase");
           const supabase = await getSupabaseClient();
           const {
             data: { session },

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+  <title id="title">Synthetic wound illustration D</title><desc id="desc">Abstract, non-photographic demo shapes, not a patient image.</desc>
+  <rect width="640" height="420" rx="28" fill="#eaf1f4"/><path d="M0 296c116-43 204-48 316-11s211 54 324 11v124H0z" fill="#d4e2e8"/>
+  <ellipse cx="320" cy="209" rx="152" ry="94" fill="#e3b99c"/><path d="M264 207c13-42 84-57 111-20 29 41-13 75-55 69-38-5-67-19-56-49z" fill="#ad6571"/><path d="M298 204c15-15 47-13 53 4 7 18-16 31-35 25-17-5-30-17-18-29z" fill="#65475e"/>
+  <rect x="28" y="28" width="233" height="42" rx="21" fill="#16345c"/><text x="48" y="56" fill="#fff" font-family="Arial,sans-serif" font-size="18" font-weight="700">SYNTHETIC DEMO · NOT A PHOTO</text>
+  <text x="320" y="379" text-anchor="middle" fill="#16345c" font-family="Arial,sans-serif" font-size="19" font-weight="700">Illustrative interface content only</text>
+</svg>

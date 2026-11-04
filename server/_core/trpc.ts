@@ -27,6 +27,20 @@ const requireUser = t.middleware(async opts => {
 
 export const protectedProcedure = t.procedure.use(requireUser);
 
+const rejectPublicDemoWrites = t.middleware(async ({ ctx, next }) => {
+  if (ctx.publicDemo) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "This public demo is read-only. Changes are disabled.",
+    });
+  }
+  return next();
+});
+
+export const protectedMutationProcedure = t.procedure
+  .use(requireUser)
+  .use(rejectPublicDemoWrites);
+
 export const adminProcedure = t.procedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;

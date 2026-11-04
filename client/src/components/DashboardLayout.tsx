@@ -6,6 +6,8 @@ import { type ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
 import ReplicaLogin from "./ReplicaLogin";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
+import { isPublicDemoMode } from "@/lib/public-demo";
+import "@/styles/public-demo.css";
 
 type DashboardLayoutProps = { children: ReactNode; demoMode?: boolean; bottomDock?: ReactNode };
 type NavItem = { path: string; label: string; icon: typeof LayoutDashboard; badge?: string };
@@ -25,14 +27,15 @@ function isActivePath(path: string, location: string) {
 }
 
 export default function DashboardLayout({ children, demoMode = false, bottomDock }: DashboardLayoutProps) {
+  const publicDemo = demoMode || isPublicDemoMode;
   const { loading, user, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const [location] = useLocation();
 
-  if (loading && !demoMode) return <DashboardLayoutSkeleton />;
-  if (!user && !demoMode) return <ReplicaLogin />;
+  if (loading && !publicDemo) return <DashboardLayoutSkeleton />;
+  if (!user && !publicDemo) return <ReplicaLogin />;
 
-  const displayUser = user ?? { name: "Local Clinician", email: "local@diabcare.local" };
+  const displayUser = user ?? { name: "Public Demo Visitor", email: "demo-visitor@invalid.example" };
   const displayName = displayUser.name || (language === "th" ? "ผู้ใช้งาน" : "Clinician");
   const dateLabel = new Intl.DateTimeFormat(language === "th" ? "th-TH" : "en-US", {
     weekday: "long",
@@ -49,7 +52,7 @@ export default function DashboardLayout({ children, demoMode = false, bottomDock
         t={t}
         displayName={displayName}
         email={displayUser.email ?? ""}
-        canLogout={!demoMode}
+            canLogout={!publicDemo}
         onLogout={() => void logout()}
       />
       <div className="app-workspace">
@@ -85,13 +88,24 @@ export default function DashboardLayout({ children, demoMode = false, bottomDock
                   <DropdownMenuItem onClick={() => setLanguage(language === "th" ? "en" : "th")} className="cursor-pointer">
                     <Languages className="mr-2 h-4 w-4" /> {t("language")}
                   </DropdownMenuItem>
-                  {!demoMode && <DropdownMenuItem onClick={() => void logout()} className="cursor-pointer text-rose-600 focus:text-rose-600"><LogOut className="mr-2 h-4 w-4" /> {t("signOut")}</DropdownMenuItem>}
+                  {!publicDemo && <DropdownMenuItem onClick={() => void logout()} className="cursor-pointer text-rose-600 focus:text-rose-600"><LogOut className="mr-2 h-4 w-4" /> {t("signOut")}</DropdownMenuItem>}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
         </header>
-        <main className="mobile-content">{children}</main>
+        <main className="mobile-content">
+          {publicDemo && (
+            <aside className="public-demo-banner" role="note" aria-label={language === "th" ? "โหมดสาธิต" : "Public demo notice"}>
+              <span aria-hidden="true">ⓘ</span>
+              <div>
+                <strong>{language === "th" ? "โหมดสาธิตสาธารณะ · ข้อมูลสังเคราะห์" : "Public demo · synthetic data"}</strong>
+                <span>{language === "th" ? "ไม่มีข้อมูลผู้ป่วยจริง และปิดการบันทึกหรือแก้ไขข้อมูล" : "No real patient data. Saving and editing are disabled."}</span>
+              </div>
+            </aside>
+          )}
+          {children}
+        </main>
         <ReplicaBottomNavigation language={language} location={location} t={t} confirmation={bottomDock} />
       </div>
     </div>

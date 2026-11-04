@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { getSupabaseClient } from "@/lib/supabase";
 
 export function useAuthenticatedMediaUrl(storageUrl: string) {
   const [url, setUrl] = useState<string | null>(null);
@@ -13,6 +12,11 @@ export function useAuthenticatedMediaUrl(storageUrl: string) {
 
     async function load() {
       try {
+        if (storageUrl.startsWith("/demo-media/")) {
+          setUrl(storageUrl);
+          return;
+        }
+        const { getSupabaseClient } = await import("@/lib/supabase");
         const supabase = await getSupabaseClient();
         const {
           data: { session },

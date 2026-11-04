@@ -2,6 +2,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDate, formatNumber } from "@/lib/locale";
 import { trpc } from "@/lib/trpc";
+import { isPublicDemoMode } from "@/lib/public-demo";
 import {
   AlertTriangle,
   ArrowRight,
@@ -151,7 +152,7 @@ export default function Patients() {
             <div className="patients-stitch-eyebrow">
               {language === "th" ? "ทะเบียนผู้ป่วย" : "PATIENT REGISTRY"}
               <span aria-hidden="true" />
-              <span>{language === "th" ? "DM FOOT CARE REGISTRY" : "CONNECTED PATIENT DIRECTORY"}</span>
+              <span>{isPublicDemoMode ? (language === "th" ? "ข้อมูลสาธิตสังเคราะห์" : "SYNTHETIC DEMO DIRECTORY") : (language === "th" ? "DM FOOT CARE REGISTRY" : "CONNECTED PATIENT DIRECTORY")}</span>
             </div>
             <h1 id="patients-stitch-title">
               {language === "th"
@@ -160,7 +161,9 @@ export default function Patients() {
               <span>{language === "th" ? "(Patient List Directory)" : "Connected clinical records"}</span>
             </h1>
             <p>
-              {language === "th"
+              {isPublicDemoMode
+                ? language === "th" ? "ข้อมูลผู้ป่วยสังเคราะห์" : "Synthetic patient data"
+                : language === "th"
                 ? "ค้นหาและเปิดข้อมูลจากแหล่งที่มาจริง โดยคงแยกระเบียนคลินิกและกลุ่มนำเข้า"
                 : "Search source records while keeping registered clinical and imported cohorts separate."}
             </p>
@@ -170,10 +173,10 @@ export default function Patients() {
               <RefreshCw className={loading ? "animate-spin" : ""} aria-hidden="true" />
               {language === "th" ? "รีเฟรชข้อมูล" : "Refresh data"}
             </button>
-            <Link href="/patients/new" className="patients-stitch-button is-primary">
+            {!isPublicDemoMode && <Link href="/patients/new" className="patients-stitch-button is-primary">
               <Users aria-hidden="true" />
               {language === "th" ? "ลงทะเบียนผู้ป่วยใหม่" : "Register new patient"}
-            </Link>
+            </Link>}
           </div>
         </header>
 

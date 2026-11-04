@@ -1,0 +1,32 @@
+.public-demo-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin: 0 0 1rem;
+  border: 1px solid #b7d9e8;
+  border-radius: 0.875rem;
+  background: #edf8fc;
+  padding: 0.75rem 1rem;
+  color: #16435d;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.public-demo-banner strong {
+  display: block;
+  font-weight: 750;
+}
+
+.public-demo-banner span {
+  display: block;
+  margin-top: 0.1rem;
+  color: #41677a;
+}
+
+.public-demo-readonly-note {
+  border: 1px dashed #9ec6d8;
+  border-radius: 0.875rem;
+  background: #f5fbfd;
+  padding: 1rem;
+  color: #16435d;
+}

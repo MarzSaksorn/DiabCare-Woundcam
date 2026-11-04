@@ -5,6 +5,7 @@ import { getDb } from "../db";
 import { ENV } from "./env";
 import { getCombinedModelReadiness } from "../woundInference";
 import { sql } from "drizzle-orm";
+import { getPublicDemoDatabase } from "../publicDemoDb";
 
 export const systemRouter = router({
   health: publicProcedure
@@ -15,16 +16,24 @@ export const systemRouter = router({
     )
     .query(async () => {
       let database = false;
-      const db = await getDb();
-      if (db) {
+      if (ENV.publicDemoMode) {
         try {
-          await db.execute(sql`select 1`);
-          database = true;
+          database = getPublicDemoDatabase().health();
         } catch {
           database = false;
         }
+      } else {
+        const db = await getDb();
+        if (db) {
+          try {
+            await db.execute(sql`select 1`);
+            database = true;
+          } catch {
+            database = false;
+          }
+        }
       }
-      const storage = Boolean(ENV.forgeApiUrl && ENV.forgeApiKey);
+      const storage = ENV.publicDemoMode || Boolean(ENV.forgeApiUrl && ENV.forgeApiKey);
       const models = getCombinedModelReadiness();
       return {
         ok: database && storage && models.detector.available,

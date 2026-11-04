@@ -1,11 +1,11 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { authenticateSupabaseRequest } from "./supabaseAuth";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
   res: CreateExpressContextOptions["res"];
   user: User | null;
+  publicDemo: boolean;
 };
 
 export function isLocalAuthBypassEnabled(env: NodeJS.ProcessEnv = process.env) {
@@ -31,12 +31,37 @@ export function createLocalDevelopmentUser(): User {
   };
 }
 
+export function createPublicDemoUser(): User {
+  const now = new Date();
+  return {
+    id: 0,
+    openId: "public-demo-visitor",
+    name: "Public Demo Visitor",
+    email: "demo-visitor@invalid.example",
+    loginMethod: "public-demo",
+    role: "user",
+    createdAt: now,
+    updatedAt: now,
+    lastSignedIn: now,
+  };
+}
+
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
+  if (process.env.PUBLIC_DEMO_MODE === "true") {
+    return {
+      req: opts.req,
+      res: opts.res,
+      user: createPublicDemoUser(),
+      publicDemo: true,
+    };
+  }
+
   let user: User | null = null;
 
   try {
+    const { authenticateSupabaseRequest } = await import("./supabaseAuth");
     user = await authenticateSupabaseRequest(opts.req);
   } catch (error) {
     // Authentication is optional for public procedures.
@@ -51,5 +76,6 @@ export async function createContext(
     req: opts.req,
     res: opts.res,
     user,
+    publicDemo: false,
   };
 }

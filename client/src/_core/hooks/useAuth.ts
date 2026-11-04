@@ -1,5 +1,5 @@
-import { getSupabaseClient } from "@/lib/supabase";
 import { trpc } from "@/lib/trpc";
+import { isPublicDemoMode } from "@/lib/public-demo";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback, useMemo } from "react";
 
@@ -14,9 +14,12 @@ export function useAuth() {
 
   const logout = useCallback(async () => {
     try {
-      const supabase = await getSupabaseClient();
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (!isPublicDemoMode) {
+        const { getSupabaseClient } = await import("@/lib/supabase");
+        const supabase = await getSupabaseClient();
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+      }
     } finally {
       try {
         await logoutMutation.mutateAsync();

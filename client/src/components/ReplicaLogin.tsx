@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getSupabaseClient } from "@/lib/supabase";
 
 export default function ReplicaLogin() {
   const { language } = useLanguage();
@@ -26,6 +25,7 @@ export default function ReplicaLogin() {
     setError(null);
 
     try {
+      const { getSupabaseClient } = await import("@/lib/supabase");
       const supabase = await getSupabaseClient();
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),

@@ -3,12 +3,12 @@ import express from "express";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerSupabaseAuthRoutes } from "./supabaseAuth";
-import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { assertProductionConfiguration } from "./env";
+import { ENV } from "./env";
+import { getPublicDemoDatabase } from "../publicDemoDb";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -31,13 +31,38 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 
 async function startServer() {
   assertProductionConfiguration();
+  if (ENV.publicDemoMode) getPublicDemoDatabase().health();
   const app = express();
   const server = createServer(app);
-  // Configure body parser with larger size limit for file uploads
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  registerStorageProxy(app);
-  registerSupabaseAuthRoutes(app);
+  app.get("/healthz", (_req, res) => {
+    try {
+      const database = !ENV.publicDemoMode || getPublicDemoDatabase().health();
+      res.status(database ? 200 : 503).json({ ok: database });
+    } catch {
+      res.status(503).json({ ok: false });
+    }
+  });
+  app.use((req, res, next) => {
+    const legacyStoragePath = ["/r2-storage", "/manus-storage"].some(
+      root => req.path === root || req.path.startsWith(`${root}/`),
+    );
+    if (ENV.publicDemoMode && legacyStoragePath) {
+      res.sendStatus(404);
+      return;
+    }
+    next();
+  });
+  const requestBodyLimit = ENV.publicDemoMode ? "2mb" : "50mb";
+  app.use(express.json({ limit: requestBodyLimit }));
+  app.use(express.urlencoded({ limit: requestBodyLimit, extended: true }));
+  if (!ENV.publicDemoMode) {
+    const [{ registerStorageProxy }, { registerSupabaseAuthRoutes }] = await Promise.all([
+      import("./storageProxy"),
+      import("./supabaseAuth"),
+    ]);
+    registerStorageProxy(app);
+    registerSupabaseAuthRoutes(app);
+  }
   // tRPC API
   app.use(
     "/api/trpc",

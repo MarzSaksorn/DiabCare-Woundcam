@@ -14,6 +14,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDate } from "@/lib/locale";
+import { isPublicDemoMode } from "@/lib/public-demo";
 
 type Photo = {
   id: number;
@@ -40,10 +41,12 @@ export function WoundPhotoGallery({
   photos,
   t,
   onChanged,
+  readOnly = isPublicDemoMode,
 }: {
   photos: Photo[];
   t: (key: string) => string;
   onChanged?: () => void;
+  readOnly?: boolean;
 }) {
   const { language } = useLanguage();
   const [showHidden, setShowHidden] = useState(false);
@@ -89,7 +92,9 @@ export function WoundPhotoGallery({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2">
         <span className="text-xs text-slate-500">
-          {t("photoManagementNote")}
+          {readOnly
+            ? language === "th" ? "ภาพประกอบสังเคราะห์สำหรับเดโมเท่านั้น" : "Synthetic illustrations for demo only"
+            : t("photoManagementNote")}
         </span>
         <Button
           type="button"
@@ -124,6 +129,7 @@ export function WoundPhotoGallery({
               onToggleHidden={toggleHidden}
               onDelete={permanentlyDelete}
               busy={hidePhoto.isPending || deletePhoto.isPending}
+              readOnly={readOnly}
             />
           ))}
         </div>
@@ -139,6 +145,7 @@ function AuthenticatedPhotoCard({
   onToggleHidden,
   onDelete,
   busy,
+  readOnly,
 }: {
   photo: Photo;
   language: "th" | "en";
@@ -146,6 +153,7 @@ function AuthenticatedPhotoCard({
   onToggleHidden: (photo: Photo) => void;
   onDelete: (photo: Photo) => void;
   busy: boolean;
+  readOnly: boolean;
 }) {
   const { url, error } = useAuthenticatedMediaUrl(photo.storageUrl);
   const mediaStatus = error
@@ -201,7 +209,7 @@ function AuthenticatedPhotoCard({
             : photo.capturedOn || t("dateNotRecorded")}{" "}
           · {(photo.fileSizeBytes / 1024 / 1024).toFixed(1)} MB
         </span>
-        <div className="mt-3 flex gap-2">
+        {!readOnly && <div className="mt-3 flex gap-2">
           <Button
             type="button"
             variant="outline"
@@ -226,7 +234,7 @@ function AuthenticatedPhotoCard({
           >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
-        </div>
+        </div>}
       </figcaption>
     </figure>
   );

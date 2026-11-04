@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDate } from "@/lib/locale";
 import { WoundPhotoGallery, WoundPhotoUpload } from "@/components/WoundPhotoGallery";
+import { isPublicDemoMode } from "@/lib/public-demo";
 
 type ProfileForm = {
   displayName: string; phone: string; dateOfBirth: string; age: string; registrationLocation: string; identifyBy: string; sex: "FEMALE" | "MALE"; diabetesContext: "none" | "type1" | "type2" | "gdm" | "multiple"; type1: 0 | 1; type2: 0 | 1; gdm: 0 | 1; clinicalNotes: string; allergiesSummary: string; diagnosesSummary: string; riskFlags: string; careTeam: string;
@@ -53,6 +54,7 @@ export default function RegisteredPatientRecord() {
   function archive() { const reason = archiveReason.trim(); if (!reason) { toast.error(t("archiveReasonRequired")); return; } if (window.confirm(t("archiveConfirm"))) archivePatient.mutate({ patientId, reason }); }
   function restore() { if (window.confirm(t("restoreConfirm"))) restorePatient.mutate({ patientId }); }
 
+  if (isPublicDemoMode) return <DashboardLayout><main className="mx-auto w-full max-w-3xl px-5 py-10"><section className="public-demo-readonly-note"><h1 className="text-xl font-bold">{language === "th" ? "แก้ไขระเบียนถูกปิดในโหมดสาธิต" : "Editing is disabled in the public demo"}</h1><p className="mt-2 text-sm">{language === "th" ? "ข้อมูลผู้ป่วยทั้งหมดเป็นข้อมูลสังเคราะห์ และระบบไม่บันทึกการเปลี่ยนแปลง" : "All patient information is synthetic. Changes are not saved."}</p><Link href={`/patients/registered/${patientId}`} className="replica-secondary-button mt-5 inline-flex">{t("backToRecord")}</Link></section></main></DashboardLayout>;
   if (record.isLoading) return <DashboardLayout><main className="mx-auto max-w-5xl p-8"><div className="h-96 animate-pulse rounded-2xl bg-[#f1f4f2]" /></main></DashboardLayout>;
   if (record.error || !record.data) return <DashboardLayout><main className="mx-auto max-w-5xl p-8"><p className="text-sm text-[#E84D67]">{t("recordUnavailable")}</p><Button onClick={() => setLocation("/patients")} variant="outline" className="mt-4">{t("backToPatients")}</Button></main></DashboardLayout>;
   const { patient, medications, woundAssessments, auditEvents } = record.data;
