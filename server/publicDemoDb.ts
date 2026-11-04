@@ -60,7 +60,16 @@ function json(value: JsonRecord) {
 }
 
 function parse<T>(value: string): T {
-  return JSON.parse(value) as T;
+  return JSON.parse(value, (key: string, entry: unknown) => {
+    if (
+      typeof entry === "string" &&
+      /At$/.test(key) &&
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(entry)
+    ) {
+      return new Date(entry);
+    }
+    return entry;
+  }) as T;
 }
 
 function isoDaysAgo(days: number) {

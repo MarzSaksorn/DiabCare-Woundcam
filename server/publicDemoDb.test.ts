@@ -33,8 +33,16 @@ describe("PublicDemoDatabase", () => {
       const record = db.registeredPatientRecord(1);
       expect(record?.patient.patientCode).toBe("DEMO-1001");
       expect(record?.media[0]?.storageUrl).toMatch(/^\/demo-media\/synthetic-wound-example-[a-d]\.svg$/);
+      expect(record?.media[0]?.capturedAt).toBeInstanceOf(Date);
+      expect(record?.media[0]?.createdAt).toBeInstanceOf(Date);
       expect(record?.patient.clinicalNotes).toContain("Synthetic interface data only");
-      expect(db.photoHistory({ offset: 0, limit: 30 }).total).toBe(5);
+      const dashboardPhoto = db.dashboardSummary().recentPhotos[0];
+      expect(dashboardPhoto?.capturedAt).toBeInstanceOf(Date);
+      expect(dashboardPhoto?.createdAt).toBeInstanceOf(Date);
+      const photoHistory = db.photoHistory({ offset: 0, limit: 30 });
+      expect(photoHistory.total).toBe(5);
+      expect(photoHistory.photos[0]?.capturedAt).toBeInstanceOf(Date);
+      expect(photoHistory.photos[0]?.createdAt).toBeInstanceOf(Date);
 
       const serialized = JSON.stringify({ summary: db.dashboardSummary(), record });
       expect(serialized).not.toMatch(/supabase|storage\.googleapis/i);
