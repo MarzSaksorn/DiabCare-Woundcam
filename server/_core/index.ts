@@ -52,7 +52,7 @@ async function startServer() {
     }
     next();
   });
-  const requestBodyLimit = ENV.publicDemoMode ? "2mb" : "50mb";
+  const requestBodyLimit = ENV.publicDemoMode ? "17mb" : "50mb";
   app.use(express.json({ limit: requestBodyLimit }));
   app.use(express.urlencoded({ limit: requestBodyLimit, extended: true }));
   if (!ENV.publicDemoMode) {

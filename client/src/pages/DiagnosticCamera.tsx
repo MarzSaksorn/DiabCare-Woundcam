@@ -360,7 +360,6 @@ export default function DiagnosticCamera() {
   }
 
   async function beginReview() {
-    if (publicDemo) return;
     if (!imageDataUrl) {
       setCameraError(t("captureError"));
       return;
@@ -1357,7 +1356,7 @@ function CaptureWorkspace({
                   </Button>
                   <Button
                     onClick={onReview}
-                    disabled={state === "analyzing" || readOnly}
+                    disabled={state === "analyzing"}
                     className="camera-console-primary-action"
                   >
                     {state === "analyzing" ? (
@@ -1606,7 +1605,7 @@ function PhotoAssignment({
       {readOnly ? (
         <div className="camera-console-assignment-message" role="status">
           <Info aria-hidden="true" />
-          <span>{language === "th" ? "ปิดการวิเคราะห์และบันทึกภาพในเดโมสาธารณะ" : "Image analysis and saving are disabled in this public demo."}</span>
+          <span>{language === "th" ? "ทดลองวิเคราะห์ภาพได้ ภาพจะถูกส่งไปประมวลผลบนเซิร์ฟเวอร์เดโมชั่วคราวและไม่บันทึก โปรดใช้เฉพาะภาพสังเคราะห์ และห้ามอัปโหลดข้อมูลผู้ป่วยจริง" : "Image analysis is available. Images are sent to this demo server for temporary processing and aren't saved. Use synthetic images only; don't upload real patient data."}</span>
         </div>
       ) : error ? (
         <div className="camera-console-assignment-message is-error" role="alert">

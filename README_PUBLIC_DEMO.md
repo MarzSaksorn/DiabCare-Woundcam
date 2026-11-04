@@ -16,7 +16,9 @@ curl --fail http://127.0.0.1:3301/healthz
 
 Open `http://127.0.0.1:3301`. The service publishes only on host loopback, so it isn't directly reachable from the LAN or public internet. The persistent SQLite file lives in the `public-demo-data` Compose volume and is seeded automatically on first startup. The navbar and title bar stay in place; a visible banner identifies the synthetic, read-only mode.
 
-In demo mode, the app skips Supabase authentication and storage routes. Read endpoints use the SQLite adapter and bundled SVG illustrations. Patient registration and editing, photo uploads/deletion, inference, and other mutations are disabled in the UI and rejected by server middleware. The demo guest is not an administrator.
+In demo mode, the app skips Supabase authentication and storage routes. Read endpoints use the SQLite adapter and bundled SVG illustrations. Visitors can capture or select an image and run the wound-analysis pipeline. The image is sent to this app's server for temporary inference and is not stored. Use synthetic images only; do not submit real patient information or photographs. The demo allows one inference at a time and caps inference at 12 requests per minute per server process.
+
+Patient registration and editing, photo saving/deletion, and all other record-changing operations remain disabled in the UI and rejected by server middleware. The demo guest is not an administrator. Analysis returns model suggestions for demonstration only and does not provide a diagnosis or treatment advice.
 
 ## Serve through Cloudflare Tunnel with HTTPS
 

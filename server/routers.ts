@@ -11,6 +11,28 @@ import { inferWoundImage } from "./woundInference";
 import { TRPCError } from "@trpc/server";
 import sharp from "sharp";
 
+const DEMO_INFERENCE_WINDOW_MS = 60_000;
+const DEMO_INFERENCE_MAX_PER_WINDOW = 12;
+let demoInferenceWindowStartedAt = 0;
+let demoInferenceRequestCount = 0;
+let demoInferenceInFlight = false;
+
+function reservePublicDemoInference() {
+  const now = Date.now();
+  if (now - demoInferenceWindowStartedAt >= DEMO_INFERENCE_WINDOW_MS) {
+    demoInferenceWindowStartedAt = now;
+    demoInferenceRequestCount = 0;
+  }
+  if (demoInferenceInFlight || demoInferenceRequestCount >= DEMO_INFERENCE_MAX_PER_WINDOW) {
+    throw new TRPCError({
+      code: "TOO_MANY_REQUESTS",
+      message: "The public demo is busy. Please wait before trying another image.",
+    });
+  }
+  demoInferenceRequestCount += 1;
+  demoInferenceInFlight = true;
+}
+
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
@@ -94,12 +116,22 @@ export const appRouter = router({
   }),
 
   wound: router({
-    infer: protectedMutationProcedure.input(z.object({ imageData: z.string().min(32).max(16_000_000), confidence: z.number().min(0.05).max(0.95).default(0.25) })).mutation(async ({ input }) => {
+    infer: protectedProcedure.input(z.object({ imageData: z.string().min(32).max(16_000_000), confidence: z.number().min(0.05).max(0.95).default(0.25) })).mutation(async ({ input, ctx }) => {
       const payload = input.imageData.includes(",") ? input.imageData.split(",", 2)[1] : input.imageData;
-      if (!payload) throw new Error("Image payload is empty");
+      if (!payload) throw new TRPCError({ code: "BAD_REQUEST", message: "Image payload is empty" });
       const image = Buffer.from(payload, "base64");
-      if (image.byteLength > 12 * 1024 * 1024) throw new Error("Image is too large");
-      return inferWoundImage(image, input.confidence);
+      if (!image.byteLength || image.byteLength > 12 * 1024 * 1024) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Image must be smaller than 12 MB" });
+      }
+      if (ctx.publicDemo) reservePublicDemoInference();
+      try {
+        return await inferWoundImage(image, input.confidence);
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        throw new TRPCError({ code: "BAD_REQUEST", message: "The selected image could not be analyzed" });
+      } finally {
+        if (ctx.publicDemo) demoInferenceInFlight = false;
+      }
     }),
   }),
 

@@ -538,7 +538,7 @@ export async function inferWoundImage(
   image: Buffer,
   confidence = DEFAULT_CONFIDENCE
 ): Promise<InferenceResult> {
-  const decoded = await sharp(image)
+  const decoded = await sharp(image, { limitInputPixels: 25_000_000 })
     .rotate()
     .resize({
       width: IMAGE_SIZE,
