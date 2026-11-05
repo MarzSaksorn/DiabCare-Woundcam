@@ -1,3 +1,5 @@
+This work is licensed under a [CC BY-NC-ND 4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+
 # DiabCare Woundcam
 
 DiabCare Woundcam is a bilingual clinical companion web application for hospital teams and local village nurses monitoring diabetic wounds. It provides a de-identified patient workspace, guided camera capture, local wound-image inference, and longitudinal clinical-record review.
