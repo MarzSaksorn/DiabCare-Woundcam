@@ -351,10 +351,14 @@ export function OverlayControls({
   onMaskOpacityChange: (value: number) => void;
 }) {
   return (
-    <fieldset className="replica-camera-overlay-controls">
-      <legend>
+    <div
+      className="replica-camera-overlay-controls"
+      role="group"
+      aria-labelledby="camera-overlay-controls-heading"
+    >
+      <h3 id="camera-overlay-controls-heading">
         {language === "th" ? "ตัวควบคุมชั้นข้อมูลภาพ" : "Overlay controls"}
-      </legend>
+      </h3>
       <label>
         <input
           type="checkbox"
@@ -420,7 +424,7 @@ export function OverlayControls({
             : "No segmentation masks are available for this result."}
         </small>
       )}
-    </fieldset>
+    </div>
   );
 }
 

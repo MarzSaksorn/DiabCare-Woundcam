@@ -23,8 +23,8 @@
   margin: 0 auto;
   padding: 2px 0 36px;
   color: var(--console-text);
-  font-family: "Atkinson Hyperlegible", sans-serif;
-  font-size: 18px;
+  font-family: "Sarabun", sans-serif;
+  font-size: 14px;
   line-height: 1.4;
 }
 
@@ -64,121 +64,6 @@
 .camera-console h3,
 .camera-console p {
   margin-top: 0;
-}
-
-.camera-console-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 32px;
-  margin-bottom: 22px;
-}
-
-.camera-console-title-block {
-  min-width: 0;
-}
-
-.camera-console-back {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  gap: 5px;
-  color: var(--console-blue-dark);
-  font-size: 17px;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.camera-console-back:hover {
-  color: var(--console-blue);
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.camera-console-back svg {
-  width: 21px;
-  height: 21px;
-}
-
-.camera-console-overline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin-top: 13px;
-  color: var(--console-blue);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-}
-
-.camera-console-secure-chip {
-  display: inline-flex;
-  min-height: 30px;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid #bbf7d0;
-  border-radius: 999px;
-  background: var(--console-stable-soft);
-  padding: 0 10px;
-  color: var(--console-stable);
-  font-size: 13px;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.camera-console-secure-chip svg {
-  width: 17px;
-  height: 17px;
-}
-
-.camera-console-header h1 {
-  margin: 7px 0 4px;
-  color: var(--console-text);
-  font-size: clamp(32px, 4vw, 46px);
-  letter-spacing: -0.045em;
-  line-height: 1.12;
-}
-
-.camera-console-header p {
-  max-width: 720px;
-  margin: 0;
-  color: var(--console-muted);
-  font-size: 19px;
-  line-height: 1.45;
-}
-
-.camera-console-brand {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 11px;
-  padding-bottom: 4px;
-}
-
-.camera-console-brand img {
-  width: 48px;
-  height: 38px;
-  border-radius: 8px;
-  object-fit: cover;
-  object-position: left center;
-}
-
-.camera-console-brand strong,
-.camera-console-brand small {
-  display: block;
-}
-
-.camera-console-brand strong {
-  color: var(--console-blue-dark);
-  font-size: 19px;
-}
-
-.camera-console-brand small {
-  margin-top: 2px;
-  color: var(--console-subtle);
-  font-size: 15px;
 }
 
 .camera-console-card {
@@ -748,6 +633,11 @@
   font-size: 15px;
 }
 
+.camera-console-case-copy .camera-console-patient-code {
+  font-family: "JetBrains Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
 .camera-console-live-tag {
   display: inline-flex;
   min-height: 32px;
@@ -762,8 +652,7 @@
   white-space: nowrap;
 }
 
-.camera-console-live-tag > span,
-.camera-console-camera-status > span {
+.camera-console-live-tag > span {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -891,224 +780,6 @@
   background: var(--console-blue-soft);
 }
 
-.camera-console-viewport {
-  position: relative;
-  display: flex;
-  min-height: 560px;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 1px solid var(--console-navy-border);
-  border-radius: 10px;
-  background: radial-gradient(
-    circle at 50% 38%,
-    #2c586f 0%,
-    #14394e 52%,
-    #061b29 100%
-  );
-}
-
-.camera-console-viewport.has-preview {
-  background: #061724;
-}
-
-.camera-console-viewport img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 560px;
-  object-fit: contain;
-}
-
-.camera-console-viewport.is-live {
-  background: #04141f;
-}
-
-.camera-console-live-video {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 560px;
-  object-fit: cover;
-}
-
-.camera-console-frame {
-  position: absolute;
-  z-index: 2;
-  inset: 14% 16%;
-  border: 1px solid rgba(186, 230, 253, 0.45);
-  border-radius: 22px;
-}
-
-.camera-console-frame span {
-  position: absolute;
-  width: 34px;
-  height: 34px;
-  border-color: #bae6fd;
-}
-
-.camera-console-frame span:nth-child(1) {
-  top: -1px;
-  left: -1px;
-  border-top: 4px solid;
-  border-left: 4px solid;
-  border-radius: 7px 0 0;
-}
-
-.camera-console-frame span:nth-child(2) {
-  top: -1px;
-  right: -1px;
-  border-top: 4px solid;
-  border-right: 4px solid;
-  border-radius: 0 7px 0 0;
-}
-
-.camera-console-frame span:nth-child(3) {
-  bottom: -1px;
-  left: -1px;
-  border-bottom: 4px solid;
-  border-left: 4px solid;
-  border-radius: 0 0 0 7px;
-}
-
-.camera-console-frame span:nth-child(4) {
-  right: -1px;
-  bottom: -1px;
-  border-right: 4px solid;
-  border-bottom: 4px solid;
-  border-radius: 0 0 7px;
-}
-
-.camera-console-empty-camera {
-  position: relative;
-  z-index: 3;
-  width: min(320px, 72%);
-  color: white;
-  text-align: center;
-}
-
-.camera-console-lens {
-  display: grid;
-  width: 76px;
-  height: 76px;
-  place-items: center;
-  margin: 0 auto 15px;
-  border: 1px solid rgba(186, 230, 253, 0.36);
-  border-radius: 19px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #e0f2fe;
-}
-
-.camera-console-lens svg {
-  width: 33px;
-  height: 33px;
-}
-
-.camera-console-empty-camera strong {
-  display: block;
-  font-size: 24px;
-}
-
-.camera-console-empty-camera p {
-  max-width: 310px;
-  margin: 7px auto 0;
-  color: rgba(255, 255, 255, 0.76);
-  font-size: 17px;
-  line-height: 1.45;
-}
-
-.camera-console-camera-status,
-.camera-console-live-label {
-  position: absolute;
-  z-index: 4;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 999px;
-  background: rgba(4, 15, 21, 0.66);
-  padding: 9px 13px;
-  color: rgba(255, 255, 255, 0.86);
-  font-size: 15px;
-  font-weight: 700;
-  backdrop-filter: blur(8px);
-}
-
-.camera-console-camera-status {
-  right: 16px;
-  bottom: 16px;
-}
-
-.camera-console-camera-status.is-error > span {
-  background: #fca5a5;
-}
-
-.camera-console-live-label {
-  top: 16px;
-  left: 16px;
-}
-
-.camera-console-live-label svg {
-  width: 19px;
-  height: 19px;
-}
-
-.camera-console-preview-overlay {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  left: 16px;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 8px;
-  background: rgba(5, 19, 27, 0.84);
-  padding: 9px 10px 9px 12px;
-  color: white;
-  backdrop-filter: blur(10px);
-}
-
-.camera-console-preview-overlay span {
-  display: inline-flex;
-  min-width: 0;
-  align-items: center;
-  gap: 8px;
-  overflow: hidden;
-  font-size: 15px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.camera-console-preview-overlay span svg {
-  width: 19px;
-  height: 19px;
-  flex: 0 0 auto;
-}
-
-.camera-console-preview-overlay button {
-  display: grid;
-  width: 36px;
-  height: 36px;
-  flex: 0 0 auto;
-  place-items: center;
-  border: 0;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.14);
-  color: white;
-}
-
-.camera-console-preview-overlay button:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.camera-console-preview-overlay button svg {
-  width: 19px;
-  height: 19px;
-}
-
 .camera-console-error {
   display: flex;
   align-items: flex-start;
@@ -1169,85 +840,8 @@
   align-items: flex-start;
 }
 
-.camera-console-review-state {
-  display: inline-flex;
-  min-height: 34px;
-  align-items: center;
-  border-radius: 999px;
-  background: #f1f5f9;
-  padding: 0 11px;
-  color: var(--console-subtle);
-  font-size: 14px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.camera-console-review-ready {
-  background: var(--console-stable-soft);
-  color: var(--console-stable);
-}
-
-.camera-console-review-analyzing {
-  background: var(--console-blue-soft);
-  color: var(--console-blue-dark);
-}
-
-.camera-console-review-captured {
-  background: var(--console-warning-soft);
-  color: var(--console-warning);
-}
-
 .camera-console-review-content {
   padding: 0 20px 20px !important;
-}
-
-.camera-console-review-empty {
-  display: flex;
-  min-height: 230px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 20px 0 14px;
-  border: 1px dashed var(--console-border);
-  border-radius: 9px;
-  background: #f8fafc;
-  padding: 22px;
-  color: var(--console-subtle);
-  text-align: center;
-}
-
-.camera-console-review-empty svg {
-  width: 42px;
-  height: 42px;
-  color: var(--console-blue);
-}
-
-.camera-console-review-empty strong {
-  margin-top: 12px;
-  color: var(--console-text);
-  font-size: 22px;
-}
-
-.camera-console-review-empty p {
-  max-width: 290px;
-  margin: 5px 0 0;
-  color: var(--console-muted);
-  font-size: 16px;
-  line-height: 1.45;
-}
-
-.camera-console-review-empty-ready {
-  border-color: #bbf7d0;
-  background: var(--console-stable-soft);
-}
-
-.camera-console-review-empty-ready svg {
-  color: var(--console-stable);
-}
-
-.camera-console-review-empty-analyzing {
-  border-color: #bae6fd;
-  background: #f0f9ff;
 }
 
 .camera-console-inference {
@@ -1340,6 +934,33 @@
   font-size: 15px;
 }
 
+.camera-console-assignment-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  padding: 9px 10px;
+  color: #1e3a8a;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.camera-console-assignment-message.is-error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.camera-console-assignment-message svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
 .camera-console-assignment label {
   display: grid;
   gap: 5px;
@@ -1384,6 +1005,7 @@
 /* The inference component keeps its data and accessibility behavior. These styles only change its placement in the console rail. */
 .camera-console .replica-camera-overlay-controls {
   display: grid;
+  min-width: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px 12px;
   margin: 0 0 14px;
@@ -1394,10 +1016,14 @@
   color: var(--console-text);
 }
 
-.camera-console .replica-camera-overlay-controls legend {
+.camera-console .replica-camera-overlay-controls h3 {
+  display: block;
   grid-column: 1 / -1;
-  padding: 0 4px;
+  width: 100%;
+  margin: 0 0 2px;
+  padding: 0;
   color: var(--console-blue-dark);
+  font-family: "Prompt", "Sarabun", sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1837,25 +1463,6 @@
     font-size: 17px;
   }
 
-  .camera-console-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 14px;
-    margin-bottom: 18px;
-  }
-
-  .camera-console-header h1 {
-    font-size: 34px;
-  }
-
-  .camera-console-header p {
-    font-size: 18px;
-  }
-
-  .camera-console-brand {
-    padding: 0;
-  }
-
   .camera-console-case-content {
     grid-template-columns: 1fr;
   }
@@ -1915,27 +1522,12 @@
     padding: 0 16px 16px !important;
   }
 
-  .camera-console-viewport,
-  .camera-console-viewport img,
-  .camera-console-live-video {
-    min-height: 350px;
-  }
-
-  .camera-console-frame {
-    inset: 15% 11%;
-  }
-
   .camera-console-actions {
     grid-template-columns: 1fr;
   }
 
   .camera-console-review-content {
     padding: 0 16px 16px !important;
-  }
-
-  .camera-console-review-empty {
-    min-height: 180px;
-    margin: 16px 0 13px;
   }
 
   .camera-console .replica-camera-overlay-controls {
@@ -2003,87 +1595,6 @@
 .camera-console input,
 .camera-console select {
   font-family: "Prompt", "Sarabun", sans-serif;
-}
-
-.camera-console .camera-console-header {
-  align-items: flex-end;
-  margin-bottom: 24px;
-  border-bottom: 1px solid rgba(203, 213, 225, 0.72);
-  padding: 0 0 24px;
-}
-
-.camera-console .camera-console-back {
-  min-height: 28px;
-  color: var(--console-text);
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.camera-console .camera-console-back:hover {
-  color: var(--console-blue-dark);
-}
-
-.camera-console .camera-console-overline {
-  gap: 8px;
-  margin-top: 14px;
-  color: var(--console-blue-dark);
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-
-.camera-console .camera-console-secure-chip {
-  min-height: 24px;
-  padding: 0 8px;
-  font-family: "Prompt", "Sarabun", sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.camera-console .camera-console-secure-chip svg {
-  width: 14px;
-  height: 14px;
-}
-
-.camera-console .camera-console-header h1 {
-  margin: 6px 0 2px;
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 36px;
-}
-
-.camera-console .camera-console-header p {
-  max-width: 760px;
-  font-size: 15px;
-  line-height: 24px;
-}
-
-.camera-console .camera-console-brand {
-  gap: 9px;
-  border: 1px solid var(--console-border-soft);
-  border-radius: 8px;
-  background: var(--console-surface);
-  padding: 8px 12px;
-}
-
-.camera-console .camera-console-brand img {
-  width: 34px;
-  height: 34px;
-  border-radius: 7px;
-}
-
-.camera-console .camera-console-brand strong {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.camera-console .camera-console-brand small {
-  font-size: 11px;
 }
 
 .camera-console .camera-console-card {
@@ -2403,79 +1914,6 @@
   padding: 0 20px 20px !important;
 }
 
-.camera-console .camera-console-viewport,
-.camera-console .camera-console-live-video,
-.camera-console .camera-console-viewport img {
-  min-height: 0;
-}
-
-.camera-console .camera-console-viewport {
-  aspect-ratio: 4 / 3;
-  margin-top: 20px;
-  border-color: #172c3f;
-  border-radius: 10px;
-  background-color: #080d1c;
-  background-image: radial-gradient(
-    rgba(56, 189, 248, 0.18) 1px,
-    transparent 1px
-  );
-  background-size: 16px 16px;
-}
-
-.camera-console .camera-console-frame {
-  inset: 12% 18%;
-  border-color: rgba(56, 189, 248, 0.42);
-  border-radius: 8px;
-  background: rgba(2, 132, 199, 0.03);
-}
-
-.camera-console .camera-console-frame span {
-  width: 24px;
-  height: 24px;
-  border-color: #38bdf8;
-  border-width: 3px;
-}
-
-.camera-console .camera-console-empty-camera strong {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.camera-console .camera-console-empty-camera p {
-  font-size: 13px;
-}
-
-.camera-console .camera-console-lens {
-  width: 48px;
-  height: 48px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-}
-
-.camera-console .camera-console-lens svg {
-  width: 24px;
-  height: 24px;
-}
-
-.camera-console .camera-console-camera-status,
-.camera-console .camera-console-live-label {
-  border-color: rgba(100, 116, 139, 0.65);
-  border-radius: 6px;
-  padding: 6px 9px;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
-}
-
-.camera-console .camera-console-camera-status {
-  right: 12px;
-  bottom: 12px;
-}
-
-.camera-console .camera-console-live-label {
-  top: 12px;
-  left: 12px;
-}
-
 .camera-console .camera-console-actions {
   gap: 12px;
   margin-top: 16px;
@@ -2492,24 +1930,6 @@
 
 .camera-console .camera-console-review-content {
   padding: 0 20px 20px !important;
-}
-
-.camera-console .camera-console-review-empty {
-  min-height: 280px;
-  margin: 20px 0;
-  border-width: 2px;
-  border-color: var(--console-border-soft);
-  border-radius: 10px;
-  background: rgba(248, 249, 255, 0.65);
-}
-
-.camera-console .camera-console-review-empty strong {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.camera-console .camera-console-review-empty p {
-  font-size: 13px;
 }
 
 .camera-console .camera-console-assignment {
@@ -2669,20 +2089,6 @@
     padding: 16px 0 28px;
   }
 
-  .camera-console .camera-console-header {
-    padding-bottom: 20px;
-  }
-
-  .camera-console .camera-console-header h1 {
-    font-size: 22px;
-    line-height: 28px;
-  }
-
-  .camera-console .camera-console-header p {
-    font-size: 14px;
-    line-height: 21px;
-  }
-
   .camera-console .camera-console-card-header,
   .camera-console .camera-console-case-tools,
   .camera-console .camera-console-case-footer {
@@ -2714,14 +2120,6 @@
     gap: 16px;
   }
 
-  .camera-console .camera-console-viewport {
-    margin-top: 16px;
-  }
-
-  .camera-console .camera-console-review-empty {
-    min-height: 220px;
-  }
-
   .camera-console .camera-console-history .camera-history-card {
     padding: 16px;
   }
@@ -2747,4 +2145,2589 @@
   .camera-console-patient-main
   > small:not(.camera-console-patient-code) {
   display: block;
+}
+
+/* Supplied Stitch patient selector integration */
+.camera-console .camera-console-stitch-selector {
+  width: min(820px, 100%);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  color: #16345c;
+  font-family: "Sarabun", sans-serif;
+}
+
+.camera-console .camera-console-stitch-selector,
+.camera-console .camera-console-stitch-selector * {
+  box-sizing: border-box;
+  font-family: "Sarabun", sans-serif;
+}
+
+.camera-console .camera-console-stitch-selector button,
+.camera-console .camera-console-stitch-selector input {
+  font: inherit;
+}
+
+.camera-console .camera-console-stitch-selector-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 24px 32px;
+}
+
+.camera-console .camera-console-stitch-selector-heading {
+  min-width: 0;
+}
+
+.camera-console .camera-console-stitch-selector-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.camera-console .camera-console-stitch-selector-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #0a4fbe;
+}
+
+.camera-console .camera-console-stitch-selector-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.camera-console .camera-console-stitch-selector-eyebrow {
+  color: #0a4fbe;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.camera-console .camera-console-stitch-selector h2 {
+  margin: 8px 0 2px;
+  color: #16345c;
+  font-size: clamp(24px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-wrap: pretty;
+}
+
+.camera-console .camera-console-stitch-selector-heading p {
+  max-width: 620px;
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.camera-console .camera-console-stitch-selector-privacy {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f1f5f9;
+  padding: 6px 11px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.camera-console .camera-console-stitch-selector-privacy svg {
+  width: 15px;
+  height: 15px;
+  color: #0a4fbe;
+}
+
+.camera-console .camera-console-stitch-selector-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 0 32px 24px;
+}
+
+.camera-console .camera-console-stitch-selector-search {
+  position: relative;
+  display: block;
+  min-width: 0;
+  flex: 1.1 1 0;
+}
+
+.camera-console .camera-console-stitch-selector-search svg {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 17px;
+  height: 17px;
+  color: #94a3b8;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.camera-console .camera-console-stitch-selector-search input {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #d8dde7;
+  border-radius: 12px;
+  outline: none;
+  background: #f8fafc;
+  padding: 9px 14px 9px 40px;
+  color: #16345c;
+  font-size: 14px;
+  line-height: 1.5;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.camera-console .camera-console-stitch-selector-search input::placeholder {
+  color: #94a3b8;
+}
+
+.camera-console .camera-console-stitch-selector-search input:hover {
+  border-color: #cbd5e1;
+}
+
+.camera-console .camera-console-stitch-selector-search input:focus {
+  border-color: #1568e8;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(21, 104, 232, 0.14);
+}
+
+.camera-console .camera-console-stitch-selector-filters {
+  display: flex;
+  min-width: 0;
+  flex: 1.8 1 0;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 1px;
+  scrollbar-width: none;
+}
+
+.camera-console .camera-console-stitch-selector-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.camera-console .camera-console-stitch-selector-filters button {
+  min-height: 42px;
+  flex: 1 0 auto;
+  border: 0;
+  border-radius: 12px;
+  background: #f1f5f9;
+  padding: 8px 14px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.camera-console .camera-console-stitch-selector-filters button:hover {
+  background: #e2e8f0;
+  color: #16345c;
+}
+
+.camera-console .camera-console-stitch-selector-filters button:focus-visible,
+.camera-console .camera-console-stitch-selector-footer button:focus-visible,
+.camera-console .camera-console-stitch-selector-patient-row:focus-within {
+  outline: 3px solid rgba(21, 104, 232, 0.22);
+  outline-offset: 2px;
+}
+
+.camera-console .camera-console-stitch-selector-filters button.is-active {
+  background: #0a4fbe;
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(10, 79, 190, 0.18);
+}
+
+.camera-console .camera-console-stitch-selector-filters button span {
+  opacity: 0.78;
+  font-size: 12px;
+}
+
+.camera-console .camera-console-stitch-selector-list-area {
+  max-height: 580px;
+  overflow-y: auto;
+  background: #f8fafc;
+  padding: 16px 32px 24px;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+  scrollbar-width: thin;
+}
+
+.camera-console .camera-console-stitch-selector-list-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.camera-console .camera-console-stitch-selector-patient-list {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.camera-console .camera-console-stitch-selector-patient-row {
+  display: flex;
+  min-width: 0;
+  min-height: 72px;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.camera-console .camera-console-stitch-selector-patient-row:hover {
+  border-color: #cbd5e1;
+  background: #fafdfe;
+}
+
+.camera-console .camera-console-stitch-selector-patient-row.is-selected {
+  border-color: #0a4fbe;
+  background: #eff6ff;
+  box-shadow: 0 0 0 1px #0a4fbe;
+}
+
+.camera-console
+  .camera-console-stitch-selector-patient-row
+  input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  margin: 0;
+  accent-color: #0a4fbe;
+  cursor: pointer;
+}
+
+.camera-console .camera-console-stitch-selector-patient-copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+
+.camera-console .camera-console-stitch-selector-patient-copy strong,
+.camera-console .camera-console-stitch-selector-patient-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console .camera-console-stitch-selector-patient-copy strong {
+  color: #16345c;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.camera-console .camera-console-stitch-selector-patient-copy small {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.camera-console .camera-console-stitch-selector-patient-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.camera-console .camera-console-stitch-selector-patient-badge.is-type1 {
+  border-color: #bae6fd;
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.camera-console .camera-console-stitch-selector-patient-badge.is-type2 {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #0a4fbe;
+}
+
+.camera-console .camera-console-stitch-selector-patient-badge.is-gdm {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.camera-console .camera-console-stitch-selector-patient-badge.is-none {
+  border-color: #e2e8f0;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.camera-console .camera-console-stitch-selector-empty,
+.camera-console .camera-console-stitch-selector-loading {
+  display: flex;
+  min-height: 240px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.camera-console .camera-console-stitch-selector-empty svg {
+  width: 28px;
+  height: 28px;
+  color: #94a3b8;
+}
+
+.camera-console .camera-console-stitch-selector-empty.is-error svg {
+  color: #ba1a1a;
+}
+
+.camera-console .camera-console-stitch-selector-empty strong {
+  margin-top: 10px;
+  color: #16345c;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-stitch-selector-empty p,
+.camera-console .camera-console-stitch-selector-empty small {
+  max-width: 380px;
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.camera-console .camera-console-stitch-selector-empty small {
+  color: #94a3b8;
+}
+
+.camera-console .camera-console-stitch-selector-empty button {
+  margin-top: 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #eff6ff;
+  padding: 7px 12px;
+  color: #0a4fbe;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-stitch-selector-empty button:hover {
+  background: #dbeafe;
+}
+
+.camera-console .camera-console-stitch-selector-loading {
+  align-items: stretch;
+  gap: 10px;
+}
+
+.camera-console .camera-console-stitch-selector-loading span {
+  display: block;
+  height: 62px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f1f5f9, #ffffff, #f1f5f9);
+  background-size: 200% 100%;
+  animation: camera-stitch-selector-shimmer 1.2s linear infinite;
+}
+
+.camera-console .camera-console-stitch-selector-footer {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 16px 32px;
+}
+
+.camera-console .camera-console-stitch-selector-selection-status {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.camera-console
+  .camera-console-stitch-selector-selection-status
+  > span:first-child {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #cbd5e1;
+}
+
+.camera-console
+  .camera-console-stitch-selector-selection-status
+  > span:first-child.is-selected {
+  background: #16a34a;
+}
+
+.camera-console
+  .camera-console-stitch-selector-selection-status
+  > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console .camera-console-stitch-selector-selection-status strong {
+  color: #16345c;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-stitch-selector-footer-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.camera-console .camera-console-stitch-selector-footer-actions button {
+  min-height: 42px;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    opacity 150ms ease;
+}
+
+.camera-console .camera-console-stitch-selector-clear {
+  border: 0;
+  background: transparent;
+  color: #64748b;
+}
+
+.camera-console .camera-console-stitch-selector-clear:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #16345c;
+}
+
+.camera-console .camera-console-stitch-selector-footer-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.camera-console .camera-console-stitch-selector-confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #0a4fbe;
+  background: #0a4fbe;
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(10, 79, 190, 0.16);
+}
+
+.camera-console .camera-console-stitch-selector-confirm:hover:not(:disabled) {
+  border-color: #08429e;
+  background: #08429e;
+}
+
+.camera-console .camera-console-stitch-selector-confirm svg {
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes camera-stitch-selector-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .camera-console .camera-console-stitch-selector-tools {
+    align-items: stretch;
+    flex-direction: column;
+    padding-top: 0;
+  }
+
+  .camera-console .camera-console-stitch-selector-search,
+  .camera-console .camera-console-stitch-selector-filters {
+    flex: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 540px) {
+  .camera-console .camera-console-stitch-selector-header {
+    padding: 20px 16px;
+  }
+
+  .camera-console .camera-console-stitch-selector-privacy {
+    display: none;
+  }
+
+  .camera-console .camera-console-stitch-selector-tools {
+    padding: 0 16px 16px;
+  }
+
+  .camera-console .camera-console-stitch-selector-list-area {
+    padding: 14px 16px 18px;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 14px 16px 16px;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer-actions {
+    width: 100%;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer-actions button {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camera-console .camera-console-stitch-selector * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Stitch v6 expanded / v8 compact patient-selection states */
+.camera-console .camera-console-stitch-selector-collapse {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #eff6ff;
+  padding: 6px 12px;
+  color: #0a4fbe;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    opacity 150ms ease;
+}
+
+.camera-console .camera-console-stitch-selector-collapse:hover:not(:disabled) {
+  border-color: #93c5fd;
+  background: #dbeafe;
+}
+
+.camera-console .camera-console-stitch-selector-collapse:focus-visible {
+  outline: 3px solid rgba(21, 104, 232, 0.22);
+  outline-offset: 2px;
+}
+
+.camera-console .camera-console-stitch-selector-collapse:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.camera-console .camera-console-stitch-selector-collapse svg {
+  width: 16px;
+  height: 16px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed {
+  width: min(960px, 100%);
+  padding: 16px 24px 0;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-main {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-patient {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 14px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-avatar {
+  position: relative;
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #0a4fbe;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-avatar svg {
+  width: 25px;
+  height: 25px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-avatar > span {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #16a34a;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-copy {
+  min-width: 0;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-badges {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-eyebrow {
+  border-radius: 4px;
+  background: #eff6ff;
+  padding: 2px 8px;
+  color: #0a4fbe;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-badges .camera-console-stitch-selector-patient-badge {
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-hn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-hn > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #cbd5e1;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed h2 {
+  overflow: hidden;
+  margin: 3px 0 1px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(18px, 2.4vw, 22px);
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-details > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-details .is-accent {
+  color: #0369a1;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f1f5f9;
+  padding: 8px 14px;
+  color: #16345c;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions button:hover {
+  border-color: #cbd5e1;
+  background: #e2e8f0;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions button:focus-visible {
+  outline: 3px solid rgba(21, 104, 232, 0.22);
+  outline-offset: 2px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions button:active {
+  transform: scale(0.98);
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions button.is-primary {
+  border-color: #0a4fbe;
+  background: #0a4fbe;
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(10, 79, 190, 0.16);
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions button.is-primary:hover {
+  border-color: #08429e;
+  background: #08429e;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions svg {
+  width: 16px;
+  height: 16px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-meta {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  border-top: 1px solid #e2e8f0;
+  padding: 10px 0;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-meta > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-meta > div:last-child {
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-meta svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  color: #0a4fbe;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-meta strong {
+  color: #16345c;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .camera-console .camera-console-stitch-selector-collapsed-main {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .camera-console .camera-console-stitch-selector-collapsed-actions {
+    width: 100%;
+  }
+
+  .camera-console .camera-console-stitch-selector-collapsed-actions button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 540px) {
+  .camera-console .camera-console-stitch-selector-collapsed {
+    padding: 16px;
+  }
+
+  .camera-console .camera-console-stitch-selector-collapsed-patient {
+    align-items: flex-start;
+  }
+
+  .camera-console .camera-console-stitch-selector-collapsed-details {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  .camera-console .camera-console-stitch-selector-collapsed-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .camera-console .camera-console-stitch-selector-collapsed-meta > div:last-child {
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camera-console .camera-console-stitch-selector-collapse,
+  .camera-console .camera-console-stitch-selector-collapsed-actions button {
+    transition: none;
+  }
+}
+
+
+/* Stitch v9 clinical photo-history gallery */
+.camera-console .camera-history-v9 {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8f9ff;
+  padding: 24px;
+  color: #0b1c30;
+  box-shadow: 0 1px 3px rgba(22, 52, 92, 0.04);
+}
+
+.camera-console .camera-history-command {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 18px;
+}
+
+.camera-console .camera-history-command-copy {
+  min-width: 0;
+}
+
+.camera-console .camera-history-overline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #0a4fbe;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.camera-console .camera-history-overline > span:last-child {
+  color: #64748b;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.camera-console .camera-history-command h2 {
+  margin: 4px 0 2px;
+  color: #0b1c30;
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.camera-console .camera-history-command-copy p {
+  margin: 0;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.camera-console .camera-history-refresh {
+  display: inline-flex;
+  min-height: 44px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 0 14px;
+  color: #0a4fbe;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    opacity 150ms ease;
+}
+
+.camera-console .camera-history-refresh:hover:not(:disabled) {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.camera-console .camera-history-refresh:focus-visible,
+.camera-console .camera-history-filter-heading button:focus-visible,
+.camera-console .camera-history-record-action:focus-visible,
+.camera-console .camera-history-pagination button:focus-visible,
+.camera-console .camera-history-lightbox-header button:focus-visible {
+  outline: 3px solid rgba(47, 185, 246, 0.36);
+  outline-offset: 2px;
+}
+
+.camera-console .camera-history-refresh:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.camera-console .camera-history-refresh svg {
+  width: 17px;
+  height: 17px;
+}
+
+.camera-console .camera-history-refresh svg.is-spinning {
+  animation: camera-history-spin 0.9s linear infinite;
+}
+
+.camera-console .camera-history-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  border-top: 1px solid #e2e8f0;
+  padding: 16px 0;
+}
+
+.camera-console .camera-history-summary-card {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px;
+  box-shadow: 0 1px 2px rgba(22, 52, 92, 0.03);
+}
+
+.camera-console .camera-history-summary-icon {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.camera-console .camera-history-summary-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.camera-console .camera-history-summary-icon.is-blue {
+  background: rgba(178, 197, 255, 0.38);
+  color: #003991;
+}
+
+.camera-console .camera-history-summary-icon.is-cyan {
+  background: rgba(126, 208, 255, 0.34);
+  color: #005d80;
+}
+
+.camera-console .camera-history-summary-icon.is-slate {
+  background: #eff4ff;
+  color: #445f8a;
+}
+
+.camera-console .camera-history-summary-card > span:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.camera-console .camera-history-summary-card small {
+  overflow: hidden;
+  color: #475569;
+  font-size: 11px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console .camera-history-summary-card strong {
+  overflow: hidden;
+  color: #0b1c30;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console .camera-history-summary-card-wide strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.camera-console .camera-history-filter-panel {
+  display: grid;
+  gap: 14px;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(22, 52, 92, 0.03);
+}
+
+.camera-console .camera-history-filter-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.camera-console .camera-history-filter-heading > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.camera-console .camera-history-filter-heading strong {
+  color: #0b1c30;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.camera-console .camera-history-filter-heading span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.camera-console .camera-history-filter-heading button {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  padding: 4px 0;
+  color: #0a4fbe;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.camera-console .camera-history-filter-heading button:hover {
+  color: #003991;
+  text-decoration: underline;
+}
+
+.camera-console .camera-history-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.8fr) minmax(180px, 1.2fr) minmax(140px, 0.9fr) minmax(140px, 0.9fr) minmax(190px, 1.2fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.camera-console .camera-history-filter-search {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+.camera-console .camera-history-filter-search > svg {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  color: #64748b;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.camera-console .camera-history-filter-search input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #eff4ff;
+  padding: 0 10px 0 34px;
+  color: #0b1c30;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.camera-console .camera-history-filter-search input::placeholder {
+  color: #737785;
+}
+
+.camera-console .camera-history-filter-search input:focus {
+  border-color: #0a4fbe;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(47, 185, 246, 0.18);
+}
+
+.camera-console .camera-history-field {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.camera-console .camera-history-field select,
+.camera-console .camera-history-field input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #eff4ff;
+  padding: 0 10px;
+  color: #0b1c30;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.camera-console .camera-history-field select:focus,
+.camera-console .camera-history-field input:focus {
+  border-color: #0a4fbe;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(47, 185, 246, 0.18);
+}
+
+.camera-console .camera-history-filter-status {
+  display: flex;
+  min-height: 40px;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  border-radius: 6px;
+  background: #eff4ff;
+  padding: 0 10px;
+  color: #475569;
+  font-size: 12px;
+}
+
+.camera-console .camera-history-filter-status svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: #003991;
+}
+
+.camera-console .camera-history-filter-status span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console .camera-history-feed-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0 10px;
+}
+
+.camera-console .camera-history-feed-heading > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.camera-console .camera-history-feed-heading strong {
+  color: #0b1c30;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.camera-console .camera-history-feed-heading span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.camera-console .camera-history-page-label {
+  flex: 0 0 auto;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.camera-console .camera-history-body {
+  min-height: 180px;
+}
+
+.camera-console .camera-history-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  padding: 0;
+}
+
+.camera-console .camera-history-record {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(22, 52, 92, 0.03);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.camera-console .camera-history-record:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 4px 12px rgba(22, 52, 92, 0.08);
+  transform: translateY(-2px);
+}
+
+.camera-console .camera-history-record-image {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #e5eeff;
+}
+
+.camera-console .camera-history-image-button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: zoom-in;
+}
+
+.camera-console .camera-history-image-button:focus-visible {
+  outline: 3px solid #2fb9f6;
+  outline-offset: -3px;
+}
+
+.camera-console .camera-history-image-button img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 250ms ease;
+}
+
+.camera-console .camera-history-record:hover .camera-history-image-button img {
+  transform: scale(1.025);
+}
+
+.camera-console .camera-history-image-view {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #003991;
+  box-shadow: 0 1px 4px rgba(11, 28, 48, 0.14);
+}
+
+.camera-console .camera-history-image-view svg {
+  width: 16px;
+  height: 16px;
+}
+
+.camera-console .camera-history-image-label,
+.camera-console .camera-history-image-file {
+  position: absolute;
+  max-width: calc(100% - 16px);
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgba(33, 49, 69, 0.86);
+  color: #eaf1ff;
+  font-size: 10px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console .camera-history-image-label {
+  top: 8px;
+  left: 8px;
+  padding: 3px 7px;
+}
+
+.camera-console .camera-history-image-file {
+  right: 8px;
+  bottom: 8px;
+  max-width: 55%;
+  padding: 3px 6px;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.camera-console .camera-history-record:hover .camera-history-image-file,
+.camera-console .camera-history-record:focus-within .camera-history-image-file {
+  opacity: 1;
+}
+
+.camera-console .camera-history-image-unavailable {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.camera-console .camera-history-image-unavailable svg {
+  width: 28px;
+  height: 28px;
+  color: #445f8a;
+}
+
+.camera-console .camera-history-record-body {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px;
+}
+
+.camera-console .camera-history-record-patient {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.camera-console .camera-history-record-patient > span {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #dae2ff;
+  color: #003991;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.camera-console .camera-history-record-patient > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.camera-console .camera-history-record-patient strong,
+.camera-console .camera-history-record-patient small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console .camera-history-record-patient strong {
+  color: #0b1c30;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.camera-console .camera-history-record-patient small {
+  color: #445f8a;
+  font-size: 11px;
+}
+
+.camera-console .camera-history-record-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.camera-console .camera-history-record-meta > span:first-child {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console .camera-history-record-meta svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
+.camera-console .camera-history-record-meta > span:last-child {
+  flex: 0 0 auto;
+  border-radius: 4px;
+  background: #eff4ff;
+  padding: 3px 5px;
+  color: #64748b;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.camera-console .camera-history-record-meta > span:last-child.is-linked {
+  background: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
+}
+
+.camera-console .camera-history-record-caption {
+  display: -webkit-box;
+  min-height: 18px;
+  overflow: hidden;
+  margin: 0;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 18px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.camera-console .camera-history-record-action {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 4px;
+  background: #eff4ff;
+  padding: 0 10px;
+  color: #003991;
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    background 150ms ease,
+    opacity 150ms ease;
+}
+
+.camera-console .camera-history-record-action:hover:not(:disabled) {
+  background: #dce9ff;
+}
+
+.camera-console .camera-history-record-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.camera-console .camera-history-record-action svg {
+  width: 15px;
+  height: 15px;
+}
+
+.camera-console .camera-history-state {
+  display: flex;
+  min-height: 220px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #c3c6d5;
+  border-radius: 8px;
+  background: #eff4ff;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.camera-console .camera-history-state > svg {
+  width: 28px;
+  height: 28px;
+  color: #737785;
+}
+
+.camera-console .camera-history-state.is-error > svg {
+  color: #ba1a1a;
+}
+
+.camera-console .camera-history-state h3 {
+  margin: 10px 0 2px;
+  color: #0b1c30;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.camera-console .camera-history-state p {
+  max-width: 440px;
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.camera-console .camera-history-state button {
+  min-height: 36px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 4px;
+  background: #0a4fbe;
+  padding: 0 14px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.camera-console .camera-history-grid-skeleton {
+  align-items: stretch;
+}
+
+.camera-console .camera-history-skeleton-card {
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding-bottom: 12px;
+}
+
+.camera-console .camera-history-skeleton-image,
+.camera-console .camera-history-skeleton-copy {
+  animation: camera-history-shimmer 1.2s linear infinite;
+  background: linear-gradient(90deg, #eff4ff, #ffffff, #eff4ff);
+  background-size: 200% 100%;
+}
+
+.camera-console .camera-history-skeleton-image {
+  aspect-ratio: 4 / 3;
+}
+
+.camera-console .camera-history-skeleton-copy {
+  width: 70%;
+  height: 12px;
+  margin: 12px 12px 0;
+  border-radius: 4px;
+}
+
+.camera-console .camera-history-skeleton-copy.is-short {
+  width: 45%;
+  margin-top: 8px;
+}
+
+.camera-console .camera-history-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  border-top: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px;
+  color: #475569;
+  font-size: 11px;
+}
+
+.camera-console .camera-history-pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.camera-console .camera-history-pagination-actions button {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #0b1c30;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.camera-console .camera-history-pagination-actions button:hover:not(:disabled) {
+  background: #eff4ff;
+}
+
+.camera-console .camera-history-pagination-actions button.is-active {
+  background: #0a4fbe;
+  color: #ffffff;
+}
+
+.camera-console .camera-history-pagination-actions button:disabled {
+  cursor: not-allowed;
+  color: #c3c6d5;
+}
+
+.camera-console .camera-history-pagination-actions svg {
+  width: 16px;
+  height: 16px;
+}
+
+.camera-console .camera-history-disclaimer {
+  margin: 14px 0 0;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.camera-console .camera-history-lightbox {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11, 28, 48, 0.72);
+  padding: 24px;
+}
+
+.camera-console .camera-history-lightbox-card {
+  width: min(900px, 100%);
+  max-height: min(900px, calc(100vh - 48px));
+  overflow: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(22, 52, 92, 0.14);
+}
+
+.camera-console .camera-history-lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+}
+
+.camera-console .camera-history-lightbox-header > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.camera-console .camera-history-lightbox-header strong,
+.camera-console .camera-history-lightbox-header span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console .camera-history-lightbox-header strong {
+  color: #0b1c30;
+  font-size: 14px;
+}
+
+.camera-console .camera-history-lightbox-header span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.camera-console .camera-history-lightbox-header button {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: #eff4ff;
+  color: #445f8a;
+}
+
+.camera-console .camera-history-lightbox-header button:hover {
+  background: #dce9ff;
+}
+
+.camera-console .camera-history-lightbox-header button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.camera-console .camera-history-lightbox-card > img {
+  display: block;
+  width: 100%;
+  max-height: calc(100vh - 190px);
+  object-fit: contain;
+  background: #0b1c30;
+}
+
+.camera-console .camera-history-lightbox-card > p {
+  margin: 0;
+  border-top: 1px solid #e2e8f0;
+  padding: 12px 16px;
+  color: #475569;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+@keyframes camera-history-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes camera-history-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 1120px) {
+  .camera-console .camera-history-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .camera-console .camera-history-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .camera-console .camera-history-filter-status {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 760px) {
+  .camera-console .camera-history-v9 {
+    padding: 16px;
+  }
+
+  .camera-console .camera-history-command {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .camera-console .camera-history-refresh {
+    align-self: flex-start;
+  }
+
+  .camera-console .camera-history-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .camera-console .camera-history-summary-card-wide {
+    grid-column: span 2;
+  }
+
+  .camera-console .camera-history-feed-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .camera-console .camera-history-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 540px) {
+  .camera-console .camera-history-summary,
+  .camera-console .camera-history-filters,
+  .camera-console .camera-history-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-console .camera-history-summary-card-wide,
+  .camera-console .camera-history-filter-status {
+    grid-column: auto;
+  }
+
+  .camera-console .camera-history-pagination-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .camera-console .camera-history-lightbox {
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camera-console .camera-history-record,
+  .camera-console .camera-history-image-button img,
+  .camera-console .camera-history-refresh svg,
+  .camera-console .camera-history-skeleton-image,
+  .camera-console .camera-history-skeleton-copy {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Responsive section-width correction */
+.camera-console {
+  container-type: inline-size;
+}
+
+.camera-console .camera-console-stitch-selector,
+.camera-console .camera-console-stitch-selector-collapsed,
+.camera-console .camera-console-history {
+  width: 100%;
+  max-width: none;
+}
+
+.camera-console .camera-console-workspace {
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+}
+
+@container (max-width: 1120px) {
+  .camera-console .camera-console-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .camera-console .camera-history-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .camera-console .camera-history-filter-status {
+    grid-column: span 2;
+  }
+}
+
+@container (max-width: 760px) {
+  .camera-console .camera-console-stitch-selector-header,
+  .camera-console .camera-console-stitch-selector-tools,
+  .camera-console .camera-console-stitch-selector-list-area,
+  .camera-console .camera-console-stitch-selector-footer {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .camera-console .camera-console-stitch-selector-tools {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .camera-console .camera-console-stitch-selector-search,
+  .camera-console .camera-console-stitch-selector-filters {
+    flex: none;
+    width: 100%;
+  }
+
+  .camera-console .camera-history-command {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .camera-console .camera-history-refresh {
+    align-self: flex-start;
+  }
+}
+
+@container (max-width: 540px) {
+  .camera-console .camera-console-stitch-selector-header {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .camera-console .camera-console-stitch-selector-privacy {
+    display: none;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer-actions {
+    width: 100%;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer-actions button {
+    flex: 1;
+  }
+
+  .camera-console .camera-history-summary,
+  .camera-console .camera-history-filters,
+  .camera-console .camera-history-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-console .camera-history-summary-card-wide,
+  .camera-console .camera-history-filter-status {
+    grid-column: auto;
+  }
+}
+
+
+/* Stitch camera preview zone only */
+.camera-console .camera-console-preview-column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.camera-console .camera-console-preview-section-heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 1px 2px;
+}
+
+.camera-console .camera-console-preview-section-heading > div:first-child {
+  min-width: 0;
+}
+
+.camera-console .camera-console-preview-title-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.camera-console .camera-console-preview-title-row > span[aria-hidden="true"] {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #cbd5e1;
+}
+
+.camera-console .camera-console-preview-title-row h2 {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: #1e293b;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-console .camera-console-preview-section-heading p {
+  margin: 3px 0 0;
+  color: #64748b;
+  font-family: "Sarabun", sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.camera-console .camera-console-preview-section-heading .camera-console-phase {
+  flex: 0 0 auto;
+  color: #94a3b8;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.camera-console .camera-console-preview-column .camera-console-help {
+  width: 38px;
+  height: 38px;
+  border-color: #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #64748b;
+}
+
+.camera-console .camera-console-preview-column .camera-console-help:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #0a4fbe;
+}
+
+.camera-console .camera-console-preview-column .camera-console-evidence-card {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 10px !important;
+}
+
+.camera-console .camera-console-preview-column .camera-console-evidence-content {
+  padding: 0 16px 16px !important;
+}
+
+.camera-console .camera-console-preview-clinical-note {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 9px;
+  border: 1px solid #bfdbfe;
+  border-radius: 7px;
+  background: #eff6ff;
+  padding: 9px 11px;
+  color: #1e3a8a;
+  font-family: "Sarabun", sans-serif;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.camera-console .camera-console-preview-clinical-note > svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #2563eb;
+}
+
+.camera-console .camera-console-preview-clinical-note strong {
+  font-weight: 700;
+}
+
+@container (max-width: 640px) {
+  .camera-console .camera-console-preview-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .camera-console .camera-console-preview-title-row h2 {
+    white-space: normal;
+  }
+}
+/* Rewritten camera preview frame */
+.camera-preview-frame {
+  --preview-ink: #dbeafe;
+  --preview-muted: #94a3b8;
+  --preview-cyan: #7dd3fc;
+  position: relative;
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #172c3f;
+  border-radius: 8px;
+  background: #061724;
+  color: var(--preview-ink);
+}
+
+.camera-preview-frame__header {
+  display: flex;
+  min-width: 0;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  background: #0b1926;
+  padding: 8px 12px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.camera-preview-frame__header-main {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.camera-preview-frame__mode,
+.camera-preview-frame__status,
+.camera-preview-frame__file {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.camera-preview-frame__mode {
+  flex: 0 0 auto;
+  color: #bae6fd;
+  letter-spacing: 0.06em;
+}
+
+.camera-preview-frame__mode > span,
+.camera-preview-frame__status > span {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+}
+
+.camera-preview-frame__file {
+  overflow: hidden;
+  color: var(--preview-muted);
+  text-overflow: ellipsis;
+}
+
+.camera-preview-frame__file svg {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+  color: #64748b;
+}
+
+.camera-preview-frame__status {
+  flex: 0 0 auto;
+  color: #86efac;
+}
+
+.camera-preview-frame__status > span {
+  background: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.12);
+}
+
+.camera-preview-frame__viewport {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #061724;
+}
+
+.camera-preview-frame__wash,
+.camera-preview-frame__guides,
+.camera-preview-frame__target {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.camera-preview-frame__wash {
+  z-index: 0;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(44, 88, 111, 0.62), transparent 50%),
+    linear-gradient(135deg, #0b2638, #061724 68%);
+}
+
+.camera-preview-frame__image,
+.camera-preview-frame__video {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.camera-preview-frame__image {
+  object-fit: contain;
+  background: #061724;
+}
+
+.camera-preview-frame__video {
+  object-fit: cover;
+  background: #04141f;
+}
+
+.camera-preview-frame__guides {
+  z-index: 2;
+  opacity: 0.7;
+  background-image:
+    radial-gradient(circle, rgba(125, 211, 252, 0.24) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px, 40px 40px, 40px 40px;
+}
+
+.camera-preview-frame--captured .camera-preview-frame__guides {
+  opacity: 0.24;
+}
+
+.camera-preview-frame--processing .camera-preview-frame__guides {
+  opacity: 0.2;
+}
+
+.camera-preview-frame--processed .camera-preview-frame__guides {
+  opacity: 0.15;
+}
+
+.camera-preview-frame__ruler {
+  position: absolute;
+  display: block;
+  opacity: 0.7;
+}
+
+.camera-preview-frame__ruler--x {
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  background: repeating-linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.36),
+    rgba(255, 255, 255, 0.36) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+.camera-preview-frame__ruler--y {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 12px;
+  border-right: 1px solid rgba(255, 255, 255, 0.22);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.36),
+    rgba(255, 255, 255, 0.36) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+}
+
+.camera-preview-frame__reticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 64px;
+  height: 64px;
+  border: 1px dashed rgba(125, 211, 252, 0.6);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.camera-preview-frame__reticle::before,
+.camera-preview-frame__reticle::after {
+  position: absolute;
+  display: block;
+  background: rgba(125, 211, 252, 0.4);
+  content: "";
+}
+
+.camera-preview-frame__reticle::before {
+  top: 50%;
+  right: -18px;
+  left: -18px;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.camera-preview-frame__reticle::after {
+  top: -18px;
+  bottom: -18px;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.camera-preview-frame__target {
+  z-index: 3;
+  inset: 12% 15%;
+  border: 1px solid rgba(186, 230, 253, 0.34);
+}
+
+.camera-preview-frame__target > span {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-color: #7dd3fc;
+}
+
+.camera-preview-frame__target > span:nth-child(1) {
+  top: -1px;
+  left: -1px;
+  border-top: 3px solid;
+  border-left: 3px solid;
+}
+
+.camera-preview-frame__target > span:nth-child(2) {
+  top: -1px;
+  right: -1px;
+  border-top: 3px solid;
+  border-right: 3px solid;
+}
+
+.camera-preview-frame__target > span:nth-child(3) {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 3px solid;
+  border-left: 3px solid;
+}
+
+.camera-preview-frame__target > span:nth-child(4) {
+  right: -1px;
+  bottom: -1px;
+  border-right: 3px solid;
+  border-bottom: 3px solid;
+}
+
+.camera-preview-frame .camera-detection-layer {
+  z-index: 4;
+}
+
+.camera-preview-frame__empty {
+  position: relative;
+  z-index: 5;
+  width: min(320px, 72%);
+  color: white;
+  text-align: center;
+}
+
+.camera-preview-frame__lens {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  place-items: center;
+  margin: 0 auto 14px;
+  border: 1px solid rgba(186, 230, 253, 0.32);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #e0f2fe;
+}
+
+.camera-preview-frame__lens svg {
+  width: 30px;
+  height: 30px;
+}
+
+.camera-preview-frame__empty strong {
+  display: block;
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.camera-preview-frame__empty p {
+  max-width: 310px;
+  margin: 7px auto 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: "Sarabun", sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.camera-preview-frame__live-label {
+  position: absolute;
+  z-index: 6;
+  top: 16px;
+  left: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+  background: rgba(4, 15, 21, 0.7);
+  padding: 7px 9px;
+  color: white;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+}
+
+.camera-preview-frame__live-label svg {
+  width: 14px;
+  height: 14px;
+}
+
+.camera-preview-frame__image-bar {
+  position: absolute;
+  z-index: 6;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  background: rgba(5, 19, 27, 0.84);
+  padding: 7px 8px 7px 10px;
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+.camera-preview-frame__image-bar > span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  overflow: hidden;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camera-preview-frame__image-bar > span svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
+.camera-preview-frame__image-bar button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+}
+
+.camera-preview-frame__image-bar button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.camera-preview-frame__image-bar button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.camera-preview-frame__state-chip {
+  position: absolute;
+  z-index: 7;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  border-radius: 4px;
+  background: rgba(6, 23, 36, 0.8);
+  padding: 4px 7px;
+  color: #bfdbfe;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.camera-preview-frame__state-chip > span {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #60a5fa;
+}
+
+.camera-preview-frame--processing .camera-preview-frame__state-chip {
+  border-color: rgba(251, 191, 36, 0.42);
+  color: #fde68a;
+}
+
+.camera-preview-frame--processing .camera-preview-frame__state-chip > span {
+  background: #fbbf24;
+}
+
+.camera-preview-frame--processed .camera-preview-frame__state-chip {
+  border-color: rgba(52, 211, 153, 0.38);
+  color: #a7f3d0;
+}
+
+.camera-preview-frame--processed .camera-preview-frame__state-chip > span {
+  background: #34d399;
+}
+
+.camera-preview-frame--error .camera-preview-frame__status {
+  color: #fca5a5;
+}
+
+.camera-preview-frame--error .camera-preview-frame__status > span {
+  background: #f87171;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.12);
+}
+
+@container (max-width: 640px) {
+  .camera-preview-frame__header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .camera-preview-frame__header-main {
+    width: 100%;
+  }
+
+  .camera-preview-frame__status {
+    align-self: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camera-preview-frame__state-chip > span {
+    animation: none;
+  }
 }

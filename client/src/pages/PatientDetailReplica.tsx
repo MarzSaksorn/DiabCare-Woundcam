@@ -7,6 +7,7 @@ import { Activity, AlertTriangle, ArrowLeft, CheckCircle2, ClipboardList, Downlo
 import { useMemo, type ReactNode } from "react";
 import { Link, useLocation, useRoute } from "wouter";
 import { toast } from "sonner";
+import "@/styles/patient-detail-redesign.css";
 
 type Source = "registered" | "imported";
 type Language = "th" | "en";
@@ -40,20 +41,20 @@ export default function PatientDetailReplica({ source }: { source: Source }) {
     toast.success(language === "th" ? "ส่งออกระเบียนแล้ว" : "Record exported");
   }
 
-  if (loading) return <DashboardLayout><DetailLoading /></DashboardLayout>;
-  if (error || !available) return <DashboardLayout><div className="replica-detail-page"><div className="replica-detail-error"><ShieldAlert aria-hidden="true" /><div><h1>{language === "th" ? "ไม่พบระเบียนผู้ป่วย" : "Patient record unavailable"}</h1><p>{language === "th" ? "ระบบไม่พบข้อมูลจากฐานข้อมูลที่เชื่อมต่อ" : "The connected database did not return this patient record."}</p><button type="button" className="replica-secondary-button" onClick={() => setLocation("/patients")}><ArrowLeft aria-hidden="true" /> {language === "th" ? "กลับไปผู้ป่วย" : "Back to patients"}</button></div></div></div></DashboardLayout>;
+  if (loading) return <DashboardLayout><main className="replica-detail-page patient-detail-stitch" aria-busy="true"><DetailLoading /></main></DashboardLayout>;
+  if (error || !available) return <DashboardLayout><main className="replica-detail-page patient-detail-stitch"><div className="replica-detail-error"><ShieldAlert aria-hidden="true" /><div><h1>{language === "th" ? "ไม่พบระเบียนผู้ป่วย" : "Patient record unavailable"}</h1><p>{language === "th" ? "ระบบไม่พบข้อมูลจากฐานข้อมูลที่เชื่อมต่อ" : "The connected database did not return this patient record."}</p><button type="button" className="replica-secondary-button" onClick={() => setLocation("/patients")}><ArrowLeft aria-hidden="true" /> {language === "th" ? "กลับไปผู้ป่วย" : "Back to patients"}</button></div></div></main></DashboardLayout>;
 
   const title = source === "registered" ? (registered.data!.patient.displayName || registered.data!.patient.patientCode) : `${language === "th" ? "ระเบียนนำเข้า" : "Imported record"} #${imported.data!.sourceRowNumber}`;
   const subtitle = source === "registered" ? `${registered.data!.patient.patientCode} · ${registered.data!.patient.registrationLocation}` : `${language === "th" ? "แถวต้นทาง" : "Source row"} ${imported.data!.sourceRowNumber} · ${imported.data!.sourceFilename}`;
   const status = source === "registered" ? (language === "th" ? "ระเบียนคลินิก" : "Clinical record") : (language === "th" ? "ยังไม่ยืนยันจากต้นทาง" : "Unverified source");
 
   return <DashboardLayout>
-    <div className="replica-detail-page">
-      <div className="replica-detail-topbar"><Link href="/patients" className="replica-detail-back"><ArrowLeft aria-hidden="true" /> {language === "th" ? "กลับไปผู้ป่วย" : "Back to patients"}</Link><span><LockKeyhole aria-hidden="true" /> {language === "th" ? "มุมมองข้อมูลที่ควบคุม" : "Governed record view"}</span></div>
-      <header className="replica-detail-hero"><div className="replica-detail-identity"><div className="replica-detail-avatar"><UserRound aria-hidden="true" /></div><div className="min-w-0"><div className="replica-detail-title-row"><h1>{title}</h1><span className={`replica-detail-status ${source === "registered" ? "is-clinical" : "is-imported"}`}><span /> {status}</span></div><p>{subtitle}</p></div><div className="replica-detail-actions"><Link href="/camera" className="replica-primary-button"><Activity aria-hidden="true" /> {language === "th" ? "เปิดกล้องแผล" : "Open wound camera"}</Link>{source === "registered" && <button type="button" className="replica-secondary-button no-print" onClick={() => void exportRegisteredRecord()} disabled={exportPatient.isPending}><Download aria-hidden="true" /> {language === "th" ? "ส่งออก JSON" : "Export JSON"}</button>}</div></div><div className={`replica-detail-action-bar ${source === "imported" ? "is-warning" : ""}`}><HeartPulse aria-hidden="true" /> {source === "registered" ? (language === "th" ? "ระเบียนที่บุคลากรทางคลินิกบันทึกเพื่อทบทวนการดูแลต่อเนื่อง" : "A clinician-recorded patient profile for longitudinal care review.") : (language === "th" ? "ตรวจสอบข้อมูลต้นทางก่อนใช้ประกอบการดูแล" : "Review source-preserved data before using it in clinical care.")}</div></header>
+    <main className="replica-detail-page patient-detail-stitch" aria-labelledby="patient-detail-title">
+      <div className="replica-detail-topbar"><Link href="/patients" className="replica-detail-back"><ArrowLeft aria-hidden="true" /> {language === "th" ? "แฟ้มประวัติคนไข้" : "Patient records"}</Link><span><LockKeyhole aria-hidden="true" /> {source === "registered" ? (language === "th" ? "ระเบียนคลินิก" : "Clinical record") : (language === "th" ? "ข้อมูลจากต้นทาง" : "Source-preserved data")}</span></div>
+      <header className="replica-detail-hero"><div className="replica-detail-identity"><div className="replica-detail-avatar"><UserRound aria-hidden="true" /><span aria-hidden="true" /></div><div className="min-w-0"><div className="replica-detail-title-row"><h1 id="patient-detail-title">{title}</h1><span className={`replica-detail-status ${source === "registered" ? "is-clinical" : "is-imported"}`}><span /> {status}</span></div><p>{subtitle}</p></div><div className="replica-detail-actions"><Link href="/camera" className="replica-primary-button"><Activity aria-hidden="true" /> {language === "th" ? "ถ่ายและวิเคราะห์ภาพแผลผู้ป่วยรายนี้" : "Capture and analyze this patient's wound"}</Link>{source === "registered" && <button type="button" className="replica-secondary-button no-print" onClick={() => void exportRegisteredRecord()} disabled={exportPatient.isPending}><Download aria-hidden="true" /> {language === "th" ? "ส่งออก JSON" : "Export JSON"}</button>}</div></div></header>
       {source === "registered" ? <RegisteredDetail record={registered.data!} language={language} t={t} refetch={() => registered.refetch()} /> : <ImportedDetail patient={imported.data!} rows={(observations.data ?? []) as ObservationRow[]} loading={observations.isLoading} language={language} />}
       <section className="replica-detail-disclaimer"><ShieldAlert aria-hidden="true" /><p><strong>{language === "th" ? "ใช้เพื่อช่วยตัดสินใจ ไม่ใช่การวินิจฉัย" : "Decision support only. Not a diagnosis."}</strong> {language === "th" ? "ข้อมูลจากภาพและโมเดลต้องได้รับการตรวจสอบโดยผู้เชี่ยวชาญก่อนตัดสินใจดูแล" : "Image and model data must be reviewed by a qualified clinician before care decisions."}</p></section>
-    </div>
+    </main>
   </DashboardLayout>;
 }
 
