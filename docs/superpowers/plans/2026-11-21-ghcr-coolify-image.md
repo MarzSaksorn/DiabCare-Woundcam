@@ -26,4 +26,4 @@
 - [x] Remove `docker-compose.registry.yml`; preserve `docker-compose.yml` for local development.
 - [x] Update `README.md` with Coolify build-server steps, Docker Image and GHCR requirements, app port, and runtime environment variables.
 - [x] Validate workflow YAML and publishing constraints; run `pnpm check`, `pnpm test`, `pnpm build`, and `git diff --check`. Docker image build could not be run because Docker is unavailable in the sandbox.
-- [ ] Review the staged diff, commit, and push this feature branch only. Do not merge or deploy.
+- [x] Review the staged diff, commit, and push this feature branch only. Do not merge or deploy.
