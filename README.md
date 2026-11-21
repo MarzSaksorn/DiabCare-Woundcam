@@ -104,6 +104,18 @@ tailscale serve status
 
 Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve requires HTTPS to be enabled for the tailnet and keeps the service available only to authorized tailnet devices. The HTTPS origin is required because mobile browsers generally do not allow `getUserMedia()` from an ordinary LAN HTTP address. For a shared or production deployment, set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `.env`; recreate the container after changing them. For an isolated local demo without Supabase Auth, `LOCAL_AUTH_BYPASS=true` is development-only and must never be used in production. Never commit `.env`, database credentials, Supabase secret keys, or patient data.
 
+### Registry image and Coolify
+
+The local `docker-compose.yml` builds from source. For Coolify deployments that must not build Compose projects, GitHub Actions builds the same `Dockerfile` on GitHub-hosted runners and publishes the image to GitHub Container Registry (GHCR). Pushes to `main` publish `ghcr.io/marzsaksorn/diabcare-woundcam:latest` and an immutable `sha-<short-commit-sha>` tag. The workflow builds `linux/amd64` images.
+
+In Coolify, configure a Docker Compose service using `docker-compose.registry.yml`. This file pulls the registry image and has no `build:` section. Route the service's domain to container port `3000`; the Compose file exposes that port to Coolify without publishing it directly on the host. After a successful GitHub Actions run, trigger a Coolify redeploy or use Coolify's image-update mechanism to pull the new image. Set `DIABCARE_IMAGE_TAG` to a `sha-<short-commit-sha>` tag when you need a reproducible deployment or rollback; otherwise, the file defaults to `latest`.
+
+If the GHCR package is private, configure registry credentials in Coolify with permission to pull packages from this GitHub account. A classic GitHub token with `read:packages` access can be used for that purpose; store it in Coolify, never in the repository. Alternatively, change the package visibility in GHCR if public access is intended.
+
+Set these required runtime variables in Coolify: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_DATABASE_URL`. Add `DATABASE_SSL_CA` when the database provider requires a custom CA. The server accepts a PEM certificate whose line breaks are represented as literal `\n` sequences, which it converts to real newlines at startup. Keep all database and R2 credentials in Coolify's runtime environment, not in workflow build arguments or image layers. Set `OWNER_OPEN_ID` to the Supabase Auth UUID that should receive the administrator role. The Compose defaults keep `LOCAL_AUTH_BYPASS` and `DISABLE_LOGIN_PAGE` disabled in production.
+
+The GHCR publishing workflow runs on pushes to `main`. It can also be started manually from the Actions tab to publish an image for a selected branch; only the default branch receives the `latest` tag.
+
 ### Cloudflare R2 image storage
 
 Captured wound images use the private `diabcare-woundcam` R2 bucket in the APAC location. The server uploads bytes with the AWS S3-compatible R2 API. The browser never receives R2 credentials and never reads a public bucket URL.
