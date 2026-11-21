@@ -1,3 +1,5 @@
+import { loadDatabaseSslCa } from "./database-ssl";
+
 export const ENV = {
   supabaseUrl: process.env.SUPABASE_URL ?? "",
   supabasePublishableKey:
@@ -10,7 +12,7 @@ export const ENV = {
   databaseUrl:
     process.env.SUPABASE_DATABASE_URL ?? process.env.DATABASE_URL ?? "",
   supabaseDatabaseUrl: process.env.SUPABASE_DATABASE_URL ?? "",
-  databaseSslCa: process.env.DATABASE_SSL_CA?.replace(/\\n/g, "\n") ?? "",
+  databaseSslCa: loadDatabaseSslCa(),
   ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
