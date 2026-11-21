@@ -104,19 +104,17 @@ tailscale serve status
 
 Open the HTTPS `*.ts.net` URL printed by Tailscale on the phone. Tailscale Serve requires HTTPS to be enabled for the tailnet and keeps the service available only to authorized tailnet devices. The HTTPS origin is required because mobile browsers generally do not allow `getUserMedia()` from an ordinary LAN HTTP address. For a shared or production deployment, set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `.env`; recreate the container after changing them. For an isolated local demo without Supabase Auth, `LOCAL_AUTH_BYPASS=true` is development-only and must never be used in production. Never commit `.env`, database credentials, Supabase secret keys, or patient data.
 
-### Coolify standard Dockerfile application with a build server
+### Coolify GHCR image deployment
 
-Keep `docker-compose.yml` for local development. For a Coolify deployment using a build server, create a standard **Application** connected to this repository and configure its build pack to use the root `Dockerfile`. Do not create a Docker Compose application for this deployment: Coolify does not offer the **Use a Build Server?** setting for Compose applications. The [Coolify build-server guide](https://coolify.io/docs/core/infrastructure/servers/build-servers) describes the full setup.
+The GitHub Actions workflow builds the root `Dockerfile` for `linux/amd64` on pull requests without publishing. When a commit reaches `main`, it publishes `ghcr.io/marzsaksorn/diabcare-woundcam:latest` and a `sha-<short-sha>` tag. Choose an AMD64 Coolify deployment server for these images. The workflow does not trigger a Coolify deployment.
 
-Add a fresh, dedicated remote server under **Servers → Add → Manual**. Configure its SSH details, enable **Use it as a build server?**, then choose **Validate Server & Install Docker Engine**. The build server should not run apps, databases, or other services, and it should use the same CPU architecture as the deployment server.
+In Coolify, create a **Docker Image** application from your project and environment. Set **Image Name** to `ghcr.io/marzsaksorn/diabcare-woundcam` and **Tag** to `latest` or a specific `sha-<short-sha>`. Set **Ports Exposes** to `3000`, then configure the domain. This Coolify resource pulls the published image and runs it; it does not clone the repository or build the Dockerfile. This path does not use Coolify's dedicated build server.
 
-On the Coolify application's **General** page, set **Docker Image** to `ghcr.io/marzsaksorn/diabcare-woundcam` and save. Then enable **Use a Build Server?**. Set the application port to `3000` and attach its domain. Coolify uses the build server to build the Dockerfile and push the image to GHCR; the deployment server then pulls and runs that image.
-
-If the GHCR package is private, authenticate to `ghcr.io` as the SSH user Coolify uses on both servers. The build server needs permission to push the package, and the deployment server needs permission to pull it. Keep registry tokens in the servers' Docker credential stores or Coolify's secret settings, never in the repository.
+If the GHCR package is private, add a GHCR login under Coolify's **Registries** for every server that will run the container. Use a GitHub token with `read:packages` permission. The GitHub Actions publisher uses its job-scoped `GITHUB_TOKEN` with `packages: write`; no registry token is stored in the repository.
 
 Set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_DATABASE_URL` in the Coolify application's runtime environment. Add `DATABASE_SSL_CA` when the database provider requires a custom CA. The server converts literal `\n` sequences in the PEM value into line breaks at startup. Keep database and R2 credentials out of Docker build arguments and image layers. Set `OWNER_OPEN_ID` to the Supabase Auth UUID that should receive the administrator role; keep `LOCAL_AUTH_BYPASS` and `DISABLE_LOGIN_PAGE` disabled in production.
 
-The GitHub Actions workflow builds the root Dockerfile for `linux/amd64` on pull requests and pushes to `main`, but it does not log in to GHCR or publish an image. Coolify owns the production image build and push when **Use a Build Server?** is enabled.
+After a successful GitHub Actions publish, deploy manually from Coolify to pull the selected tag. `latest` is convenient but mutable. A `sha-<short-sha>` tag identifies its source revision, but tags can be overwritten; use an image digest when you need to pin exact image contents. To move to a newer SHA, update the image tag in Coolify and redeploy. Keep `docker-compose.yml` for local development; it is not used by this registry deployment.
 
 ### Cloudflare R2 image storage
 
