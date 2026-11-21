@@ -33,4 +33,4 @@
 - [x] Add a main-only GHCR publish job with scoped `packages: write`, registry login, metadata tags, and `linux/amd64` build/push.
 - [x] Replace the Coolify build-server README section with Docker Image setup, private GHCR pull credentials, port `3000`, runtime variables, tag/redeploy behavior, and no automatic deployment.
 - [x] Validate workflow YAML and publishing conditions, inspect the full diff, and confirm local Compose is unchanged. Docker image building will be exercised by the GitHub Actions PR check because Docker is unavailable in the sandbox.
-- [ ] Commit and push the feature branch, then open a PR. Do not merge or deploy.
+- [x] Commit and push the feature branch, then open a PR. Do not merge or deploy.
