@@ -16,6 +16,7 @@ import {
   RefreshCcw,
   Search,
   ShieldCheck,
+  Sparkles,
   Upload,
   UserRound,
   X,
@@ -36,198 +37,10 @@ import {
 import "@/styles/clinical-tokens.css";
 import "@/styles/camera-redesign.css";
 import "@heroui/react/styles";
-import "@/styles/diagnostic-appearance.css";
 
 type CaptureState = "idle" | "preview" | "analyzing" | "ready";
 type CameraState = "closed" | "starting" | "live" | "error";
 type PatientContext = "all" | "type1" | "type2" | "gdm";
-type DiagnosticPageStage = "selection" | "capture";
-type DiagnosticPageCopy = { title: string; description: string; note: string };
-
-const diagnosticPageCopy: Record<
-  DiagnosticPageStage,
-  Record<"en" | "th", DiagnosticPageCopy>
-> = {
-  selection: {
-    en: {
-      title: "Choose a diabetes patient",
-      description:
-        "Select one patient before capturing a wound image and reviewing it for the care record.",
-      note: "Patient details come from the connected register.",
-    },
-    th: {
-      title: "เลือกผู้ป่วยเบาหวาน",
-      description: "เลือกผู้ป่วยหนึ่งรายก่อนถ่ายภาพแผลและตรวจสอบภาพสำหรับเวชระเบียน",
-      note: "ข้อมูลผู้ป่วยมาจากทะเบียนที่เชื่อมต่อ",
-    },
-  },
-  capture: {
-    en: {
-      title: "Capture a wound image",
-      description:
-        "Create a clear image for the care team to review. No diagnosis is made from this screen.",
-      note: "Capture, review, then save to the record.",
-    },
-    th: {
-      title: "ถ่ายภาพแผล",
-      description:
-        "สร้างภาพที่ชัดเจนสำหรับให้ทีมดูแลตรวจสอบ หน้านี้ไม่ได้ใช้วินิจฉัยโรค",
-      note: "ถ่ายภาพ ตรวจสอบ แล้วบันทึกลงในเวชระเบียน",
-    },
-  },
-};
-
-const previewModeLabels: Record<
-  CameraPreviewMode,
-  Record<"en" | "th", string>
-> = {
-  standby: { en: "Frame guide", th: "แนวจัดกรอบภาพ" },
-  starting: { en: "Starting camera", th: "กำลังเปิดกล้อง" },
-  live: { en: "Camera live preview", th: "แสดงภาพสดจากกล้อง" },
-  error: { en: "Camera unavailable", th: "กล้องไม่พร้อมใช้งาน" },
-  captured: { en: "Image ready for review", th: "ภาพพร้อมตรวจสอบ" },
-  processing: { en: "Review in progress", th: "กำลังตรวจสอบภาพ" },
-  processed: { en: "Model result available", th: "มีผลลัพธ์จากโมเดล" },
-};
-
-export function getDiagnosticPageCopy({
-  language,
-  stage,
-}: {
-  language: "en" | "th";
-  stage: DiagnosticPageStage;
-}): DiagnosticPageCopy {
-  return diagnosticPageCopy[stage][language];
-}
-
-export function getPreviewModeLabel({
-  language,
-  mode,
-}: {
-  language: "en" | "th";
-  mode: CameraPreviewMode;
-}): string {
-  return previewModeLabels[mode][language];
-}
-
-type DiagnosticWorkflowStep = {
-  title: string;
-  detail: string;
-  status: string;
-  state: "complete" | "current" | "pending";
-};
-
-export function getDiagnosticWorkflowSteps({
-  language,
-  captureState,
-  cameraState,
-  hasImage,
-  hasInferenceResult,
-  recordLoaded,
-  recordLoading,
-  recordError,
-  hasCapturedAt,
-  saving,
-}: {
-  language: "en" | "th";
-  captureState: CaptureState;
-  cameraState: CameraState;
-  hasImage: boolean;
-  hasInferenceResult: boolean;
-  recordLoaded: boolean;
-  recordLoading: boolean;
-  recordError: boolean;
-  hasCapturedAt: boolean;
-  saving: boolean;
-}): DiagnosticWorkflowStep[] {
-  const reviewComplete = captureState === "ready" && hasInferenceResult;
-  const saveReady = reviewComplete && recordLoaded && hasCapturedAt;
-  const saveStatus = recordError
-    ? language === "th"
-      ? "ไม่สามารถเข้าถึงระเบียนได้"
-      : "Record unavailable"
-    : recordLoading
-      ? language === "th"
-        ? "กำลังโหลดระเบียน"
-        : "Loading record"
-      : !recordLoaded
-        ? language === "th"
-          ? "ระเบียนไม่พร้อมใช้งาน"
-          : "Record unavailable"
-        : saving
-          ? language === "th"
-            ? "กำลังบันทึก"
-            : "Saving"
-          : !reviewComplete
-            ? language === "th"
-              ? "พร้อมหลังตรวจสอบภาพ"
-              : "Available after review"
-            : !hasCapturedAt
-              ? language === "th"
-                ? "ต้องระบุเวลาถ่ายภาพ"
-                : "Capture time required"
-              : language === "th"
-                ? "พร้อมบันทึก"
-                : "Ready to save";
-
-  return [
-    {
-      title: language === "th" ? "ถ่ายภาพ" : "Capture",
-      detail:
-        language === "th" ? "ใช้กล้องหรืออัปโหลดไฟล์" : "Camera or local upload",
-      status: hasImage
-        ? language === "th"
-          ? "เลือกภาพแล้ว"
-          : "Image selected"
-        : cameraState === "live"
-          ? language === "th"
-            ? "กล้องพร้อมใช้"
-            : "Camera ready"
-          : language === "th"
-            ? "ต้องมีภาพ"
-            : "Image needed",
-      state: hasImage ? "complete" : "current",
-    },
-    {
-      title: language === "th" ? "ตรวจสอบภาพ" : "Review image",
-      detail:
-        language === "th"
-          ? "ยืนยันกรอบภาพและแหล่งที่มา"
-          : "Confirm framing and source context",
-      status:
-        captureState === "analyzing"
-          ? language === "th"
-            ? "กำลังตรวจสอบ"
-            : "Review in progress"
-          : reviewComplete
-            ? language === "th"
-              ? "มีผลลัพธ์จากโมเดล"
-              : "Model result available"
-            : hasImage
-              ? language === "th"
-                ? "รอตรวจสอบ"
-                : "Waiting for review"
-              : language === "th"
-                ? "รอภาพ"
-                : "Waiting for image",
-      state:
-        reviewComplete
-          ? "complete"
-          : hasImage || captureState === "analyzing"
-            ? "current"
-            : "pending",
-    },
-    {
-      title: language === "th" ? "บันทึกลงเวชระเบียน" : "Save to record",
-      detail:
-        language === "th"
-          ? "ต้องระบุเวลาถ่ายภาพ ส่วนการประเมินเป็นทางเลือก"
-          : "Capture time required; assessment is optional.",
-      status: saveStatus,
-      state: saveReady || saving ? "current" : "pending",
-    },
-  ];
-}
 
 const localDateTimeValue = () =>
   new Date(Date.now() - new Date().getTimezoneOffset() * 60_000)
@@ -338,9 +151,7 @@ export default function DiagnosticCamera() {
         ? t("cameraStarting")
         : cameraState === "error"
           ? t("cameraPermission")
-          : language === "th"
-            ? "ยังไม่ได้เชื่อมต่อภาพจากกล้อง"
-            : "Camera preview not connected";
+          : t("cameraReady");
 
   function updateImageLayout() {
     const image = previewImageRef.current;
@@ -612,10 +423,6 @@ export default function DiagnosticCamera() {
   return (
     <DashboardLayout bottomDock={patientSelectionDock}>
       <div className="camera-console">
-        <DiagnosticPageHeading
-          language={language}
-          stage={workflowStarted ? "capture" : "selection"}
-        />
         {!workflowStarted ? (
           <PatientSelector
             language={language}
@@ -702,33 +509,6 @@ export default function DiagnosticCamera() {
         </div>
       </div>
     </DashboardLayout>
-  );
-}
-
-function DiagnosticPageHeading({
-  language,
-  stage,
-}: {
-  language: "en" | "th";
-  stage: DiagnosticPageStage;
-}) {
-  const copy = getDiagnosticPageCopy({ language, stage });
-  const NoteIcon = stage === "selection" ? ShieldCheck : Info;
-
-  return (
-    <header className="camera-console-page-heading">
-      <div>
-        <span className="camera-console-page-eyebrow">
-          {language === "th" ? "การถ่ายภาพแผล" : "Wound photography"}
-        </span>
-        <h1>{copy.title}</h1>
-        <p>{copy.description}</p>
-      </div>
-      <p className="camera-console-page-note">
-        <NoteIcon aria-hidden="true" />
-        <span>{copy.note}</span>
-      </p>
-    </header>
   );
 }
 
@@ -832,14 +612,47 @@ function PatientSelector({
   return (
     <section
       className="camera-console-stitch-selector"
-      aria-labelledby="camera-patient-list-heading"
+      aria-labelledby="camera-case-gate-heading"
     >
-      <aside
-        className="camera-console-stitch-selector-tools"
-        aria-label={
-          language === "th" ? "ค้นหาและกรองผู้ป่วย" : "Patient search and filters"
-        }
-      >
+      <header className="camera-console-stitch-selector-header">
+        <div className="camera-console-stitch-selector-heading">
+          <div className="camera-console-stitch-selector-title-row">
+            <span className="camera-console-stitch-selector-icon">
+              <UserRound aria-hidden="true" />
+            </span>
+            <span className="camera-console-stitch-selector-eyebrow">
+              {language === "th" ? "ระบบคัดเลือกผู้ป่วย" : "PATIENT SELECTION"}
+            </span>
+          </div>
+          <h2 id="camera-case-gate-heading">
+            {language === "th"
+              ? "เลือกผู้ป่วยเบาหวาน"
+              : "Choose a diabetes patient"}
+          </h2>
+          <p>
+            {language === "th"
+              ? "แตะเพื่อเลือกผู้ป่วยหนึ่งรายสำหรับบันทึกภาพถ่ายและติดตามการดูแล"
+              : "Tap to choose one patient for wound photography and care follow-up."}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="camera-console-stitch-selector-collapse"
+          onClick={() => setCollapsed(true)}
+          disabled={!selectedPatient}
+          aria-expanded={!isCompact}
+          title={
+            language === "th"
+              ? "พับเก็บรายการเลือกผู้ป่วย"
+              : "Collapse patient list"
+          }
+        >
+          <span>{language === "th" ? "พับเก็บรายการ" : "Collapse list"}</span>
+          <ChevronUp aria-hidden="true" />
+        </button>
+      </header>
+
+      <div className="camera-console-stitch-selector-tools">
         <label className="camera-console-stitch-selector-search">
           <Search aria-hidden="true" />
           <input
@@ -854,9 +667,6 @@ function PatientSelector({
             }
           />
         </label>
-        <span className="camera-console-stitch-selector-filter-label">
-          {language === "th" ? "ประเภทเบาหวาน" : "Diabetes type"}
-        </span>
         <div
           className="camera-console-stitch-selector-filters"
           role="tablist"
@@ -877,81 +687,27 @@ function PatientSelector({
             </button>
           ))}
         </div>
-        <div className="camera-console-stitch-selector-source-note">
-          <ShieldCheck aria-hidden="true" />
-          <span>
-            <strong>
-              {language === "th"
-                ? "ข้อมูลผู้ป่วยจากทะเบียนที่เชื่อมต่อ"
-                : "Source-backed patient details"}
-            </strong>
-            <span>
-              {language === "th"
-                ? "ชื่อ รหัสผู้ป่วย อายุ และประเภทเบาหวานมาจากทะเบียนที่เชื่อมต่อ"
-                : "Names, codes, ages, and diabetes types come from the connected register."}
-            </span>
-          </span>
-        </div>
-      </aside>
+      </div>
 
-      <section
-        className="camera-console-stitch-selector-list-area"
-        aria-labelledby="camera-patient-list-heading"
-      >
+      <main className="camera-console-stitch-selector-list-area">
         <div className="camera-console-stitch-selector-list-meta">
-          <div className="camera-console-stitch-selector-list-heading">
-            <h2 id="camera-patient-list-heading">
-              {language === "th" ? "รายชื่อผู้ป่วย" : "Patient list"}
-            </h2>
-            <p>
-              {language === "th"
-                ? "เลือกหนึ่งรายการเพื่อดำเนินการต่อ"
-                : "Choose one record to continue"}
-            </p>
-          </div>
-          <div className="camera-console-stitch-selector-list-actions">
-            <span className="camera-console-stitch-selector-count">
-              {loading
-                ? language === "th"
-                  ? "กำลังโหลดรายชื่อ"
-                  : "Loading patients"
-                : error
-                  ? language === "th"
-                    ? "ไม่สามารถแสดงจำนวนได้"
-                    : "Count unavailable"
-                  : language === "th"
-                    ? `${total} รายการ`
-                    : `${total} records`}
-            </span>
-            <button
-              type="button"
-              className="camera-console-stitch-selector-collapse"
-              onClick={() => setCollapsed(true)}
-              disabled={!selectedPatient}
-              aria-expanded={!isCompact}
-              title={
-                language === "th"
-                  ? "พับเก็บรายการเลือกผู้ป่วย"
-                  : "Collapse patient list"
-              }
-            >
-              <span>
-                {language === "th" ? "พับเก็บรายการ" : "Collapse list"}
-              </span>
-              <ChevronUp aria-hidden="true" />
-            </button>
-          </div>
+          <span>
+            {language === "th"
+              ? "แสดงผลตามเงื่อนไขที่เลือก"
+              : "Showing matches for the selected filters"}
+          </span>
+          <span>
+            {language === "th" ? `${total} รายการ` : `${total} records`}
+          </span>
         </div>
         {loading && (
           <div
             className="camera-console-stitch-selector-loading"
             aria-label={t("loading")}
-            role="status"
-            aria-live="polite"
           >
-            <span aria-hidden="true" />
-            <span aria-hidden="true" />
-            <span aria-hidden="true" />
+            <span />
+            <span />
+            <span />
           </div>
         )}
         {!loading && Boolean(error) && (
@@ -1014,8 +770,8 @@ function PatientSelector({
               />
             ))}
           </fieldset>
-          )}
-      </section>
+        )}
+      </main>
 
       <PatientSelectionFooter
         variant="inline"
@@ -1079,7 +835,7 @@ function CollapsedPatientBanner({
           <div className="camera-console-stitch-selector-collapsed-copy">
             <div className="camera-console-stitch-selector-collapsed-badges">
               <span className="camera-console-stitch-selector-collapsed-eyebrow">
-                {language === "th" ? "ผู้ป่วยที่เลือก" : "Selected patient"}
+                {language === "th" ? "ผู้ป่วยที่เลือก" : "SELECTED PATIENT"}
               </span>
               <span
                 className={`camera-console-stitch-selector-patient-badge is-${diabetesContextKey(patient)}`}
@@ -1273,15 +1029,11 @@ function PatientChoice({
       <span className="camera-console-stitch-selector-patient-copy">
         <strong>{name}</strong>
         <small>
-          <span>HN: {patient.patientCode}</span>
-          <span aria-hidden="true">·</span>
-          <span>
-            {patient.age === null
-              ? language === "th"
-                ? "อายุไม่ระบุ"
-                : "Age not recorded"
-              : `${patient.age} ${language === "th" ? "ปี" : "years"}`}
-          </span>
+          {patient.age === null
+            ? language === "th"
+              ? "อายุไม่ระบุ"
+              : "Age not recorded"
+            : `${patient.age} ${language === "th" ? "ปี" : "years"}`}
         </small>
       </span>
       <span
@@ -1417,26 +1169,18 @@ function CaptureWorkspace({
             : cameraState === "live"
               ? "live"
               : cameraState === "error"
-              ? "error"
-              : "standby";
-  const previewModeLabel = getPreviewModeLabel({
-    language,
-    mode: previewMode,
-  });
-  const workflowSteps = getDiagnosticWorkflowSteps({
-    language,
-    captureState: state,
-    cameraState,
-    hasImage: Boolean(previewUrl),
-    hasInferenceResult: Boolean(inferenceResult),
-    recordLoaded: Boolean(selectedPatientRecord) &&
-      !selectedPatientRecordLoading &&
-      !selectedPatientRecordError,
-    recordLoading: selectedPatientRecordLoading,
-    recordError: Boolean(selectedPatientRecordError),
-    hasCapturedAt: Boolean(capturedAt),
-    saving,
-  });
+                ? "error"
+                : "standby";
+  const previewModeLabelByMode: Record<CameraPreviewMode, string> = {
+    standby: language === "th" ? "พร้อมจัดกรอบภาพ" : "FRAME GUIDE",
+    starting: language === "th" ? "กำลังเปิดกล้อง" : "STARTING CAMERA",
+    live: "AI LIVE ASSIST",
+    error: language === "th" ? "กล้องไม่พร้อมใช้งาน" : "CAMERA ERROR",
+    captured: language === "th" ? "บันทึกภาพแล้ว" : "CAPTURED FRAME",
+    processing: language === "th" ? "กำลังประมวลผล" : "PROCESSING",
+    processed: language === "th" ? "ทบทวนผลโมเดล" : "MODEL REVIEW",
+  };
+  const previewModeLabel = previewModeLabelByMode[previewMode];
 
   return (
     <>
@@ -1449,7 +1193,7 @@ function CaptureWorkspace({
         </div>
         <div className="camera-console-case-copy">
           <span className="camera-console-phase">
-            {language === "th" ? "ผู้ป่วยปัจจุบัน" : "Active case"}
+            {language === "th" ? "ผู้ป่วยปัจจุบัน" : "ACTIVE CASE"}
           </span>
           <strong>{patientName}</strong>
           <small>
@@ -1466,6 +1210,10 @@ function CaptureWorkspace({
             {patientAge && <> · {patientAge}</>}
           </small>
         </div>
+        <span className="camera-console-live-tag">
+          <span />
+          {language === "th" ? "พร้อมถ่ายภาพ" : "Ready for capture"}
+        </span>
         <button
           type="button"
           className="camera-console-change-case"
@@ -1483,12 +1231,12 @@ function CaptureWorkspace({
           <div className="camera-console-preview-section-heading">
             <div>
               <div className="camera-console-preview-title-row">
-                <span className="camera-console-phase">Capture 2</span>
+                <span className="camera-console-phase">CAPTURE / 02</span>
                 <span aria-hidden="true" />
                 <h2 id="camera-console-capture-heading">
                   {language === "th"
-                    ? "ถ่ายภาพแผล"
-                    : "Capture image"}
+                    ? "ถ่ายภาพแผลและตรวจจับอัตโนมัติ (Live AI Detection)"
+                    : "Capture and detect automatically (Live AI assist)"}
                 </h2>
               </div>
               <p>
@@ -1611,7 +1359,9 @@ function CaptureWorkspace({
                         {t("preparing")}
                       </>
                     ) : (
-                      t("reviewImage")
+                      <>
+                        <Sparkles aria-hidden="true" /> {t("reviewImage")}
+                      </>
                     )}
                   </Button>
                 </>
@@ -1692,11 +1442,11 @@ function CaptureWorkspace({
           >
             <HeroCard.Header className="camera-console-card-header camera-console-review-header">
               <div>
-                <span className="camera-console-phase">Review 3</span>
+                <span className="camera-console-phase">REVIEW / 03</span>
                 <h2 id="camera-console-review-heading">
                   {language === "th"
-                    ? "ตรวจสอบและบันทึก"
-                    : "Review and save"}
+                    ? "ตรวจสอบก่อนบันทึก"
+                    : "Review before save"}
                 </h2>
                 <p>
                   {language === "th"
@@ -1706,30 +1456,6 @@ function CaptureWorkspace({
               </div>
             </HeroCard.Header>
             <HeroCard.Content className="camera-console-review-content">
-              <ol
-                className="camera-console-workflow"
-                aria-label={
-                  language === "th" ? "ขั้นตอนการทำงาน" : "Diagnostic workflow"
-                }
-              >
-                {workflowSteps.map((step, index) => (
-                  <li
-                    className={`camera-console-workflow-step is-${step.state}`}
-                    key={step.title}
-                  >
-                    <span className="camera-console-workflow-index" aria-hidden="true">
-                      {index + 1}
-                    </span>
-                    <span className="camera-console-workflow-copy">
-                      <strong>{step.title}</strong>
-                      <small>{step.detail}</small>
-                    </span>
-                    <span className="camera-console-workflow-status">
-                      {step.status}
-                    </span>
-                  </li>
-                ))}
-              </ol>
               {inferenceResult && (
                 <div
                   className="camera-console-inference"
@@ -1852,7 +1578,7 @@ function PhotoAssignment({
       <div className="camera-console-assignment-title">
         <Database aria-hidden="true" />
         <div>
-          <span className="camera-console-phase">Record link</span>
+          <span className="camera-console-phase">RECORD LINK</span>
           <strong>
             {language === "th"
               ? "บันทึกเข้าระเบียนผู้ป่วย"

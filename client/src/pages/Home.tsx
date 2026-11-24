@@ -16,38 +16,55 @@ import {
   Timer,
   TriangleAlert,
   UserPlus,
+  Users,
 } from "lucide-react";
 import { Link } from "wouter";
 import "@/styles/home-redesign.css";
 
+type MetricTone = "primary" | "cyan" | "amber" | "green";
+
 type MetricCardProps = {
+  icon: typeof Users;
   label: string;
   value: string;
   helper: string;
+  tone: MetricTone;
   unavailable?: boolean;
 };
 
-function MetricCard({ label, value, helper, unavailable = false }: MetricCardProps) {
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  helper,
+  tone,
+  unavailable = false,
+}: MetricCardProps) {
   return (
-    <article className="home-stitch-metric">
-      <span className="home-stitch-metric-label">{label}</span>
-      <strong className={unavailable ? "is-unavailable" : undefined}>{value}</strong>
+    <article className={`home-stitch-metric is-${tone}`}>
+      <div className="home-stitch-metric-heading">
+        <span>{label}</span>
+        <Icon aria-hidden="true" />
+      </div>
+      <div className="home-stitch-metric-value">
+        <strong className={unavailable ? "is-unavailable" : undefined}>
+          {value}
+        </strong>
+      </div>
       <p>{helper}</p>
     </article>
   );
 }
 
-function LoadingRows({ label }: { label: string }) {
+function LoadingRows({ compact = false }: { compact?: boolean }) {
   return (
     <div
-      className="home-stitch-loading"
-      role="status"
-      aria-live="polite"
-      aria-label={label}
+      className={`home-stitch-loading ${compact ? "is-compact" : ""}`}
+      aria-label="Loading"
     >
-      <span aria-hidden="true" />
-      <span aria-hidden="true" />
-      <span aria-hidden="true" />
+      <span />
+      <span />
+      <span />
     </div>
   );
 }
@@ -58,7 +75,7 @@ function EmptyState({
   detail,
   action,
 }: {
-  icon: typeof ImageIcon;
+  icon: typeof Users;
   title: string;
   detail: string;
   action?: React.ReactNode;
@@ -94,10 +111,6 @@ export default function Home() {
     language === "th"
       ? "ตรวจสอบการตั้งค่า Supabase PostgreSQL ของเซิร์ฟเวอร์"
       : "Check the server Supabase PostgreSQL configuration.";
-  const loadingSummary =
-    language === "th" ? "กำลังโหลดข้อมูลสรุป" : "Loading dashboard data";
-  const loadingHistory =
-    language === "th" ? "กำลังโหลดประวัติรูปแผล" : "Loading wound-photo history";
   const noAppointments =
     language === "th"
       ? "ยังไม่มีแหล่งข้อมูลนัดหมายที่เชื่อมต่อ"
@@ -106,25 +119,49 @@ export default function Home() {
     language === "th"
       ? "ยังไม่มีข้อมูลการวัดแผลตามช่วงเวลา"
       : "No longitudinal wound measurements are connected";
+  const dateLabel = new Intl.DateTimeFormat(
+    language === "th" ? "th-TH" : "en-US",
+    { dateStyle: "medium" }
+  ).format(new Date());
   const recentPhotos = summary?.recentPhotos ?? [];
-  const metricHelper = (available: string) =>
-    summary ? available : dashboard.isLoading ? loadingSummary : unavailable;
 
   return (
     <DashboardLayout>
       <main className="home-stitch" aria-labelledby="home-stitch-title">
         <header className="home-stitch-welcome">
           <div className="home-stitch-welcome-copy">
-            <span className="home-stitch-eyebrow">
-              {language === "th" ? "พื้นที่ทำงานทางคลินิก" : "Clinical workspace"}
-            </span>
-            <h1 id="home-stitch-title">
-              {language === "th" ? "ภาพรวมทางคลินิก" : "Clinical overview"}
-            </h1>
-            <p className="home-stitch-description">
+            <div className="home-stitch-eyebrow">
+              <span aria-hidden="true" />
               {language === "th"
-                ? "ตรวจดูผู้ป่วยที่ลงทะเบียน การประเมินแผล และภาพแผลที่บันทึกไว้"
-                : "Review registered patients, wound assessments, and saved wound photos."}
+                ? "ระบบติดตามแผลเบาหวานแบบเรียลไทม์ (Clinical OS)"
+                : "DIABETIC WOUND CARE OPERATIONS"}
+              <span className="home-stitch-eyebrow-divider" aria-hidden="true">
+                |
+              </span>
+              <span className="home-stitch-eyebrow-muted">
+                {language === "th" ? "ศูนย์ดูแลแผล" : "CLINICAL WORKSPACE"}
+              </span>
+            </div>
+            <h1 id="home-stitch-title">
+              {language === "th" ? (
+                <>
+                  ยินดีต้อนรับสู่ศูนย์ดูแลแผลเบาหวาน
+                  <span>(DiabCare WoundCam)</span>
+                </>
+              ) : (
+                <>
+                  Welcome to the diabetic wound care center
+                  <span>(DiabCare WoundCam)</span>
+                </>
+              )}
+            </h1>
+            <p className="home-stitch-date">
+              <CalendarDays aria-hidden="true" />
+              {dateLabel}
+              <span aria-hidden="true">•</span>
+              {language === "th"
+                ? "ข้อมูลจริงจากระเบียนที่เชื่อมต่อ"
+                : "Live data from connected clinical records"}
             </p>
           </div>
           <div className="home-stitch-welcome-actions">
@@ -134,70 +171,85 @@ export default function Home() {
             </Link>
             <Link href="/patients/new" className="home-stitch-button is-secondary">
               <UserPlus aria-hidden="true" />
-              {language === "th" ? "ลงทะเบียนผู้ป่วย" : "Register patient"}
+              {language === "th" ? "ลงทะเบียนผู้ป่วยใหม่" : "Register patient"}
             </Link>
             <Link
               href="/reports"
-              className="home-stitch-report-link"
-              aria-label={language === "th" ? "เปิดรายงาน" : "Open reports"}
+              className="home-stitch-button is-tertiary"
+              aria-label={
+                language === "th" ? "เปิดรายงาน" : "Open reports"
+              }
             >
               <FileText aria-hidden="true" />
-              {language === "th" ? "รายงาน" : "Reports"}
+              <span>{language === "th" ? "รายงาน" : "Reports"}</span>
             </Link>
           </div>
         </header>
 
-        <section className="home-stitch-metrics" aria-labelledby="home-stitch-metrics-title">
-          <div className="home-stitch-section-heading">
-            <h2 id="home-stitch-metrics-title">
-              {language === "th" ? "ตัวชี้วัดหลัก" : "Key metrics"}
-            </h2>
-          </div>
-          <div className="home-stitch-metric-grid">
-            <MetricCard
-              label={language === "th" ? "ผู้ป่วยที่ลงทะเบียน" : "Registered patients"}
-              value={summary ? formatNumber(summary.registeredPatientCount, language) : "—"}
-              helper={metricHelper(
-                language === "th" ? "ระเบียนทางคลินิกที่ใช้งาน" : "Active clinical records"
-              )}
-              unavailable={!summary}
-            />
-            <MetricCard
-              label={language === "th" ? "การประเมินแผล" : "Wound assessments"}
-              value={summary ? formatNumber(summary.woundAssessmentCount, language) : "—"}
-              helper={metricHelper(
-                language === "th" ? "รายการที่บันทึกแล้ว" : "Persisted assessments"
-              )}
-              unavailable={!summary}
-            />
-            <MetricCard
-              label={language === "th" ? "ภาพแผลที่มองเห็น" : "Visible wound photos"}
-              value={summary ? formatNumber(summary.visiblePhotoCount, language) : "—"}
-              helper={metricHelper(
-                language === "th" ? "ไม่รวมสื่อที่ซ่อน" : "Hidden media excluded"
-              )}
-              unavailable={!summary}
-            />
-            <MetricCard
-              label={language === "th" ? "นัดหมายวันนี้" : "Appointments today"}
-              value="—"
-              helper={noAppointments}
-              unavailable
-            />
-          </div>
+        <section
+          className="home-stitch-metrics"
+          aria-label={language === "th" ? "ตัวชี้วัดหลัก" : "Key metrics"}
+        >
+          <MetricCard
+            icon={Users}
+            tone="primary"
+            label={language === "th" ? "ผู้ป่วยทั้งหมดในระบบ" : "Registered patients"}
+            value={summary ? formatNumber(summary.registeredPatientCount, language) : "—"}
+            helper={
+              summary
+                ? language === "th"
+                  ? "ระเบียนที่ยังใช้งาน"
+                  : "Active clinical records"
+                : unavailable
+            }
+            unavailable={!summary}
+          />
+          <MetricCard
+            icon={ClipboardList}
+            tone="cyan"
+            label={language === "th" ? "การประเมินแผล" : "Wound assessments"}
+            value={summary ? formatNumber(summary.woundAssessmentCount, language) : "—"}
+            helper={
+              summary
+                ? language === "th"
+                  ? "รายการที่บันทึกจริง"
+                  : "Persisted assessments"
+                : unavailable
+            }
+            unavailable={!summary}
+          />
+          <MetricCard
+            icon={ImageIcon}
+            tone="green"
+            label={language === "th" ? "รูปแผลที่มองเห็น" : "Visible wound photos"}
+            value={summary ? formatNumber(summary.visiblePhotoCount, language) : "—"}
+            helper={
+              summary
+                ? language === "th"
+                  ? "ไม่รวมสื่อที่ซ่อน"
+                  : "Hidden media excluded"
+                : unavailable
+            }
+            unavailable={!summary}
+          />
+          <MetricCard
+            icon={CalendarDays}
+            tone="amber"
+            label={language === "th" ? "นัดหมายตรวจวันนี้" : "Appointments today"}
+            value="—"
+            helper={noAppointments}
+            unavailable
+          />
         </section>
 
-        <section
-          className="home-stitch-focus-grid"
-          aria-label={language === "th" ? "จุดติดตามหลัก" : "Clinical focus"}
-        >
+        <section className="home-stitch-focus-grid" aria-label={language === "th" ? "จุดติดตามหลัก" : "Clinical focus"}>
           <article className="home-stitch-card home-stitch-queue-card is-full-width">
             <div className="home-stitch-card-heading">
               <div>
                 <span className="home-stitch-section-kicker">
-                  {language === "th" ? "คิวนัดหมายถัดไป" : "Next queue"}
+                  {language === "th" ? "คิวนัดหมายถัดไป" : "NEXT QUEUE"}
                 </span>
-                <h2>{language === "th" ? "นัดหมาย" : "Appointments"}</h2>
+                <h2>{language === "th" ? "นัดตรวจอาการ" : "Appointments"}</h2>
               </div>
               <Timer aria-hidden="true" />
             </div>
@@ -206,7 +258,7 @@ export default function Home() {
               title={noAppointments}
               detail={
                 language === "th"
-                  ? "คิวถัดไปจะแสดงเมื่อมีแหล่งข้อมูลนัดหมายที่ได้รับอนุมัติเชื่อมต่อ"
+                  ? "จะแสดงคิวเมื่อมีแหล่งข้อมูลนัดหมายที่ได้รับการเชื่อมต่อ"
                   : "The next queue will appear when an approved appointment source is connected."
               }
               action={
@@ -219,15 +271,12 @@ export default function Home() {
           </article>
         </section>
 
-        <section
-          className="home-stitch-lower-grid"
-          aria-label={language === "th" ? "แนวโน้มและตารางนัดหมาย" : "Wound trend and schedule"}
-        >
+        <section className="home-stitch-lower-grid">
           <article className="home-stitch-card home-stitch-trend-card">
             <div className="home-stitch-card-heading is-stackable">
               <div>
                 <span className="home-stitch-section-kicker">
-                  {language === "th" ? "แนวโน้มการสมานแผล" : "Healing trend"}
+                  {language === "th" ? "แนวโน้มการสมานแผล" : "HEALING TREND"}
                 </span>
                 <h2>
                   {language === "th"
@@ -240,15 +289,9 @@ export default function Home() {
                     : "Two or more dated assessments are required before a trend can be shown."}
                 </p>
               </div>
-              <div
-                className="home-stitch-periods"
-                role="group"
-                aria-label={language === "th" ? "ช่วงเวลา" : "Time range"}
-              >
+              <div className="home-stitch-periods" role="group" aria-label={language === "th" ? "ช่วงเวลา" : "Time range"}>
                 <button type="button" disabled>{language === "th" ? "30 วัน" : "30 days"}</button>
-                <button type="button" className="is-active" disabled aria-pressed="true">
-                  {language === "th" ? "3 เดือน" : "3 months"}
-                </button>
+                <button type="button" className="is-active" disabled>{language === "th" ? "3 เดือน" : "3 months"}</button>
                 <button type="button" disabled>{language === "th" ? "1 ปี" : "1 year"}</button>
               </div>
             </div>
@@ -267,7 +310,7 @@ export default function Home() {
             <div className="home-stitch-card-heading">
               <div>
                 <span className="home-stitch-section-kicker">
-                  {language === "th" ? "ตารางผู้ป่วย" : "Patient schedule"}
+                  {language === "th" ? "ตารางนัดหมายผู้ป่วย" : "PATIENT SCHEDULE"}
                 </span>
                 <h2>{language === "th" ? "ตารางวันนี้" : "Today’s schedule"}</h2>
               </div>
@@ -278,27 +321,27 @@ export default function Home() {
               <strong>{noAppointments}</strong>
               <p>
                 {language === "th"
-                  ? "กำหนดการเข้าพบจะแสดงเมื่อมีแหล่งข้อมูลที่ได้รับอนุมัติเชื่อมต่อ"
+                  ? "ระบบจะแสดงนัดเมื่อมีแหล่งข้อมูลที่ได้รับการอนุมัติ"
                   : "Scheduled visits will appear when an approved source is connected."}
               </p>
             </div>
           </article>
         </section>
 
-        <section className="home-stitch-card home-stitch-captures-card" aria-labelledby="home-stitch-captures-title">
+        <section className="home-stitch-card home-stitch-captures-card">
           <div className="home-stitch-card-heading">
             <div>
-              <h2 id="home-stitch-captures-title">
-                {language === "th" ? "ประวัติรูปแผล" : "Wound-photo history"}
-              </h2>
-              <p>{language === "th" ? "ภาพที่บันทึกล่าสุด" : "Latest captures"}</p>
+              <span className="home-stitch-section-kicker">
+                {language === "th" ? "การถ่ายภาพล่าสุด" : "LATEST CAPTURES"}
+              </span>
+              <h2>{language === "th" ? "ประวัติรูปแผล" : "Wound-photo history"}</h2>
             </div>
             <Link href="/camera#capture-history" className="home-stitch-inline-link">
               {language === "th" ? "เปิดประวัติ" : "Open history"}
               <ArrowRight aria-hidden="true" />
             </Link>
           </div>
-          {dashboard.isLoading && <LoadingRows label={loadingHistory} />}
+          {dashboard.isLoading && <LoadingRows compact />}
           {dashboard.isError && (
             <UnavailableState message={unavailable} detail={unavailableDetail} />
           )}
@@ -308,7 +351,7 @@ export default function Home() {
               title={language === "th" ? "ยังไม่มีรูปภาพ" : "No wound photos"}
               detail={
                 language === "th"
-                  ? "รูปที่บันทึกไว้ในระเบียนผู้ป่วยจะแสดงในประวัติรูปแผล"
+                  ? "รูปที่บันทึกกับผู้ป่วยจะแสดงในประวัติรูปแผล"
                   : "Photos saved to a patient record will appear in wound-photo history."
               }
               action={
@@ -344,10 +387,7 @@ export default function Home() {
           )}
         </section>
 
-        <section
-          className="home-stitch-safety"
-          aria-label={language === "th" ? "ความปลอดภัยทางคลินิก" : "Clinical safety note"}
-        >
+        <section className="home-stitch-safety" aria-label={language === "th" ? "ความปลอดภัยทางคลินิก" : "Clinical safety note"}>
           <ShieldCheck aria-hidden="true" />
           <div>
             <strong>{t("decisionSupport")}</strong>
