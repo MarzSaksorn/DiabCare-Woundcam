@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Bell, Camera, ChevronsLeft, FileText, Languages, LayoutDashboard, LogOut, Settings, UserRound, Users } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
+import "@/styles/clinical-appearance.css";
 import ReplicaLogin from "./ReplicaLogin";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 
@@ -28,6 +29,7 @@ export default function DashboardLayout({ children, demoMode = false, bottomDock
   const { loading, user, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const [location] = useLocation();
+  const isClinicalWorkspace = ["/", "/camera", "/assessments"].includes(location);
 
   if (loading && !demoMode) return <DashboardLayoutSkeleton />;
   if (!user && !demoMode) return <ReplicaLogin />;
@@ -40,9 +42,14 @@ export default function DashboardLayout({ children, demoMode = false, bottomDock
     month: "long",
     year: "numeric",
   }).format(new Date());
+  const appShellClassName = [
+    "app-shell",
+    isClinicalWorkspace && "is-clinical-workspace",
+    bottomDock && "has-bottom-confirmation",
+  ].filter(Boolean).join(" ");
 
   return (
-    <div className={`app-shell ${bottomDock ? "has-bottom-confirmation" : ""}`} lang={language === "th" ? "th" : "en"}>
+    <div className={appShellClassName} lang={language === "th" ? "th" : "en"}>
       <ReplicaSidebarNavigation
         language={language}
         location={location}

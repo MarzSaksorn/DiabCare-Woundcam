@@ -1,0 +1,410 @@
+/* Shared appearance for the dashboard and diagnostic workflow only. */
+.app-shell.is-clinical-workspace {
+  --clinical-canvas: #f7f8fa;
+  --clinical-surface: #ffffff;
+  --clinical-ink: #17202b;
+  --clinical-secondary: #465465;
+  --clinical-muted: #657487;
+  --clinical-border: #dfe5eb;
+  --clinical-accent: #0a4fbe;
+  --clinical-action-ink: #003991;
+
+  min-height: 100dvh;
+  background: var(--clinical-canvas);
+  color: var(--clinical-ink);
+  font-family: "Sarabun", sans-serif;
+}
+
+.app-shell.is-clinical-workspace .app-workspace {
+  min-width: 0;
+  background: var(--clinical-canvas);
+}
+
+.app-shell.is-clinical-workspace .app-header {
+  display: block;
+  width: 100%;
+  border-bottom: 1px solid var(--clinical-border);
+  background: var(--clinical-surface);
+  box-shadow: none;
+}
+
+.app-shell.is-clinical-workspace .app-header-inner {
+  min-height: 64px;
+  padding: 8px 28px;
+}
+
+.app-shell.is-clinical-workspace .app-header-brand {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-shell.is-clinical-workspace .app-header-brand img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.app-shell.is-clinical-workspace .app-header-title {
+  color: var(--clinical-ink);
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.app-shell.is-clinical-workspace .app-header-date {
+  margin: 3px 0 0;
+  color: var(--clinical-muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.app-shell.is-clinical-workspace .app-header-actions {
+  gap: 10px;
+}
+
+.app-shell.is-clinical-workspace .language-toggle,
+.app-shell.is-clinical-workspace .icon-action,
+.app-shell.is-clinical-workspace .profile-action {
+  min-width: 40px;
+  min-height: 40px;
+  border: 1px solid var(--clinical-border);
+  border-radius: 8px;
+  background: var(--clinical-surface);
+  color: var(--clinical-secondary);
+  box-shadow: none;
+}
+
+.app-shell.is-clinical-workspace .language-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+}
+
+.app-shell.is-clinical-workspace .language-toggle span {
+  display: grid;
+  min-width: 34px;
+  min-height: 32px;
+  place-items: center;
+  border-radius: 6px;
+  color: var(--clinical-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.app-shell.is-clinical-workspace .language-toggle span.is-active {
+  background: #eef3f8;
+  color: var(--clinical-ink);
+}
+
+.app-shell.is-clinical-workspace .icon-action,
+.app-shell.is-clinical-workspace .profile-action {
+  display: inline-grid;
+  place-items: center;
+}
+
+.app-shell.is-clinical-workspace .icon-action svg,
+.app-shell.is-clinical-workspace .profile-action svg {
+  width: 18px;
+  height: 18px;
+}
+
+.app-shell.is-clinical-workspace .notification-dot {
+  display: none;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar {
+  width: 240px;
+  min-width: 240px;
+  flex-basis: 240px;
+  border-right-color: var(--clinical-border);
+  background: var(--clinical-surface);
+  color: var(--clinical-ink);
+  padding: 20px 16px;
+  font-family: "Sarabun", sans-serif;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-brand {
+  border-bottom-color: var(--clinical-border);
+  padding-bottom: 16px;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-brand strong {
+  color: var(--clinical-ink);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-brand-copy > span {
+  color: var(--clinical-secondary);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-collapse {
+  width: 40px;
+  height: 40px;
+  border-color: var(--clinical-border);
+  border-radius: 8px;
+  background: var(--clinical-surface);
+  color: var(--clinical-secondary);
+  box-shadow: none;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-collapse:hover,
+.app-shell.is-clinical-workspace .landscape-sidebar-nav-item:hover {
+  border-color: var(--clinical-border);
+  background: #f3f6f9;
+  color: var(--clinical-ink);
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-nav {
+  gap: 4px;
+  margin-top: 20px;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-nav-item {
+  min-height: 44px;
+  gap: 10px;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--clinical-secondary);
+  font-weight: 400;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-nav-item > svg {
+  width: 18px;
+  height: 18px;
+  color: currentColor;
+  stroke-width: 1.8;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-nav-item.is-active {
+  border-color: transparent;
+  background: var(--clinical-accent);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-nav-item.is-active > svg {
+  color: #ffffff;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-nav-badge,
+.app-shell.is-clinical-workspace .landscape-sidebar-nav-dot,
+.app-shell.is-clinical-workspace .landscape-sidebar-avatar > span {
+  display: none;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-profile {
+  border-top-color: var(--clinical-border);
+  padding-top: 14px;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-avatar {
+  width: 36px;
+  height: 36px;
+  border-color: var(--clinical-border);
+  background: #f3f6f9;
+  color: var(--clinical-secondary);
+  font-weight: 500;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-profile strong {
+  color: var(--clinical-ink);
+  font-weight: 500;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-profile small {
+  color: var(--clinical-muted);
+  font-size: 11px;
+}
+
+.app-shell.is-clinical-workspace .landscape-sidebar-logout {
+  color: var(--clinical-muted);
+}
+
+.app-shell.is-clinical-workspace .mobile-content {
+  min-width: 0;
+  min-height: 0;
+  background: var(--clinical-canvas);
+  padding: 0;
+}
+
+.app-shell.is-clinical-workspace :where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--clinical-accent);
+  outline-offset: 2px;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-dock {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  max-width: none;
+  border: 0;
+  border-top: 1px solid var(--clinical-border);
+  border-radius: 0;
+  background: var(--clinical-surface);
+  box-shadow: 0 -2px 8px rgb(23 32 43 / 5%);
+  backdrop-filter: none;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-dock .bottom-nav {
+  height: 64px;
+  border-top: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-dock .bottom-nav-item,
+.app-shell.is-clinical-workspace .bottom-nav-dock .bottom-nav-item.is-camera {
+  height: 64px;
+  min-height: 48px;
+  margin: 0;
+  gap: 4px;
+  color: var(--clinical-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-dock .bottom-nav-item.is-active,
+.app-shell.is-clinical-workspace .bottom-nav-dock .bottom-nav-item.is-camera > span:last-child {
+  color: var(--clinical-accent);
+  font-weight: 600;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-dock .bottom-nav-active-indicator {
+  display: none;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-dock .bottom-nav-camera-wrap {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: currentColor;
+  box-shadow: none;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-dock .bottom-nav-item.is-camera .bottom-nav-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-dock .bottom-nav-badge {
+  display: none;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-confirmation {
+  min-height: 60px;
+  border-bottom-color: var(--clinical-border);
+  background: var(--clinical-surface);
+  padding: 8px 20px;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-confirmation-status {
+  color: var(--clinical-secondary);
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-confirmation-status strong {
+  color: var(--clinical-ink);
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-confirmation-actions button {
+  min-height: 44px;
+  border-radius: 8px;
+}
+
+.app-shell.is-clinical-workspace .bottom-nav-confirmation-confirm:not(:disabled) {
+  border-color: var(--clinical-accent);
+  background: var(--clinical-accent);
+  box-shadow: none;
+}
+
+@media (orientation: landscape) {
+  .app-shell.is-clinical-workspace .app-header,
+  .app-shell.is-clinical-workspace .app-header-brand {
+    display: block;
+  }
+
+  .app-shell.is-clinical-workspace .app-header-brand {
+    display: flex;
+  }
+
+  .app-shell.is-clinical-workspace .mobile-content {
+    padding: 0;
+  }
+
+  .app-shell.is-clinical-workspace .bottom-nav-dock {
+    display: none;
+  }
+}
+
+@media (orientation: portrait) {
+  .app-shell.is-clinical-workspace .mobile-content {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .app-shell.is-clinical-workspace.has-bottom-confirmation .mobile-content {
+    padding-bottom: calc(168px + env(safe-area-inset-bottom));
+  }
+
+  .app-shell.is-clinical-workspace.has-bottom-confirmation .bottom-nav-dock {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell.is-clinical-workspace .app-header-inner {
+    min-height: 56px;
+    padding: 6px 12px;
+  }
+
+  .app-shell.is-clinical-workspace .app-header-brand {
+    gap: 8px;
+  }
+
+  .app-shell.is-clinical-workspace .app-header-brand img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .app-shell.is-clinical-workspace .app-header-title {
+    font-size: 14px;
+  }
+
+  .app-shell.is-clinical-workspace .app-header-date {
+    display: none;
+  }
+
+  .app-shell.is-clinical-workspace .app-header-actions {
+    gap: 6px;
+  }
+
+  .app-shell.is-clinical-workspace .icon-action,
+  .app-shell.is-clinical-workspace .profile-action {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .app-shell.is-clinical-workspace .bottom-nav-confirmation {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell.is-clinical-workspace .landscape-sidebar-collapse,
+  .app-shell.is-clinical-workspace .landscape-sidebar-nav-item,
+  .app-shell.is-clinical-workspace .bottom-nav-dock .bottom-nav-item {
+    transition: none;
+  }
+}
