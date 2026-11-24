@@ -5,7 +5,7 @@ Approved plan: `docs/superpowers/plans/2026-11-24-dashboard-diagnostic-appearanc
 
 ## Shared clinical workspace shell
 
-**Status: Complete — commit `8ce5c28`; route-scoped shell and navigation regressions passed.**
+**Status: Complete — commits `8ce5c28` and `2251fed`; route scope, navigation, and collapse behavior preserved.**
 
 - [x] Apply the revised shared workspace appearance only to `/`, `/camera`, and `/assessments`; keep patient, report, settings, login, and registration screens outside this style scope.
 - [x] Preserve the existing `DashboardLayout`, authentication gate, sidebar links, active-route behavior, language control, logout, sidebar collapse, and bottom navigation.
@@ -27,7 +27,7 @@ Approved plan: `docs/superpowers/plans/2026-11-24-dashboard-diagnostic-appearanc
 
 ## Diagnostic capture and review appearance migration
 
-**Status: Implementation and independent review complete; review findings resolved.**
+**Status: Complete — implementation and read-only independent review finished; findings resolved.**
 
 - [x] Apply the approved clinical appearance to the existing `DiagnosticCamera` page rendered at `/camera` and `/assessments` without changing route names or history anchors.
 - [x] Preserve patient search, context filters, selection, assignment, and selected-patient record loading/error behavior.
@@ -36,11 +36,11 @@ Approved plan: `docs/superpowers/plans/2026-11-24-dashboard-diagnostic-appearanc
 - [x] Preserve English/Thai copy, image-privacy guidance, model-review boundaries, and clinical disclaimers. Do not fabricate patient rows or inference outputs.
 - [x] Keep diagnostic capture and review controls at least 48px high, maintain mobile stacking, and keep patient confirmation controls reachable.
 - [x] Keep clinical assessment, inference, and save behavior unchanged; this task changes appearance and truthful display wording only. A TypeScript AST comparison confirmed `startCamera`, `captureFrame`, `beginReview`, `saveToPatient`, and every page-level tRPC query/mutation declaration match the committed baseline exactly.
-- [x] Fix the reviewed sidebar collapse override and clarify that assessment linkage is optional in both languages.
+- [x] Fix the reviewed sidebar collapse override and clarify that assessment linkage is optional in both languages. Amber is reserved for model-review processing; camera startup uses a cool-blue indicator.
 
 ## Verification and delivery boundary
 
-**Status: Checks and independent review complete; final commit and feature-branch push remain.**
+**Status: Complete — feature branch pushed; no deployment or merge to `main`.**
 
 - [x] `pnpm test`: 17 test files and 63 tests passed after review fixes.
 - [x] `pnpm check`: passed after review fixes.
@@ -48,6 +48,6 @@ Approved plan: `docs/superpowers/plans/2026-11-24-dashboard-diagnostic-appearanc
 - [x] `git diff --check`: passed after review fixes.
 - [x] Complete an independent read-only branch review and resolve confirmed issues. The reviewer found a 240px sidebar override defeating collapse, misleading copy about assessment being required, and unchecked plan progress; these were corrected and rechecked.
 - [x] Confirm the final changes contain no schema migrations, production-data writes, infrastructure edits, or unrelated review-mockup modifications.
-- [ ] Commit the remaining reviewed diagnostic changes and documentation, then push only `feat/dashboard-diagnostic-unslop-migration-2026-11-24`. Do not deploy, merge into `main`, or change production configuration.
+- [x] Commit and push only `feat/dashboard-diagnostic-unslop-migration-2026-11-24`. Do not deploy, merge into `main`, or change production configuration.
 
 Verification limits: no browser/screenshot acceptance, authenticated production rendering, physical camera test, or medical validation was performed.

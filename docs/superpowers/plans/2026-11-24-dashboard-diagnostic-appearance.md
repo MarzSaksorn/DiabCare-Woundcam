@@ -81,7 +81,7 @@ The 4,734-line camera stylesheet has accumulated override layers. A dedicated, d
 - [x] Run `pnpm check`, `pnpm test`, and `pnpm build`. Report pre-existing failures separately from introduced failures. Do not use tests that write to connected production services.
 - [x] Request a read-only independent branch review of clinical contracts, route/style scope, bilingual states, and the completed checks. Resolve confirmed issues and rerun the affected checks.
 - [x] Inspect the final diff for no backend/schema/infrastructure/mockup edits; record verification limits honestly. Do not claim real hardware, authenticated production rendering, or medical validation unless actually exercised.
-- [ ] Commit and push only `feat/dashboard-diagnostic-unslop-migration-2026-11-24`. Do not deploy or merge into `main`.
+- [x] Commit and push only `feat/dashboard-diagnostic-unslop-migration-2026-11-24`. Do not deploy or merge into `main` (`5d1001f` and the final documentation update were pushed to origin).
 
 ## Approval and Execution
 
