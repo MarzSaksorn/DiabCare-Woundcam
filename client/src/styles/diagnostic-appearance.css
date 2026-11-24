@@ -1,0 +1,1632 @@
+/*
+ * Diagnostic workspace appearance. Imported after the legacy camera layer so
+ * this file can stay focused on presentation without disturbing workflow CSS.
+ */
+.camera-console {
+  --diagnostic-canvas: var(--clinical-canvas, #f7f8fa);
+  --diagnostic-surface: var(--clinical-surface, #ffffff);
+  --diagnostic-ink: var(--clinical-ink, #17202b);
+  --diagnostic-secondary: var(--clinical-secondary, #465465);
+  --diagnostic-muted: var(--clinical-muted, #657487);
+  --diagnostic-border: var(--clinical-border, #dfe5eb);
+  --diagnostic-accent: var(--clinical-accent, #0a4fbe);
+  --diagnostic-accent-soft: #edf4fb;
+  --diagnostic-viewfinder: #0b1926;
+
+  display: grid;
+  width: min(100%, 1440px);
+  min-width: 0;
+  gap: 24px;
+  margin-inline: auto;
+  padding: 24px 28px 40px;
+  color: var(--diagnostic-ink);
+  font-family: "Sarabun", sans-serif;
+  container-type: inline-size;
+}
+
+.camera-console,
+.camera-console * {
+  box-sizing: border-box;
+}
+
+.camera-console h1,
+.camera-console h2,
+.camera-console h3,
+.camera-console p {
+  text-wrap: pretty;
+}
+
+.camera-console button,
+.camera-console select,
+.camera-console input:not([type="radio"]):not([type="checkbox"]),
+.camera-console textarea {
+  min-height: 48px;
+  border-radius: 8px;
+  font-family: "Sarabun", sans-serif;
+}
+
+.camera-console button {
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.camera-console button:focus-visible,
+.camera-console input:focus-visible,
+.camera-console select:focus-visible,
+.camera-console textarea:focus-visible {
+  outline: 3px solid rgba(10, 79, 190, 0.3);
+  outline-offset: 2px;
+}
+
+.camera-console-page-heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.camera-console-page-heading > div {
+  min-width: 0;
+  max-width: 760px;
+}
+
+.camera-console-page-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--diagnostic-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.camera-console-page-heading h1 {
+  margin: 0;
+  color: var(--diagnostic-ink);
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: clamp(26px, 3vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.camera-console-page-heading > div > p {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: var(--diagnostic-secondary);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.camera-console-page-note {
+  display: flex;
+  max-width: 300px;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 3px;
+  color: var(--diagnostic-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.camera-console-page-note svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--diagnostic-muted);
+}
+
+/* Case selection: tools and source-backed results sit in one quiet surface. */
+.camera-console .camera-console-stitch-selector {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.34fr) minmax(0, 0.66fr);
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 12px;
+  background: var(--diagnostic-surface);
+  box-shadow: none;
+}
+
+.camera-console .camera-console-stitch-selector-tools {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+  border-right: 1px solid var(--diagnostic-border);
+  background: #fbfcfd;
+  padding: 20px;
+}
+
+.camera-console .camera-console-stitch-selector-search {
+  display: flex;
+  min-width: 0;
+  min-height: 48px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 8px;
+  background: var(--diagnostic-surface);
+  padding: 0 12px;
+}
+
+.camera-console .camera-console-stitch-selector-search > svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: var(--diagnostic-muted);
+}
+
+.camera-console .camera-console-stitch-selector-search input {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  color: var(--diagnostic-ink);
+  font-size: 14px;
+}
+
+.camera-console .camera-console-stitch-selector-search input:focus-visible {
+  outline: none;
+}
+
+.camera-console .camera-console-stitch-selector-search:focus-within {
+  border-color: var(--diagnostic-accent);
+  outline: 3px solid rgba(10, 79, 190, 0.18);
+  outline-offset: 1px;
+}
+
+.camera-console .camera-console-stitch-selector-search input::placeholder {
+  color: var(--diagnostic-muted);
+  opacity: 1;
+}
+
+.camera-console .camera-console-stitch-selector-filter-label {
+  margin-bottom: -8px;
+  color: var(--diagnostic-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.camera-console .camera-console-stitch-selector-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  min-width: 0;
+}
+
+.camera-console .camera-console-stitch-selector-filters button {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  padding: 8px 12px;
+  color: var(--diagnostic-secondary);
+  font-size: 14px;
+  text-align: left;
+}
+
+.camera-console .camera-console-stitch-selector-filters button:hover {
+  border-color: var(--diagnostic-border);
+  background: #f4f6f8;
+  color: var(--diagnostic-ink);
+}
+
+.camera-console .camera-console-stitch-selector-filters button.is-active {
+  border-color: #9bb9dc;
+  background: var(--diagnostic-accent-soft);
+  color: var(--diagnostic-action-ink, #003991);
+  font-weight: 600;
+}
+
+.camera-console .camera-console-stitch-selector-filters button > span {
+  color: var(--diagnostic-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+.camera-console .camera-console-stitch-selector-source-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: auto;
+  border-top: 1px solid var(--diagnostic-border);
+  padding-top: 16px;
+  color: var(--diagnostic-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.camera-console .camera-console-stitch-selector-source-note > svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--diagnostic-muted);
+}
+
+.camera-console .camera-console-stitch-selector-source-note > span,
+.camera-console .camera-console-stitch-selector-source-note > span > span {
+  display: block;
+}
+
+.camera-console .camera-console-stitch-selector-source-note strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--diagnostic-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-stitch-selector-list-area {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--diagnostic-surface);
+  padding: 20px 24px;
+}
+
+.camera-console .camera-console-stitch-selector-list-meta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.camera-console .camera-console-stitch-selector-list-heading {
+  min-width: 0;
+}
+
+.camera-console .camera-console-stitch-selector-list-heading h2 {
+  margin: 0;
+  color: var(--diagnostic-ink);
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.camera-console .camera-console-stitch-selector-list-heading p {
+  margin: 3px 0 0;
+  color: var(--diagnostic-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.camera-console .camera-console-stitch-selector-list-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.camera-console .camera-console-stitch-selector-count {
+  color: var(--diagnostic-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.camera-console .camera-console-stitch-selector-collapse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--diagnostic-border);
+  background: var(--diagnostic-surface);
+  padding: 8px 12px;
+  color: var(--diagnostic-secondary);
+  font-size: 13px;
+}
+
+.camera-console .camera-console-stitch-selector-collapse:hover:not(:disabled) {
+  border-color: #9bb9dc;
+  background: var(--diagnostic-accent-soft);
+  color: var(--diagnostic-action-ink, #003991);
+}
+
+.camera-console .camera-console-stitch-selector-collapse:disabled {
+  display: none;
+}
+
+.camera-console .camera-console-stitch-selector-collapse svg {
+  width: 16px;
+  height: 16px;
+}
+
+.camera-console .camera-console-stitch-selector-patient-list {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.camera-console .camera-console-stitch-selector-patient-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  min-width: 0;
+  min-height: 64px;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 8px;
+  background: var(--diagnostic-surface);
+  padding: 10px 14px;
+  color: var(--diagnostic-ink);
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.camera-console .camera-console-stitch-selector-patient-row:hover {
+  border-color: #b7c6d6;
+  background: #fbfcfd;
+}
+
+.camera-console .camera-console-stitch-selector-patient-row.is-selected {
+  border-color: var(--diagnostic-accent);
+  background: #f4f8fc;
+}
+
+.camera-console .camera-console-stitch-selector-patient-row:focus-within {
+  outline: 3px solid rgba(10, 79, 190, 0.24);
+  outline-offset: 2px;
+}
+
+.camera-console .camera-console-stitch-selector-patient-row input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--diagnostic-accent);
+}
+
+.camera-console .camera-console-stitch-selector-patient-copy {
+  display: block;
+  min-width: 0;
+}
+
+.camera-console .camera-console-stitch-selector-patient-copy strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--diagnostic-ink);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.camera-console .camera-console-stitch-selector-patient-copy small {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 3px;
+  color: var(--diagnostic-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.camera-console .camera-console-stitch-selector-patient-badge {
+  max-width: 180px;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 6px;
+  background: #f7f8fa;
+  padding: 5px 8px;
+  color: var(--diagnostic-secondary);
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: center;
+  text-transform: none;
+  white-space: normal;
+}
+
+.camera-console .camera-console-stitch-selector-loading {
+  display: grid;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.camera-console .camera-console-stitch-selector-loading > span {
+  display: block;
+  min-height: 64px;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 8px;
+  background: #f4f6f8;
+  animation: none;
+}
+
+.camera-console .camera-console-stitch-selector-empty {
+  display: flex;
+  min-height: 184px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  border: 1px dashed #cbd4dd;
+  border-radius: 8px;
+  background: #fbfcfd;
+  padding: 20px;
+  color: var(--diagnostic-secondary);
+}
+
+.camera-console .camera-console-stitch-selector-empty > svg {
+  width: 20px;
+  height: 20px;
+  color: var(--diagnostic-muted);
+}
+
+.camera-console .camera-console-stitch-selector-empty strong {
+  color: var(--diagnostic-ink);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-stitch-selector-empty p {
+  margin: 0;
+  color: var(--diagnostic-secondary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.camera-console .camera-console-stitch-selector-empty small {
+  color: var(--diagnostic-muted);
+  font-size: 13px;
+}
+
+.camera-console .camera-console-stitch-selector-empty.is-error {
+  border-style: solid;
+  border-color: #e5c5c3;
+  background: #fffafa;
+}
+
+.camera-console .camera-console-stitch-selector-empty.is-error > svg,
+.camera-console .camera-console-stitch-selector-empty.is-error strong {
+  color: #9b2c26;
+}
+
+.camera-console .camera-console-stitch-selector-empty button {
+  border: 1px solid var(--diagnostic-border);
+  background: var(--diagnostic-surface);
+  padding: 8px 12px;
+  color: var(--diagnostic-action-ink, #003991);
+  font-size: 14px;
+}
+
+.camera-console .camera-console-stitch-selector-footer {
+  display: flex;
+  grid-column: 1 / -1;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--diagnostic-border);
+  background: var(--diagnostic-surface);
+  padding: 12px 20px;
+}
+
+.camera-console .camera-console-stitch-selector-selection-status {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  color: var(--diagnostic-secondary);
+  font-size: 14px;
+}
+
+.camera-console .camera-console-stitch-selector-selection-status > span:first-child {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border: 1px solid #aeb9c4;
+  border-radius: 50%;
+  background: var(--diagnostic-surface);
+}
+
+.camera-console .camera-console-stitch-selector-selection-status > span:first-child.is-selected {
+  border: 5px solid var(--diagnostic-accent);
+}
+
+.camera-console .camera-console-stitch-selector-selection-status > span:last-child {
+  overflow-wrap: anywhere;
+}
+
+.camera-console .camera-console-stitch-selector-footer-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.camera-console .camera-console-stitch-selector-footer button {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.camera-console .camera-console-stitch-selector-clear {
+  border: 1px solid var(--diagnostic-border);
+  background: var(--diagnostic-surface);
+  color: var(--diagnostic-secondary);
+}
+
+.camera-console .camera-console-stitch-selector-confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--diagnostic-accent);
+  background: var(--diagnostic-accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-stitch-selector-confirm:hover:not(:disabled) {
+  border-color: #003991;
+  background: #003991;
+}
+
+.camera-console .camera-console-stitch-selector-footer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.camera-console .camera-console-stitch-selector-confirm svg {
+  width: 17px;
+  height: 17px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 12px;
+  background: var(--diagnostic-surface);
+  padding: 16px 20px;
+  box-shadow: none;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-main,
+.camera-console .camera-console-stitch-selector-collapsed-patient,
+.camera-console .camera-console-stitch-selector-collapsed-copy {
+  min-width: 0;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-patient {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-avatar {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 8px;
+  background: #f5f7f9;
+  color: var(--diagnostic-secondary);
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-avatar > svg {
+  width: 20px;
+  height: 20px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-eyebrow,
+.camera-console .camera-console-phase {
+  color: var(--diagnostic-muted);
+  font-family: "Sarabun", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: none;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-copy h2 {
+  margin: 3px 0 0;
+  color: var(--diagnostic-ink);
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 4px;
+  color: var(--diagnostic-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-details .is-accent {
+  color: var(--diagnostic-secondary);
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--diagnostic-border);
+  background: var(--diagnostic-surface);
+  padding: 8px 12px;
+  color: var(--diagnostic-secondary);
+  font-size: 14px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions button.is-primary {
+  border-color: #9bb9dc;
+  background: var(--diagnostic-accent-soft);
+  color: var(--diagnostic-action-ink, #003991);
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-actions button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--diagnostic-border);
+  padding-top: 10px;
+  color: var(--diagnostic-muted);
+  font-size: 12px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-meta > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-meta svg {
+  width: 15px;
+  height: 15px;
+}
+
+.camera-console .camera-console-stitch-selector-collapsed-meta strong {
+  color: var(--diagnostic-secondary);
+  font-weight: 500;
+}
+
+/* Active capture: patient context, evidence, and review status stay distinct. */
+.camera-console .camera-console-case-banner {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 12px;
+  background: var(--diagnostic-surface);
+  padding: 14px 16px;
+  box-shadow: none;
+}
+
+.camera-console .camera-console-case-avatar {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 8px;
+  background: #f5f7f9;
+  color: var(--diagnostic-secondary);
+}
+
+.camera-console .camera-console-case-avatar svg {
+  width: 20px;
+  height: 20px;
+}
+
+.camera-console .camera-console-case-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.camera-console .camera-console-case-copy > strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--diagnostic-ink);
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.camera-console .camera-console-case-copy > small {
+  display: block;
+  margin-top: 3px;
+  color: var(--diagnostic-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.camera-console .camera-console-patient-code {
+  font-variant-numeric: tabular-nums;
+}
+
+.camera-console .camera-console-change-case {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--diagnostic-border);
+  background: var(--diagnostic-surface);
+  padding: 8px 14px;
+  color: var(--diagnostic-action-ink, #003991);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-change-case:hover {
+  border-color: #9bb9dc;
+  background: var(--diagnostic-accent-soft);
+}
+
+.camera-console .camera-console-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+  align-items: start;
+  gap: 24px;
+  min-width: 0;
+}
+
+.camera-console .camera-console-preview-column,
+.camera-console .camera-console-review-rail {
+  min-width: 0;
+}
+
+.camera-console .camera-console-preview-column {
+  gap: 12px;
+}
+
+.camera-console .camera-console-preview-title-row {
+  align-items: baseline;
+  gap: 10px;
+}
+
+.camera-console .camera-console-preview-title-row > span[aria-hidden="true"] {
+  display: none;
+}
+
+.camera-console .camera-console-preview-title-row h2 {
+  overflow: visible;
+  color: var(--diagnostic-ink);
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.camera-console .camera-console-preview-section-heading p {
+  color: var(--diagnostic-secondary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.camera-console .camera-console-preview-section-heading .camera-console-phase {
+  white-space: nowrap;
+}
+
+.camera-console .camera-console-help {
+  width: 48px;
+  height: 48px;
+  border-color: var(--diagnostic-border);
+  border-radius: 8px;
+  background: var(--diagnostic-surface);
+  color: var(--diagnostic-secondary);
+}
+
+.camera-console .camera-console-help:hover {
+  border-color: #9bb9dc;
+  background: var(--diagnostic-accent-soft);
+  color: var(--diagnostic-action-ink, #003991);
+}
+
+.camera-console .camera-console-evidence-card,
+.camera-console .camera-console-review-card {
+  min-width: 0;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 12px;
+  background: var(--diagnostic-surface);
+  box-shadow: none;
+}
+
+.camera-console .camera-console-evidence-card {
+  border: 0;
+  background: transparent;
+}
+
+.camera-console .camera-console-evidence-content {
+  display: grid;
+  gap: 12px;
+  padding: 0 !important;
+}
+
+.camera-console .camera-console-privacy {
+  margin: 0;
+  color: var(--diagnostic-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.camera-console .camera-console-privacy svg {
+  color: var(--diagnostic-muted);
+}
+
+.camera-console .camera-console-preview-clinical-note {
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 8px;
+  background: #f3f6fa;
+  color: var(--diagnostic-secondary);
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.camera-console .camera-console-preview-clinical-note > svg {
+  color: var(--diagnostic-secondary);
+}
+
+.camera-console .camera-console-preview-clinical-note strong {
+  color: var(--diagnostic-ink);
+  font-weight: 600;
+}
+
+.camera-console .camera-console-review-header {
+  border-bottom: 1px solid var(--diagnostic-border);
+  background: var(--diagnostic-surface);
+  padding: 20px 20px 16px;
+}
+
+.camera-console .camera-console-review-header h2 {
+  margin: 4px 0 0;
+  color: var(--diagnostic-ink);
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.camera-console .camera-console-review-header p {
+  margin: 6px 0 0;
+  color: var(--diagnostic-secondary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.camera-console .camera-console-review-content {
+  display: grid;
+  gap: 16px;
+  padding: 0 0 18px;
+}
+
+.camera-console .camera-console-workflow {
+  display: grid;
+  margin: 0;
+  border-bottom: 1px solid var(--diagnostic-border);
+  padding: 0;
+  list-style: none;
+}
+
+.camera-console .camera-console-workflow-step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) max-content;
+  min-width: 0;
+  min-height: 68px;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #edf0f3;
+  padding: 10px 16px;
+}
+
+.camera-console .camera-console-workflow-step:last-child {
+  border-bottom: 0;
+}
+
+.camera-console .camera-console-workflow-index {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid var(--diagnostic-border);
+  border-radius: 50%;
+  background: var(--diagnostic-surface);
+  color: var(--diagnostic-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.camera-console .camera-console-workflow-step.is-current .camera-console-workflow-index {
+  border-color: var(--diagnostic-accent);
+  background: var(--diagnostic-accent);
+  color: #ffffff;
+}
+
+.camera-console .camera-console-workflow-step.is-complete .camera-console-workflow-index {
+  border-color: #9bb9dc;
+  color: var(--diagnostic-action-ink, #003991);
+}
+
+.camera-console .camera-console-workflow-copy {
+  display: block;
+  min-width: 0;
+}
+
+.camera-console .camera-console-workflow-copy strong {
+  display: block;
+  color: var(--diagnostic-ink);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.camera-console .camera-console-workflow-copy small {
+  display: block;
+  margin-top: 2px;
+  color: var(--diagnostic-secondary);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.camera-console .camera-console-workflow-status {
+  max-width: 140px;
+  color: var(--diagnostic-muted);
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.camera-console .camera-console-workflow-step.is-current .camera-console-workflow-status {
+  color: var(--diagnostic-action-ink, #003991);
+  font-weight: 600;
+}
+
+.camera-console .camera-console-review-content > :not(.camera-console-workflow) {
+  margin-right: 16px;
+  margin-left: 16px;
+}
+
+.camera-console .camera-console-review-content .camera-console-assignment {
+  margin-top: 0;
+  border: 0;
+  border-top: 1px solid var(--diagnostic-border);
+  border-radius: 0;
+  background: var(--diagnostic-surface);
+  padding: 16px 0 0;
+  box-shadow: none;
+}
+
+.camera-console .camera-console-assignment-title {
+  align-items: center;
+  gap: 10px;
+}
+
+.camera-console .camera-console-assignment-title > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--diagnostic-muted);
+}
+
+.camera-console .camera-console-assignment-title strong {
+  color: var(--diagnostic-ink);
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.camera-console .camera-console-assignment > p {
+  color: var(--diagnostic-secondary);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.camera-console .camera-console-assignment label > span {
+  color: var(--diagnostic-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.camera-console .camera-console-assignment select,
+.camera-console .camera-console-assignment input {
+  min-height: 48px;
+  border-color: var(--diagnostic-border);
+  border-radius: 8px;
+  background: var(--diagnostic-surface);
+  color: var(--diagnostic-ink);
+  font-size: 14px;
+}
+
+.camera-console .camera-console-assignment .camera-console-primary-action {
+  min-height: 48px;
+  border-radius: 8px;
+  background: var(--diagnostic-accent);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-assignment > small {
+  color: var(--diagnostic-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.camera-console .camera-console-primary-action,
+.camera-console .camera-console-secondary-action {
+  min-height: 48px;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.camera-console .camera-console-primary-action {
+  border-color: var(--diagnostic-accent);
+  background: var(--diagnostic-accent);
+  color: #ffffff;
+}
+
+.camera-console .camera-console-primary-action:hover:not(:disabled) {
+  border-color: #003991;
+  background: #003991;
+}
+
+.camera-console .camera-console-secondary-action {
+  border: 1px solid var(--diagnostic-border);
+  background: var(--diagnostic-surface);
+  color: var(--diagnostic-secondary);
+}
+
+.camera-console .camera-console-secondary-action:hover:not(:disabled) {
+  border-color: #9bb9dc;
+  background: var(--diagnostic-accent-soft);
+  color: var(--diagnostic-action-ink, #003991);
+}
+
+.camera-console .camera-console-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.camera-console .camera-console-actions > * {
+  min-height: 48px;
+}
+
+.camera-console .camera-console-history {
+  min-width: 0;
+  border-top: 1px solid var(--diagnostic-border);
+  padding-top: 20px;
+}
+
+/* The dark viewport is the single high-contrast focal surface. */
+.camera-preview-frame {
+  --preview-ink: #dbe5ee;
+  --preview-muted: #aab7c5;
+  --preview-cyan: #7dd3fc;
+  border: 1px solid #203447;
+  border-radius: 8px;
+  background: var(--diagnostic-viewfinder, #0b1926);
+  color: var(--preview-ink);
+  box-shadow: none;
+}
+
+.camera-preview-frame__header {
+  min-height: 48px;
+  border-bottom-color: rgba(219, 229, 238, 0.14);
+  background: #0b1926;
+  padding: 8px 12px;
+  font-family: "Sarabun", sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.camera-preview-frame__header-main {
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.camera-preview-frame__mode,
+.camera-preview-frame__status,
+.camera-preview-frame__file {
+  gap: 8px;
+  white-space: normal;
+}
+
+.camera-preview-frame__mode {
+  color: #dbe5ee;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.camera-preview-frame__mode > span,
+.camera-preview-frame__status > span {
+  box-shadow: none;
+}
+
+.camera-preview-frame__file {
+  overflow-wrap: anywhere;
+  color: var(--preview-muted);
+}
+
+.camera-preview-frame__file svg {
+  color: var(--preview-muted);
+}
+
+.camera-preview-frame__status {
+  color: #dbe5ee;
+}
+
+.camera-preview-frame__status > span {
+  background: #94a3b8;
+}
+
+.camera-preview-frame--live .camera-preview-frame__status > span {
+  background: #86efac;
+}
+
+.camera-preview-frame--starting .camera-preview-frame__status > span {
+  background: #7dd3fc;
+}
+
+.camera-preview-frame__viewport {
+  aspect-ratio: 16 / 10;
+  min-height: 300px;
+  background: #0b1926;
+}
+
+.camera-preview-frame__wash {
+  background: #0b1926;
+}
+
+.camera-preview-frame__guides {
+  display: none;
+}
+
+.camera-preview-frame__target {
+  inset: 10% 14%;
+  border-color: rgba(219, 229, 238, 0.2);
+}
+
+.camera-preview-frame__target > span {
+  width: 24px;
+  height: 24px;
+  border-color: #7dd3fc;
+}
+
+.camera-preview-frame__target > span:nth-child(1) {
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+
+.camera-preview-frame__target > span:nth-child(2) {
+  border-top-width: 2px;
+  border-right-width: 2px;
+}
+
+.camera-preview-frame__target > span:nth-child(3) {
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+}
+
+.camera-preview-frame__target > span:nth-child(4) {
+  border-right-width: 2px;
+  border-bottom-width: 2px;
+}
+
+.camera-preview-frame__empty {
+  width: min(420px, 76%);
+  color: #dbe5ee;
+}
+
+.camera-preview-frame__lens {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  border-color: #344a5d;
+  border-radius: 8px;
+  background: #122637;
+  color: #dbe5ee;
+}
+
+.camera-preview-frame__lens svg {
+  width: 21px;
+  height: 21px;
+}
+
+.camera-preview-frame__empty strong {
+  font-family: "Prompt", "Sarabun", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.camera-preview-frame__empty p {
+  margin-top: 8px;
+  color: #b8c4cf;
+  font-family: "Sarabun", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.camera-preview-frame__live-label {
+  min-height: 40px;
+  border-color: rgba(219, 229, 238, 0.18);
+  border-radius: 6px;
+  background: #0b1926;
+  padding: 8px 10px;
+  color: #dbe5ee;
+  font-family: "Sarabun", sans-serif;
+  font-size: 12px;
+}
+
+.camera-preview-frame__live-label svg {
+  color: #dbe5ee;
+}
+
+.camera-preview-frame__image-bar {
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  min-height: 56px;
+  border-color: rgba(219, 229, 238, 0.18);
+  border-radius: 6px;
+  background: #0b1926;
+  padding: 4px 4px 4px 12px;
+  backdrop-filter: none;
+}
+
+.camera-preview-frame__image-bar > span {
+  font-family: "Sarabun", sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.camera-preview-frame__image-bar button {
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  border-radius: 6px;
+  background: #203447;
+  color: #ffffff;
+}
+
+.camera-preview-frame__image-bar button:hover {
+  background: #314a60;
+}
+
+.camera-preview-frame__state-chip {
+  min-height: 32px;
+  border-color: rgba(219, 229, 238, 0.24);
+  border-radius: 6px;
+  background: #0b1926;
+  padding: 6px 9px;
+  color: #dbe5ee;
+  font-family: "Sarabun", sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.camera-preview-frame__state-chip > span {
+  background: #7dd3fc;
+  animation: none;
+}
+
+.camera-preview-frame--processing .camera-preview-frame__state-chip {
+  border-color: rgba(251, 191, 36, 0.45);
+  color: #fde68a;
+}
+
+.camera-preview-frame--processing .camera-preview-frame__state-chip > span {
+  background: #fbbf24;
+}
+
+.camera-preview-frame--processed .camera-preview-frame__state-chip {
+  border-color: rgba(125, 211, 252, 0.36);
+  color: #dbe5ee;
+}
+
+.camera-preview-frame--processed .camera-preview-frame__state-chip > span {
+  background: #7dd3fc;
+}
+
+.camera-preview-frame--error .camera-preview-frame__status {
+  color: #fecaca;
+}
+
+.camera-preview-frame--error .camera-preview-frame__status > span {
+  background: #f87171;
+  box-shadow: none;
+}
+
+.camera-console .camera-console-phase,
+.camera-console .camera-console-stitch-selector-eyebrow,
+.camera-console .camera-console-stitch-selector-collapsed-eyebrow {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+@container (max-width: 960px) {
+  .camera-console .camera-console-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container (max-width: 800px) {
+  .camera-console .camera-console-stitch-selector {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .camera-console .camera-console-stitch-selector-tools {
+    border-right: 0;
+    border-bottom: 1px solid var(--diagnostic-border);
+  }
+
+  .camera-console .camera-console-stitch-selector-source-note {
+    margin-top: 0;
+  }
+
+  .camera-console .camera-console-stitch-selector-list-area {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .camera-console {
+    gap: 20px;
+    padding: 20px 16px 32px;
+  }
+}
+
+@container (max-width: 640px) {
+  .camera-console-page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .camera-console-page-heading h1 {
+    font-size: 26px;
+  }
+
+  .camera-console-page-heading > div > p {
+    font-size: 15px;
+  }
+
+  .camera-console-page-note {
+    max-width: none;
+    margin: 0;
+  }
+
+  .camera-console .camera-console-stitch-selector-tools,
+  .camera-console .camera-console-stitch-selector-list-area {
+    padding: 16px;
+  }
+
+  .camera-console .camera-console-stitch-selector-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .camera-console .camera-console-stitch-selector-list-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .camera-console .camera-console-stitch-selector-list-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .camera-console .camera-console-stitch-selector-patient-row {
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+
+  .camera-console .camera-console-stitch-selector-patient-badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer-actions {
+    width: 100%;
+  }
+
+  .camera-console .camera-console-stitch-selector-footer-actions button {
+    flex: 1 1 0;
+  }
+
+  .camera-console .camera-console-stitch-selector-collapsed-main,
+  .camera-console .camera-console-stitch-selector-collapsed-actions,
+  .camera-console .camera-console-stitch-selector-collapsed-meta {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .camera-console .camera-console-stitch-selector-collapsed-actions button {
+    width: 100%;
+  }
+
+  .camera-console .camera-console-case-banner {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 12px;
+  }
+
+  .camera-console .camera-console-case-copy {
+    flex-basis: calc(100% - 60px);
+  }
+
+  .camera-console .camera-console-change-case {
+    width: 100%;
+  }
+
+  .camera-console .camera-console-workspace {
+    gap: 20px;
+  }
+
+  .camera-console .camera-console-preview-section-heading {
+    align-items: flex-start;
+    flex-direction: row;
+  }
+
+  .camera-console .camera-console-preview-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .camera-console .camera-console-preview-title-row h2 {
+    font-size: 18px;
+  }
+
+  .camera-console .camera-console-preview-section-heading p {
+    font-size: 13px;
+  }
+
+  .camera-console .camera-console-evidence-content {
+    gap: 10px;
+  }
+
+  .camera-console .camera-console-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .camera-console .camera-console-actions > * {
+    width: 100%;
+  }
+
+  .camera-console .camera-console-review-header {
+    padding: 16px;
+  }
+
+  .camera-console .camera-console-review-content {
+    gap: 12px;
+  }
+
+  .camera-console .camera-console-workflow-step {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 8px 10px;
+    padding: 12px 14px;
+  }
+
+  .camera-console .camera-console-workflow-status {
+    grid-column: 2;
+    max-width: none;
+    text-align: left;
+  }
+
+  .camera-preview-frame__header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .camera-preview-frame__header-main {
+    width: 100%;
+  }
+
+  .camera-preview-frame__status {
+    align-self: flex-start;
+  }
+
+  .camera-preview-frame__viewport {
+    min-height: 260px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .camera-preview-frame__target {
+    inset: 12% 10%;
+  }
+
+  .camera-preview-frame__target > span {
+    width: 18px;
+    height: 18px;
+  }
+
+  .camera-preview-frame__empty {
+    width: min(340px, 76%);
+  }
+
+  .camera-preview-frame__empty strong {
+    font-size: 16px;
+  }
+
+  .camera-preview-frame__empty p {
+    font-size: 13px;
+  }
+
+  .camera-preview-frame__state-chip {
+    top: 10px;
+    right: 10px;
+    max-width: calc(100% - 20px);
+    white-space: normal;
+  }
+
+  .camera-console .camera-console-history {
+    padding-top: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camera-console button,
+  .camera-preview-frame__state-chip > span {
+    transition: none;
+    animation: none;
+  }
+}

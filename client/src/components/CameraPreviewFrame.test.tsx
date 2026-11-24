@@ -95,5 +95,78 @@ describe("camera preview frame", () => {
     expect(markup).toContain("camera-detection-layer");
     expect(markup).toContain("camera-detection-box");
     expect(markup).toContain("camera-preview-frame__state-chip");
+    expect(markup).toContain('aria-label="Remove image"');
+  });
+
+  it("keeps standby, camera startup, live preview, and camera errors distinct", () => {
+    const standbyMarkup = renderToStaticMarkup(
+      <CameraPreviewFrame
+        {...baseProps}
+        mode="standby"
+        modeLabel="Frame guide"
+        previewUrl={null}
+        inferenceResult={null}
+      />
+    );
+    expect(standbyMarkup).toContain("camera-preview-frame--standby");
+    expect(standbyMarkup).toContain("Position the wound inside the frame");
+
+    const startingMarkup = renderToStaticMarkup(
+      <CameraPreviewFrame
+        {...baseProps}
+        mode="starting"
+        modeLabel="Starting camera"
+        previewUrl={null}
+        inferenceResult={null}
+      />
+    );
+    expect(startingMarkup).toContain("camera-preview-frame--starting");
+    expect(startingMarkup).toContain('aria-label="Live wound camera preview"');
+    expect(startingMarkup).toContain("Starting camera…");
+
+    const liveMarkup = renderToStaticMarkup(
+      <CameraPreviewFrame
+        {...baseProps}
+        mode="live"
+        modeLabel="Camera live preview"
+        liveLabel="Camera live preview"
+        previewUrl={null}
+        inferenceResult={null}
+      />
+    );
+    expect(liveMarkup).toContain("camera-preview-frame--live");
+    expect(liveMarkup).toContain("Camera live preview");
+    expect(liveMarkup).toContain("<video");
+
+    const errorMarkup = renderToStaticMarkup(
+      <CameraPreviewFrame
+        {...baseProps}
+        mode="error"
+        modeLabel="Camera error"
+        previewUrl={null}
+        inferenceResult={null}
+      />
+    );
+    expect(errorMarkup).toContain("camera-preview-frame--error");
+    expect(errorMarkup).toContain("Camera access is required");
+    expect(errorMarkup).toContain("Camera permission was denied.");
+  });
+
+  it("shows processing without model overlays until results exist", () => {
+    const markup = renderToStaticMarkup(
+      <CameraPreviewFrame
+        {...baseProps}
+        mode="processing"
+        modeLabel="Review in progress"
+        previewUrl="blob:processing"
+        inferenceResult={null}
+      />
+    );
+
+    expect(markup).toContain("camera-preview-frame--processing");
+    expect(markup).toContain("Review in progress");
+    expect(markup).toContain("camera-preview-frame__state-chip");
+    expect(markup).not.toContain("camera-detection-layer");
+    expect(markup).toContain('aria-label="Remove image"');
   });
 });
