@@ -127,6 +127,12 @@
   font-family: "Sarabun", sans-serif;
 }
 
+.app-shell.is-clinical-workspace .landscape-sidebar.is-collapsed {
+  width: 80px;
+  min-width: 80px;
+  flex-basis: 80px;
+}
+
 .app-shell.is-clinical-workspace .landscape-sidebar-brand {
   border-bottom-color: var(--clinical-border);
   padding-bottom: 16px;
